@@ -1,0 +1,33 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Version>0.1.0</Version>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <AbpProjectType>module</AbpProjectType>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>EasyAbp Team</Authors>
+    <Description>An ABP application module that allows users to book time for people or assets.</Description>
+    <PackageIconUrl>https://avatars3.githubusercontent.com/u/58311641?s=128</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/EasyAbp/BookingService</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/EasyAbp/BookingService</RepositoryUrl>
+    <PackageTags>abp module easyabp bookingservice booking appointment order reservation</PackageTags>
+    <Company>EasyAbp</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="ConfigureAwait.Fody" Version="3.3.1" PrivateAssets="All" />
+    <PackageReference Include="Fody" Version="6.5.3">
+      <PrivateAssets>All</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+
+  <Target Name="NoWarnOnRazorViewImportedTypeConflicts" BeforeTargets="RazorCoreCompile">
+    <PropertyGroup>
+      <NoWarn>$(NoWarn);0436</NoWarn>
+    </PropertyGroup>
+  </Target>
+
+</Project>
