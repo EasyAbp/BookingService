@@ -29,6 +29,11 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
     /// Will fall back to <see cref="AssetCategory"/> if the value here is <c>null</c>.
     /// </summary>
     public virtual AssetSchedulePolicy? DefaultSchedulePolicy { get; protected set; }
+    
+    /// <summary>
+    /// When occupying an Asset through AssetCategoryId, the Priority value determines to pick which Asset.
+    /// </summary>
+    public virtual int Priority { get; protected set; }
 
     protected Asset()
     {
@@ -36,7 +41,7 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
     }
 
     public Asset(Guid id, Guid? tenantId, [NotNull] string name, [NotNull] string assetDefinitionName,
-        Guid assetCategoryId, Guid? periodSchemeId, AssetSchedulePolicy? defaultSchedulePolicy) : base(id)
+        Guid assetCategoryId, Guid? periodSchemeId, AssetSchedulePolicy? defaultSchedulePolicy, int priority) : base(id)
     {
         TenantId = tenantId;
         Name = name;
@@ -44,5 +49,6 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
         AssetCategoryId = assetCategoryId;
         PeriodSchemeId = periodSchemeId;
         DefaultSchedulePolicy = defaultSchedulePolicy;
+        Priority = priority;
     }
 }
