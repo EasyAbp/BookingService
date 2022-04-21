@@ -11,9 +11,15 @@ public class AssetDefinition
     
     /// <summary>
     /// This property determines whether assets can be occupied by default when there is no schedule created.
-    /// The SchedulePolicy of <see cref="AssetCategory"/> is preferred.
+    /// The property value from <see cref="AssetCategory"/> is preferred.
     /// </summary>
     public virtual AssetSchedulePolicy DefaultSchedulePolicy { get; }
+    
+    /// <summary>
+    /// How many days in advance can you occupy the asset.
+    /// The property value from <see cref="AssetCategory"/> is preferred.
+    /// </summary>
+    public virtual int DaysInAdvance { get; protected set; }
 
     public AssetDefinition([NotNull] string name, AssetSchedulePolicy defaultSchedulePolicy)
     {

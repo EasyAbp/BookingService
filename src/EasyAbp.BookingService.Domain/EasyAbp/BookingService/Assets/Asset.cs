@@ -34,6 +34,13 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
     /// When occupying an Asset through AssetCategoryId, the Priority value determines to pick which Asset.
     /// </summary>
     public virtual int Priority { get; protected set; }
+    
+    /// <summary>
+    /// How many days in advance can you occupy the asset.
+    /// The property value from <see cref="AssetSchedule"/> is preferred.
+    /// Will fall back to <see cref="AssetCategory"/> if the value here is <c>null</c>.
+    /// </summary>
+    public virtual int? DaysInAdvance { get; protected set; }
 
     protected Asset()
     {

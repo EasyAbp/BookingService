@@ -30,11 +30,18 @@ public class AssetCategory : FullAuditedAggregateRoot<Guid>, ITree<AssetCategory
     
     /// <summary>
     /// This property determines whether assets can be occupied by default when there is no schedule created.
-    /// The SchedulePolicy of <see cref="Asset"/> is preferred.
     /// This value only affects assets in this category, but not assets in children.
+    /// The property value from <see cref="Asset"/> is preferred.
     /// Will fall back to <see cref="AssetDefinition"/> if the value here is <c>null</c>.
     /// </summary>
     public virtual AssetSchedulePolicy? DefaultSchedulePolicy { get; protected set; }
+    
+    /// <summary>
+    /// How many days in advance can you occupy the asset.
+    /// The property value from <see cref="Asset"/> is preferred.
+    /// Will fall back to <see cref="AssetCategory"/> if the value here is <c>null</c>.
+    /// </summary>
+    public virtual int? DaysInAdvance { get; protected set; }
 
     #region Properties from ITree
 
