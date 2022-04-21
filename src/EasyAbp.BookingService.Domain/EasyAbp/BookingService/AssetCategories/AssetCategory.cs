@@ -22,8 +22,8 @@ public class AssetCategory : FullAuditedAggregateRoot<Guid>, ITree<AssetCategory
     public virtual string AssetDefinitionName { get; protected set; }
     
     /// <summary>
-    /// Asset.PeriodSchemeId is preferred.
     /// This value only affects assets in this category, but not assets in children.
+    /// The property value from <see cref="Asset"/> is preferred.
     /// Will fall back to <see cref="PeriodScheme"/> where the IsDefault property is <c>true</c> if the value here is <c>null</c>.
     /// </summary>
     public virtual Guid? PeriodSchemeId { get; protected set; }

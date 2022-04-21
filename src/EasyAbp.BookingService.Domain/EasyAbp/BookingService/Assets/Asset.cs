@@ -1,5 +1,6 @@
 ﻿using System;
 using EasyAbp.BookingService.AssetCategories;
+using EasyAbp.BookingService.AssetPeriodSchemes;
 using EasyAbp.BookingService.AssetSchedules;
 using JetBrains.Annotations;
 using Volo.Abp.Domain.Entities.Auditing;
@@ -20,6 +21,7 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
     public virtual Guid AssetCategoryId { get; protected set; }
     
     /// <summary>
+    /// The property value from <see cref="AssetPeriodScheme"/> is preferred.
     /// Will fall back to <see cref="AssetCategory"/> if the value here is <c>null</c>.
     /// </summary>
     public virtual Guid? PeriodSchemeId { get; protected set; }
