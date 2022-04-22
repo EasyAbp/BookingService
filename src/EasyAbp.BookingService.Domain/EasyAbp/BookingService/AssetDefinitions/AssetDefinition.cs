@@ -19,11 +19,12 @@ public class AssetDefinition
     /// How many days in advance can you occupy the asset.
     /// The property value from <see cref="AssetCategory"/> is preferred.
     /// </summary>
-    public virtual int DaysInAdvance { get; protected set; }
+    public virtual int DaysInAdvance { get; }
 
-    public AssetDefinition([NotNull] string name, AssetSchedulePolicy defaultSchedulePolicy)
+    public AssetDefinition([NotNull] string name, AssetSchedulePolicy defaultSchedulePolicy, int daysInAdvance)
     {
         Name = name;
         DefaultSchedulePolicy = defaultSchedulePolicy;
+        DaysInAdvance = daysInAdvance;
     }
 }
