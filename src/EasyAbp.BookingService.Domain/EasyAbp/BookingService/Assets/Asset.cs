@@ -52,7 +52,8 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
     }
 
     public Asset(Guid id, Guid? tenantId, [NotNull] string name, [NotNull] string assetDefinitionName,
-        Guid assetCategoryId, Guid? periodSchemeId, AssetSchedulePolicy? defaultSchedulePolicy, int priority) : base(id)
+        Guid assetCategoryId, Guid? periodSchemeId, AssetSchedulePolicy? defaultSchedulePolicy, int priority,
+        int? daysInAdvance, bool disabled) : base(id)
     {
         TenantId = tenantId;
         Name = name;
@@ -61,5 +62,7 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
         PeriodSchemeId = periodSchemeId;
         DefaultSchedulePolicy = defaultSchedulePolicy;
         Priority = priority;
+        DaysInAdvance = daysInAdvance;
+        Disabled = disabled;
     }
 }

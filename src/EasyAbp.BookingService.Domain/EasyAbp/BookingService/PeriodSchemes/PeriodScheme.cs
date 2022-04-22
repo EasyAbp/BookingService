@@ -23,7 +23,7 @@ public class PeriodScheme : FullAuditedAggregateRoot<Guid>, IMultiTenant
         Periods = new List<Period>();
     }
 
-    public PeriodScheme(Guid? tenantId, string name, bool isDefault, List<Period> periods)
+    public PeriodScheme(Guid id, Guid? tenantId, string name, bool isDefault, List<Period> periods) : base(id)
     {
         TenantId = tenantId;
         Name = name;

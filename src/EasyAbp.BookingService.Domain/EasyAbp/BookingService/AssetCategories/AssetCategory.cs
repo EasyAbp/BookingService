@@ -66,8 +66,9 @@ public class AssetCategory : FullAuditedAggregateRoot<Guid>, ITree<AssetCategory
         Children = new List<AssetCategory>();
     }
 
-    public AssetCategory(Guid? tenantId, [CanBeNull] string assetDefinitionName, Guid? periodSchemeId,
-        AssetSchedulePolicy? defaultSchedulePolicy, Guid? parentId, string displayName)
+    public AssetCategory(Guid id, Guid? tenantId, [CanBeNull] string assetDefinitionName, Guid? periodSchemeId,
+        AssetSchedulePolicy? defaultSchedulePolicy, Guid? parentId, string displayName, int? daysInAdvance,
+        bool disabled) : base(id)
     {
         TenantId = tenantId;
         AssetDefinitionName = assetDefinitionName;
@@ -75,6 +76,8 @@ public class AssetCategory : FullAuditedAggregateRoot<Guid>, ITree<AssetCategory
         DefaultSchedulePolicy = defaultSchedulePolicy;
         ParentId = parentId;
         DisplayName = displayName;
+        DaysInAdvance = daysInAdvance;
+        Disabled = disabled;
 
         Children = new List<AssetCategory>();
     }
