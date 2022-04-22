@@ -42,6 +42,8 @@ public class AssetCategory : FullAuditedAggregateRoot<Guid>, ITree<AssetCategory
     /// Will fall back to <see cref="AssetCategory"/> if the value here is <c>null</c>.
     /// </summary>
     public virtual int? DaysInAdvance { get; protected set; }
+    
+    public virtual bool Disabled { get; protected set; }
 
     #region Properties from ITree
 

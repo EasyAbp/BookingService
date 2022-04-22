@@ -43,6 +43,8 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
     /// Will fall back to <see cref="AssetCategory"/> if the value here is <c>null</c>.
     /// </summary>
     public virtual int? DaysInAdvance { get; protected set; }
+    
+    public virtual bool Disabled { get; protected set; }
 
     protected Asset()
     {
