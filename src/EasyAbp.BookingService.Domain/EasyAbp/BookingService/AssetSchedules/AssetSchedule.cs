@@ -1,5 +1,6 @@
 ﻿using System;
 using EasyAbp.BookingService.Assets;
+using JetBrains.Annotations;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.MultiTenancy;
 
@@ -23,10 +24,11 @@ public class AssetSchedule : FullAuditedAggregateRoot<Guid>, IHasPeriodInfo, IMu
     public virtual AssetSchedulePolicy SchedulePolicy { get; protected set; }
     
     /// <summary>
-    /// How many days in advance can you occupy the asset.
+    /// This value object describes the time range for assets that can occupy.
     /// Will fall back to <see cref="Asset"/> if the value here is <c>null</c>.
     /// </summary>
-    public virtual int? DaysInAdvance { get; protected set; }
+    [CanBeNull]
+    public virtual TimeInAdvance TimeInAdvance { get; protected set; }
 
     protected AssetSchedule()
     {
@@ -34,7 +36,7 @@ public class AssetSchedule : FullAuditedAggregateRoot<Guid>, IHasPeriodInfo, IMu
     }
 
     public AssetSchedule(Guid id, Guid? tenantId, Guid assetId, DateTime date, TimeSpan startingTime, TimeSpan duration,
-        AssetSchedulePolicy schedulePolicy) : base(id)
+        AssetSchedulePolicy schedulePolicy, [CanBeNull] TimeInAdvance timeInAdvance) : base(id)
     {
         TenantId = tenantId;
         AssetId = assetId;
@@ -42,5 +44,6 @@ public class AssetSchedule : FullAuditedAggregateRoot<Guid>, IHasPeriodInfo, IMu
         StartingTime = startingTime;
         Duration = duration;
         SchedulePolicy = schedulePolicy;
+        TimeInAdvance = timeInAdvance;
     }
 }

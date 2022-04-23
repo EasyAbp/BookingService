@@ -16,15 +16,17 @@ public class AssetDefinition
     public virtual AssetSchedulePolicy DefaultSchedulePolicy { get; }
     
     /// <summary>
-    /// How many days in advance can you occupy the asset.
+    /// This value object describes the time range for assets that can occupy.
     /// The property value from <see cref="AssetCategory"/> is preferred.
     /// </summary>
-    public virtual int DaysInAdvance { get; }
+    [NotNull]
+    public virtual TimeInAdvance TimeInAdvance { get; }
 
-    public AssetDefinition([NotNull] string name, AssetSchedulePolicy defaultSchedulePolicy, int daysInAdvance)
+    public AssetDefinition([NotNull] string name, AssetSchedulePolicy defaultSchedulePolicy,
+        [NotNull] TimeInAdvance timeInAdvance)
     {
         Name = name;
         DefaultSchedulePolicy = defaultSchedulePolicy;
-        DaysInAdvance = daysInAdvance;
+        TimeInAdvance = timeInAdvance;
     }
 }

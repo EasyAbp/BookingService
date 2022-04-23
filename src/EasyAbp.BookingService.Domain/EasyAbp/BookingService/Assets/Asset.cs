@@ -38,11 +38,12 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
     public virtual int Priority { get; protected set; }
     
     /// <summary>
-    /// How many days in advance can you occupy the asset.
+    /// This value object describes the time range for assets that can occupy.
     /// The property value from <see cref="AssetSchedule"/> is preferred.
     /// Will fall back to <see cref="AssetCategory"/> if the value here is <c>null</c>.
     /// </summary>
-    public virtual int? DaysInAdvance { get; protected set; }
+    [CanBeNull]
+    public virtual TimeInAdvance TimeInAdvance { get; protected set; }
     
     public virtual bool Disabled { get; protected set; }
 
@@ -53,7 +54,7 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
 
     public Asset(Guid id, Guid? tenantId, [NotNull] string name, [NotNull] string assetDefinitionName,
         Guid assetCategoryId, Guid? periodSchemeId, AssetSchedulePolicy? defaultSchedulePolicy, int priority,
-        int? daysInAdvance, bool disabled) : base(id)
+        [CanBeNull] TimeInAdvance timeInAdvance, bool disabled) : base(id)
     {
         TenantId = tenantId;
         Name = name;
@@ -62,7 +63,7 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
         PeriodSchemeId = periodSchemeId;
         DefaultSchedulePolicy = defaultSchedulePolicy;
         Priority = priority;
-        DaysInAdvance = daysInAdvance;
+        TimeInAdvance = timeInAdvance;
         Disabled = disabled;
     }
 }

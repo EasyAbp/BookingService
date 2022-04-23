@@ -37,11 +37,12 @@ public class AssetCategory : FullAuditedAggregateRoot<Guid>, ITree<AssetCategory
     public virtual AssetSchedulePolicy? DefaultSchedulePolicy { get; protected set; }
     
     /// <summary>
-    /// How many days in advance can you occupy the asset.
+    /// This value object describes the time range for assets that can occupy.
     /// The property value from <see cref="Asset"/> is preferred.
     /// Will fall back to <see cref="AssetCategory"/> if the value here is <c>null</c>.
     /// </summary>
-    public virtual int? DaysInAdvance { get; protected set; }
+    [CanBeNull]
+    public virtual TimeInAdvance TimeInAdvance { get; protected set; }
     
     public virtual bool Disabled { get; protected set; }
 
@@ -67,8 +68,8 @@ public class AssetCategory : FullAuditedAggregateRoot<Guid>, ITree<AssetCategory
     }
 
     public AssetCategory(Guid id, Guid? tenantId, [CanBeNull] string assetDefinitionName, Guid? periodSchemeId,
-        AssetSchedulePolicy? defaultSchedulePolicy, Guid? parentId, string displayName, int? daysInAdvance,
-        bool disabled) : base(id)
+        AssetSchedulePolicy? defaultSchedulePolicy, Guid? parentId, string displayName,
+        [CanBeNull] TimeInAdvance timeInAdvance, bool disabled) : base(id)
     {
         TenantId = tenantId;
         AssetDefinitionName = assetDefinitionName;
@@ -76,7 +77,7 @@ public class AssetCategory : FullAuditedAggregateRoot<Guid>, ITree<AssetCategory
         DefaultSchedulePolicy = defaultSchedulePolicy;
         ParentId = parentId;
         DisplayName = displayName;
-        DaysInAdvance = daysInAdvance;
+        TimeInAdvance = timeInAdvance;
         Disabled = disabled;
 
         Children = new List<AssetCategory>();
