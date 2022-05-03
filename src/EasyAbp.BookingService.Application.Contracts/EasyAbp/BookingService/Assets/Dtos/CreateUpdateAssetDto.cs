@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using EasyAbp.BookingService.AssetSchedules;
 using EasyAbp.BookingService.Dtos;
 using Volo.Abp.ObjectExtending;
@@ -10,6 +11,7 @@ public class CreateUpdateAssetDto : ExtensibleObject
 {
     public string Name { get; set; }
 
+    [Required]
     public string AssetDefinitionName { get; set; }
 
     public Guid AssetCategoryId { get; set; }

@@ -6,10 +6,8 @@ using Volo.Abp.ObjectExtending;
 namespace EasyAbp.BookingService.AssetCategories.Dtos;
 
 [Serializable]
-public class CreateUpdateAssetCategoryDto : ExtensibleObject
+public class UpdateAssetCategoryDto : ExtensibleObject
 {
-    public string AssetDefinitionName { get; set; }
-
     public Guid? PeriodSchemeId { get; set; }
 
     public AssetSchedulePolicy? DefaultSchedulePolicy { get; set; }

@@ -7,4 +7,8 @@ namespace EasyAbp.BookingService.AssetPeriodSchemes.Dtos;
 public class GetAssetPeriodSchemesRequestDto : PagedAndSortedResultRequestDto
 {
     public Guid? PeriodSchemeId { get; set; }
+
+    public Guid? AssetId { get; set; }
+
+    public DateTime? Date { get; set; }
 }

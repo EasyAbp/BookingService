@@ -1,5 +1,6 @@
 {
   "culture": "zh-Hant",
   "texts": {
+    "EasyAbp.BookingService:AssetDefinitionNotExists": ""
   }
 }

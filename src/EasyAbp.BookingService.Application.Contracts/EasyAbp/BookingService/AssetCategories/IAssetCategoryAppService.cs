@@ -9,7 +9,8 @@ public interface IAssetCategoryAppService :
         AssetCategoryDto,
         Guid,
         GetAssetCategoriesRequestDto,
-        CreateUpdateAssetCategoryDto,
-        CreateUpdateAssetCategoryDto>
+        CreateAssetCategoryDto,
+        UpdateAssetCategoryDto>
 {
+    // TODO Search for available asset category occupancy
 }

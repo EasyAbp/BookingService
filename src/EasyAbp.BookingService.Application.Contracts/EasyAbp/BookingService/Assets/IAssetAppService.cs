@@ -12,4 +12,5 @@ public interface IAssetAppService :
         CreateUpdateAssetDto,
         CreateUpdateAssetDto>
 {
+    // TODO Search for available asset occupancy
 }

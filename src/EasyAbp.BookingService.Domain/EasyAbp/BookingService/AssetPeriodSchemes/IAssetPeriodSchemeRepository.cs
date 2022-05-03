@@ -1,8 +1,7 @@
-﻿using System;
-using Volo.Abp.Domain.Repositories;
+﻿using Volo.Abp.Domain.Repositories;
 
 namespace EasyAbp.BookingService.AssetPeriodSchemes;
 
-public interface IAssetPeriodSchemeRepository : IRepository<AssetPeriodScheme, AssetPeriodSchemeKey>
+public interface IAssetPeriodSchemeRepository : IRepository<AssetPeriodScheme>
 {
 }

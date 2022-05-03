@@ -26,7 +26,8 @@ public class BookingServiceApplicationAutoMapperProfile : Profile
         CreateMap<TimeInAdvanceDto, TimeInAdvance>();
 
         CreateMap<AssetCategory, AssetCategoryDto>();
-        CreateMap<CreateUpdateAssetCategoryDto, AssetCategory>(MemberList.Source);
+        CreateMap<CreateAssetCategoryDto, AssetCategory>(MemberList.Source);
+        CreateMap<UpdateAssetCategoryDto, AssetCategory>(MemberList.Source);
         CreateMap<AssetOccupancy, AssetOccupancyDto>();
         CreateMap<CreateUpdateAssetOccupancyDto, AssetOccupancy>(MemberList.Source);
         CreateMap<AssetPeriodScheme, AssetPeriodSchemeDto>();
@@ -36,8 +37,7 @@ public class BookingServiceApplicationAutoMapperProfile : Profile
         CreateMap<AssetSchedule, AssetScheduleDto>();
         CreateMap<CreateUpdateAssetScheduleDto, AssetSchedule>(MemberList.Source);
         CreateMap<PeriodScheme, PeriodSchemeDto>();
-        CreateMap<CreatePeriodSchemeDto, PeriodScheme>(MemberList.Source);
-        CreateMap<UpdatePeriodSchemeDto, PeriodScheme>(MemberList.Source);
+        CreateMap<CreateUpdatePeriodSchemeDto, PeriodScheme>(MemberList.Source);
         CreateMap<Period, PeriodDto>();
         CreateMap<CreatePeriodDto, Period>(MemberList.Source);
     }

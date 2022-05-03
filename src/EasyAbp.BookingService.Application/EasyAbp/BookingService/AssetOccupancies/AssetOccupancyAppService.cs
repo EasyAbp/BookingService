@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using EasyAbp.BookingService.Permissions;
 using EasyAbp.BookingService.AssetOccupancies.Dtos;
-using Volo.Abp.Application.Dtos;
+using EasyAbp.BookingService.Permissions;
 using Volo.Abp.Application.Services;
 
 namespace EasyAbp.BookingService.AssetOccupancies;
@@ -19,10 +18,13 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
     protected override string DeletePolicyName { get; set; } = BookingServicePermissions.AssetOccupancy.Delete;
 
     private readonly IAssetOccupancyRepository _repository;
+    private readonly IAssetOccupancyManager _assetOccupancyManager;
 
-    public AssetOccupancyAppService(IAssetOccupancyRepository repository) : base(repository)
+    public AssetOccupancyAppService(IAssetOccupancyRepository repository,
+        IAssetOccupancyManager assetOccupancyManager) : base(repository)
     {
         _repository = repository;
+        _assetOccupancyManager = assetOccupancyManager;
     }
 
     protected override async Task<IQueryable<AssetOccupancy>> CreateFilteredQueryAsync(
@@ -33,5 +35,25 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
                 x => x.AssetId == input.AssetId.Value)
             .WhereIf(input.Date.HasValue,
                 x => x.Date == input.Date.Value);
+    }
+
+    protected override async Task<AssetOccupancy> MapToEntityAsync(CreateUpdateAssetOccupancyDto createInput)
+    {
+        return await _assetOccupancyManager.CreateAsync(
+            createInput.AssetId,
+            createInput.Date,
+            createInput.StartingTime,
+            createInput.Duration,
+            createInput.OccupierUserId);
+    }
+
+    protected override async Task MapToEntityAsync(CreateUpdateAssetOccupancyDto updateInput, AssetOccupancy entity)
+    {
+        await _assetOccupancyManager.UpdateAsync(entity,
+            updateInput.AssetId,
+            updateInput.Date,
+            updateInput.StartingTime,
+            updateInput.Duration,
+            updateInput.OccupierUserId);
     }
 }

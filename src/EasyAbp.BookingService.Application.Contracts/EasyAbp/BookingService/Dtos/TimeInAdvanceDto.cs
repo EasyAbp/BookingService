@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace EasyAbp.BookingService.Dtos;
 
 [Serializable]
-public class TimeInAdvanceDto
+public class TimeInAdvanceDto : IValidatableObject
 {
     /// <summary>
     /// The maximum number of days people can occupy assets in advance.
@@ -13,6 +15,7 @@ public class TimeInAdvanceDto
     /// Value <c>-1</c> means can not occupy.
     /// Only the value with an EARLIER time of this property and the <see cref="MaxTimespanInAdvance"/> property will take effect.
     /// </summary>
+    [Required, Range(-1, int.MaxValue)]
     public int MaxDaysInAdvance { get; set; }
 
     /// <summary>
@@ -33,6 +36,7 @@ public class TimeInAdvanceDto
     /// Only the value with a LATER time of this property and the <see cref="MinTimespanInAdvance"/> property will take effect.
     /// Null values have the lowest priority.
     /// </summary>
+    [Range(-1, int.MaxValue)]
     public int? MinDaysInAdvance { get; set; }
 
     /// <summary>
@@ -44,4 +48,29 @@ public class TimeInAdvanceDto
     /// Null values have the lowest priority.
     /// </summary>
     public TimeSpan? MinTimespanInAdvance { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (MinDaysInAdvance > MaxDaysInAdvance)
+        {
+            yield return new ValidationResult(
+                "MinDaysInAdvance should be less than MaxDaysInAdvance!",
+                new[]
+                {
+                    nameof(MinDaysInAdvance), nameof(MaxDaysInAdvance)
+                }
+            );
+        }
+
+        if (MinTimespanInAdvance > MaxTimespanInAdvance)
+        {
+            yield return new ValidationResult(
+                "MinTimespanInAdvance should be less than MaxTimespanInAdvance!",
+                new[]
+                {
+                    nameof(MinTimespanInAdvance), nameof(MinTimespanInAdvance)
+                }
+            );
+        }
+    }
 }

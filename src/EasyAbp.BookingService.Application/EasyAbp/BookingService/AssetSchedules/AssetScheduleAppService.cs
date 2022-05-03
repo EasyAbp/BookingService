@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using EasyAbp.BookingService.AssetSchedules.Dtos;
+using EasyAbp.BookingService.Dtos;
 using EasyAbp.BookingService.Permissions;
 using Volo.Abp.Application.Services;
 
@@ -18,10 +19,13 @@ public class AssetScheduleAppService : CrudAppService<AssetSchedule, AssetSchedu
     protected override string DeletePolicyName { get; set; } = BookingServicePermissions.AssetSchedule.Delete;
 
     private readonly IAssetScheduleRepository _repository;
+    private readonly IAssetScheduleManager _assetScheduleManager;
 
-    public AssetScheduleAppService(IAssetScheduleRepository repository) : base(repository)
+    public AssetScheduleAppService(IAssetScheduleRepository repository,
+        IAssetScheduleManager assetScheduleManager) : base(repository)
     {
         _repository = repository;
+        _assetScheduleManager = assetScheduleManager;
     }
 
     protected override async Task<IQueryable<AssetSchedule>> CreateFilteredQueryAsync(
@@ -32,5 +36,29 @@ public class AssetScheduleAppService : CrudAppService<AssetSchedule, AssetSchedu
                 x => x.AssetId == input.AssetId.Value)
             .WhereIf(input.Date.HasValue,
                 x => x.Date == input.Date.Value);
+    }
+
+    protected override async Task<AssetSchedule> MapToEntityAsync(CreateUpdateAssetScheduleDto createInput)
+    {
+        return await _assetScheduleManager.CreateAsync(
+            createInput.AssetId,
+            createInput.Date,
+            createInput.StartingTime,
+            createInput.Duration,
+            createInput.SchedulePolicy,
+            ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(createInput.TimeInAdvance)
+        );
+    }
+
+    protected override async Task MapToEntityAsync(CreateUpdateAssetScheduleDto updateInput, AssetSchedule entity)
+    {
+        await _assetScheduleManager.UpdateAsync(entity,
+            updateInput.AssetId,
+            updateInput.Date,
+            updateInput.StartingTime,
+            updateInput.Duration,
+            updateInput.SchedulePolicy,
+            ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(updateInput.TimeInAdvance)
+        );
     }
 }

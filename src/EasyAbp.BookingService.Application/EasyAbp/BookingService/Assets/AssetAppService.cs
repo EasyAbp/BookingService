@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using EasyAbp.BookingService.Assets.Dtos;
+using EasyAbp.BookingService.Dtos;
 using EasyAbp.BookingService.Permissions;
 using Volo.Abp.Application.Services;
 
@@ -18,10 +19,13 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
     protected override string DeletePolicyName { get; set; } = BookingServicePermissions.Asset.Delete;
 
     private readonly IAssetRepository _repository;
+    private readonly IAssetManager _assetManager;
 
-    public AssetAppService(IAssetRepository repository) : base(repository)
+    public AssetAppService(IAssetRepository repository,
+        IAssetManager assetManager) : base(repository)
     {
         _repository = repository;
+        _assetManager = assetManager;
     }
 
     protected override async Task<IQueryable<Asset>> CreateFilteredQueryAsync(
@@ -36,5 +40,31 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
                 x => x.Name == input.Name)
             .WhereIf(!input.AssetDefinitionName.IsNullOrWhiteSpace(),
                 x => x.AssetDefinitionName == input.AssetDefinitionName);
+    }
+
+    protected override async Task<Asset> MapToEntityAsync(CreateUpdateAssetDto createInput)
+    {
+        return await _assetManager.CreateAsync(
+            createInput.Name,
+            createInput.AssetDefinitionName,
+            createInput.AssetCategoryId,
+            createInput.PeriodSchemeId,
+            createInput.DefaultSchedulePolicy,
+            createInput.Priority,
+            ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(createInput.TimeInAdvance),
+            createInput.Disabled);
+    }
+
+    protected override async Task MapToEntityAsync(CreateUpdateAssetDto updateInput, Asset entity)
+    {
+        await _assetManager.UpdateAsync(entity,
+            updateInput.Name,
+            updateInput.AssetDefinitionName,
+            updateInput.AssetCategoryId,
+            updateInput.PeriodSchemeId,
+            updateInput.DefaultSchedulePolicy,
+            updateInput.Priority,
+            ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(updateInput.TimeInAdvance),
+            updateInput.Disabled);
     }
 }

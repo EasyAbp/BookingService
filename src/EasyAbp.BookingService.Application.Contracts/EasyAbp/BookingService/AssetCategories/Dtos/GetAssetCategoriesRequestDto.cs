@@ -11,4 +11,6 @@ public class GetAssetCategoriesRequestDto : PagedAndSortedResultRequestDto
     public bool? Disabled { get; set; }
 
     public string DisplayName { get; set; }
+    
+    public Guid? ParentId { get; set; }
 }

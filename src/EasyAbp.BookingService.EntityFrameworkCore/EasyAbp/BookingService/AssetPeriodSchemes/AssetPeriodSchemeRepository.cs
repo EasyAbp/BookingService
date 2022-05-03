@@ -5,7 +5,7 @@ using Volo.Abp.EntityFrameworkCore;
 namespace EasyAbp.BookingService.AssetPeriodSchemes;
 
 public class AssetPeriodSchemeRepository :
-    EfCoreRepository<IBookingServiceDbContext, AssetPeriodScheme, AssetPeriodSchemeKey>, IAssetPeriodSchemeRepository
+    EfCoreRepository<IBookingServiceDbContext, AssetPeriodScheme>, IAssetPeriodSchemeRepository
 {
     public AssetPeriodSchemeRepository(IDbContextProvider<IBookingServiceDbContext> dbContextProvider) : base(
         dbContextProvider)

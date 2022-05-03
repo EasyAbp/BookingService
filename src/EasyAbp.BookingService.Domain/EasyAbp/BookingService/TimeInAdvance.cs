@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using Volo.Abp.Domain.Values;
 
 namespace EasyAbp.BookingService;
@@ -19,7 +20,7 @@ public class TimeInAdvance : ValueObject
     /// Only the value with an EARLIER time of this property and the <see cref="MaxTimespanInAdvance"/> property will take effect.
     /// </summary>
     public int MaxDaysInAdvance { get; set; }
-    
+
     /// <summary>
     /// The maximum timespan people can occupy assets in advance.
     /// Given we are occupying from "March 10, 2022, 10:00".
@@ -28,7 +29,7 @@ public class TimeInAdvance : ValueObject
     /// Only the value with an EARLIER time of this property and the <see cref="MaxDaysInAdvance"/> property will take effect.
     /// </summary>
     public TimeSpan MaxTimespanInAdvance { get; set; }
-    
+
     /// <summary>
     /// The minimum number of days people can occupy assets in advance.
     /// Given we are occupying from "March 10, 2022, 10:00".
@@ -39,7 +40,7 @@ public class TimeInAdvance : ValueObject
     /// Null values have the lowest priority.
     /// </summary>
     public int? MinDaysInAdvance { get; set; }
-    
+
     /// <summary>
     /// The minimum timespan people can occupy assets in advance.
     /// Given we are occupying from "March 10, 2022, 10:00".
@@ -49,7 +50,7 @@ public class TimeInAdvance : ValueObject
     /// Null values have the lowest priority.
     /// </summary>
     public TimeSpan? MinTimespanInAdvance { get; set; }
-    
+
     protected override IEnumerable<object> GetAtomicValues()
     {
         yield return MaxDaysInAdvance;
