@@ -8,23 +8,23 @@ namespace EasyAbp.BookingService.AssetOccupancies;
 public class AssetOccupancy : CreationAuditedAggregateRoot<Guid>, IHasPeriodInfo, IMultiTenant
 {
     public virtual Guid? TenantId { get; protected set; }
-    
+
     public virtual Guid AssetId { get; protected set; }
-    
+
     /// <summary>
     /// By default, it is generated with "CategoryDisplayName-AssetName".
     /// </summary>
     [NotNull]
     public virtual string Asset { get; protected set; }
-    
+
     public virtual DateTime Date { get; protected set; }
-    
+
     public virtual TimeSpan StartingTime { get; protected set; }
-    
+
     public virtual TimeSpan Duration { get; protected set; }
-    
+
     public virtual Guid? OccupierUserId { get; protected set; }
-    
+
     /// <summary>
     /// By default, it is the UserName of the occupier user.
     /// </summary>
@@ -33,7 +33,6 @@ public class AssetOccupancy : CreationAuditedAggregateRoot<Guid>, IHasPeriodInfo
 
     protected AssetOccupancy()
     {
-        
     }
 
     public AssetOccupancy(Guid id, Guid? tenantId, Guid assetId, [NotNull] string asset, DateTime date,
@@ -48,4 +47,16 @@ public class AssetOccupancy : CreationAuditedAggregateRoot<Guid>, IHasPeriodInfo
         OccupierUserId = occupierUserId;
         OccupierName = occupierName;
     }
+
+    public bool IsConflicted(DateTime date, TimeSpan startingTime, TimeSpan duration)
+    {
+        var startDateTime = date + startingTime;
+        var endDateTime = startDateTime + duration;
+        var occupancyStartDateTime = Date + StartingTime;
+        var occupancyEndDateTime = occupancyStartDateTime + Duration;
+
+        return !(occupancyStartDateTime > endDateTime || occupancyEndDateTime < startDateTime);
+    }
+
+    public DateTime GetStartingDateTime() => Date + StartingTime;
 }

@@ -5,10 +5,11 @@ using EasyAbp.BookingService.AssetDefinitions;
 using EasyAbp.BookingService.AssetSchedules;
 using Microsoft.Extensions.Options;
 using Volo.Abp.Domain.Services;
+using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.AssetCategories;
 
-public class AssetCategoryManager : DomainService, IAssetCategoryManager
+public class AssetCategoryManager : DomainService, IAssetCategoryManager, IUnitOfWorkEnabled
 {
     private readonly IAssetCategoryRepository _repository;
     private readonly BookingServiceOptions _options;
@@ -20,19 +21,16 @@ public class AssetCategoryManager : DomainService, IAssetCategoryManager
         _options = options.Value;
     }
 
-    public async Task<AssetCategory> CreateAsync(Guid? parentId, string displayName, string assetDefinitionName,
+    public virtual Task<AssetCategory> CreateAsync(Guid? parentId, string displayName, string assetDefinitionName,
         Guid? periodSchemeId,
         AssetSchedulePolicy? defaultSchedulePolicy, TimeInAdvance timeInAdvance, bool disabled)
     {
         if (_options.AssetDefinitions.All(x => x.Name != assetDefinitionName))
         {
-            // TODO: throw ex?
             throw new AssetDefinitionNotExistsException(assetDefinitionName);
         }
 
-        // TODO: Do we need to check periodScheme exists if periodSchemeId is not null?
-
-        return new AssetCategory(GuidGenerator.Create(),
+        return Task.FromResult(new AssetCategory(GuidGenerator.Create(),
             CurrentTenant.Id,
             assetDefinitionName,
             periodSchemeId,
@@ -40,14 +38,13 @@ public class AssetCategoryManager : DomainService, IAssetCategoryManager
             parentId,
             displayName,
             timeInAdvance,
-            disabled);
+            disabled));
     }
 
-    public async Task UpdateAsync(AssetCategory entity, Guid? parentId, string displayName, Guid? periodSchemeId,
+    public virtual Task UpdateAsync(AssetCategory entity, Guid? parentId, string displayName, Guid? periodSchemeId,
         AssetSchedulePolicy? defaultSchedulePolicy, TimeInAdvance timeInAdvance, bool disabled)
     {
-        // TODO: Do we need to check periodScheme exists if periodSchemeId is not null?
-
         entity.Update(parentId, displayName, periodSchemeId, defaultSchedulePolicy, timeInAdvance, disabled);
+        return Task.CompletedTask;
     }
 }

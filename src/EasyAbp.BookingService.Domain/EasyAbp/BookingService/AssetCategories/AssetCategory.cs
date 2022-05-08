@@ -94,7 +94,6 @@ public class AssetCategory : FullAuditedAggregateRoot<Guid>, ITree<AssetCategory
 
         if (Disabled != disabled)
         {
-            // TODO: Do we need disabled event?
             Disabled = disabled;
             AddDistributedEvent(new AssetCategoryDisabledChangedEto
             {

@@ -6,6 +6,7 @@ namespace EasyAbp.BookingService.PeriodSchemes.Dtos;
 [Serializable]
 public class CreatePeriodDto : ExtensibleObject, IHasPeriodInfo
 {
+    // TODO validate this should less than 24 hours
     public TimeSpan StartingTime { get; set; }
 
     public TimeSpan Duration { get; set; }

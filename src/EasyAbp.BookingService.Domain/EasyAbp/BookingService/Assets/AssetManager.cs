@@ -8,10 +8,11 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
+using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.Assets;
 
-public class AssetManager : DomainService, IAssetManager
+public class AssetManager : DomainService, IAssetManager, IUnitOfWorkEnabled
 {
     private readonly IAssetRepository _repository;
     private readonly IAssetCategoryRepository _assetCategoryRepository;
@@ -26,7 +27,8 @@ public class AssetManager : DomainService, IAssetManager
         _options = options.Value;
     }
 
-    public async Task<Asset> CreateAsync(string name, [NotNull] string assetDefinitionName, Guid assetCategoryId,
+    public virtual async Task<Asset> CreateAsync(string name, [NotNull] string assetDefinitionName,
+        Guid assetCategoryId,
         Guid? periodSchemeId,
         AssetSchedulePolicy? defaultSchedulePolicy,
         int priority, TimeInAdvance timeInAdvance, bool disabled)
@@ -35,7 +37,6 @@ public class AssetManager : DomainService, IAssetManager
 
         if (_options.AssetDefinitions.All(x => x.Name != assetDefinitionName))
         {
-            // TODO: throw ex?
             throw new AssetDefinitionNotExistsException(assetDefinitionName);
         }
 
@@ -46,8 +47,6 @@ public class AssetManager : DomainService, IAssetManager
         {
             throw new AssetDefinitionNameNotMatchException(assetDefinitionName, category.AssetDefinitionName);
         }
-
-        // TODO: Do we need to check periodScheme exists if periodSchemeId is not null?
 
         return new Asset(GuidGenerator.Create(),
             CurrentTenant.Id,
@@ -69,7 +68,6 @@ public class AssetManager : DomainService, IAssetManager
 
         if (_options.AssetDefinitions.All(x => x.Name != assetDefinitionName))
         {
-            // TODO: throw ex?
             throw new AssetDefinitionNotExistsException(assetDefinitionName);
         }
 

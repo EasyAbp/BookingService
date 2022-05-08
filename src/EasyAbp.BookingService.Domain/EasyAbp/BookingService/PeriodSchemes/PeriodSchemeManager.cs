@@ -3,19 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Services;
+using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.PeriodSchemes;
 
-public class PeriodSchemeManager : DomainService, IPeriodSchemeManager
+public class PeriodSchemeManager : DomainService, IPeriodSchemeManager, IUnitOfWorkEnabled
 {
     private readonly IPeriodSchemeRepository _repository;
+    private readonly DefaultPeriodSchemeStore _defaultPeriodSchemeStore;
 
-    public PeriodSchemeManager(IPeriodSchemeRepository repository)
+    public PeriodSchemeManager(IPeriodSchemeRepository repository,
+        DefaultPeriodSchemeStore defaultPeriodSchemeStore)
     {
         _repository = repository;
+        _defaultPeriodSchemeStore = defaultPeriodSchemeStore;
     }
 
-    public async Task DeleteAsync(Guid id)
+    [UnitOfWork]
+    public virtual async Task DeleteAsync(Guid id)
     {
         var entity = await _repository.GetAsync(id);
         if (entity.IsDefault)
@@ -26,11 +31,14 @@ public class PeriodSchemeManager : DomainService, IPeriodSchemeManager
         await _repository.DeleteAsync(entity);
     }
 
-    public async Task<PeriodScheme> SetAsDefaultAsync(Guid id)
+    [UnitOfWork]
+    public virtual async Task<PeriodScheme> SetAsDefaultAsync(Guid id)
     {
         var entity = await _repository.GetAsync(id);
         if (!entity.IsDefault)
         {
+            await _defaultPeriodSchemeStore.ClearAsync();
+            
             var defaultPeriodScheme = await _repository.FindAsync(x => x.IsDefault);
             if (defaultPeriodScheme is not null)
             {
@@ -45,9 +53,12 @@ public class PeriodSchemeManager : DomainService, IPeriodSchemeManager
         return entity;
     }
 
-    public async Task<PeriodScheme> CreateAsync(string name, List<Period> periods)
+    public virtual async Task<PeriodScheme> CreateAsync(string name, List<Period> periods)
     {
         var defaultPeriodScheme = await _repository.FindAsync(x => x.IsDefault);
+
+        await _defaultPeriodSchemeStore.ClearAsync();
+
         return new PeriodScheme(GuidGenerator.Create(),
             CurrentTenant.Id,
             name,
@@ -55,7 +66,7 @@ public class PeriodSchemeManager : DomainService, IPeriodSchemeManager
             periods);
     }
 
-    public Task UpdateAsync(PeriodScheme entity, string name, List<Period> periods)
+    public virtual Task UpdateAsync(PeriodScheme entity, string name, List<Period> periods)
     {
         var newPeriods = new List<Period>();
         if (!periods.IsNullOrEmpty())

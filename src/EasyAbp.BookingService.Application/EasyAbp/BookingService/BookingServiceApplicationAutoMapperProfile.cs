@@ -40,5 +40,10 @@ public class BookingServiceApplicationAutoMapperProfile : Profile
         CreateMap<CreateUpdatePeriodSchemeDto, PeriodScheme>(MemberList.Source);
         CreateMap<Period, PeriodDto>();
         CreateMap<CreatePeriodDto, Period>(MemberList.Source);
+
+        CreateMap<AssetBookableDate, AssetBookableDateDto>();
+        CreateMap<AssetBookablePeriod, AssetBookablePeriodDto>();
+        CreateMap<CategoryBookableDate, CategoryBookableDateDto>();
+        CreateMap<CategoryBookablePeriod, CategoryBookablePeriodDto>();
     }
 }

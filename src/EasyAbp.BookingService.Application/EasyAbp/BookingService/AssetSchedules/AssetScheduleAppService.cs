@@ -21,6 +21,7 @@ public class AssetScheduleAppService : CrudAppService<AssetSchedule, AssetSchedu
     private readonly IAssetScheduleRepository _repository;
     private readonly IAssetScheduleManager _assetScheduleManager;
 
+
     public AssetScheduleAppService(IAssetScheduleRepository repository,
         IAssetScheduleManager assetScheduleManager) : base(repository)
     {

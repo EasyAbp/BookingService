@@ -37,8 +37,6 @@ public static class BookingServiceDbContextModelCreatingExtensions
         });
         */
 
-        // TODO Add Entity indexes
-
         builder.Entity<AssetCategory>(b =>
         {
             b.ToTable(BookingServiceDbProperties.DbTablePrefix + "AssetCategories",
@@ -46,9 +44,6 @@ public static class BookingServiceDbContextModelCreatingExtensions
             b.ConfigureByConvention();
 
             b.OwnsOne(x => x.TimeInAdvance);
-
-            b.HasIndex(x => x.AssetDefinitionName);
-            b.HasIndex(x => x.Disabled);
             /* Configure more properties here */
         });
 
@@ -81,10 +76,6 @@ public static class BookingServiceDbContextModelCreatingExtensions
             b.ConfigureByConvention();
             b.OwnsOne(x => x.TimeInAdvance);
 
-            b.HasIndex(x => x.AssetDefinitionName);
-            b.HasIndex(x => x.Disabled);
-            b.HasIndex(x => x.AssetCategoryId);
-
             /* Configure more properties here */
         });
 
@@ -95,9 +86,6 @@ public static class BookingServiceDbContextModelCreatingExtensions
             b.ConfigureByConvention();
             b.OwnsOne(x => x.TimeInAdvance);
 
-            b.HasIndex(x => x.AssetId);
-            b.HasIndex(x => new { x.AssetId, x.Date, x.StartingTime }).IsUnique();
-
             /* Configure more properties here */
         });
 
@@ -107,7 +95,6 @@ public static class BookingServiceDbContextModelCreatingExtensions
             b.ToTable(BookingServiceDbProperties.DbTablePrefix + "PeriodSchemes", BookingServiceDbProperties.DbSchema);
             b.ConfigureByConvention();
 
-            b.HasIndex(x => x.IsDefault);
             /* Configure more properties here */
         });
     }

@@ -11,6 +11,7 @@ public class CreateUpdateAssetScheduleDto : ExtensibleObject
 
     public DateTime Date { get; set; }
 
+    // TODO validate this should less than 24 hours
     public TimeSpan StartingTime { get; set; }
 
     public TimeSpan Duration { get; set; }

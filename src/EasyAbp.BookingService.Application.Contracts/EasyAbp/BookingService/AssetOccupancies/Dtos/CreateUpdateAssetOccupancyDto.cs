@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using Volo.Abp.ObjectExtending;
 
 namespace EasyAbp.BookingService.AssetOccupancies.Dtos;
@@ -10,6 +11,7 @@ public class CreateUpdateAssetOccupancyDto : ExtensibleObject
 
     public DateTime Date { get; set; }
 
+    // TODO validate this should less than 24 hours
     public TimeSpan StartingTime { get; set; }
 
     public TimeSpan Duration { get; set; }

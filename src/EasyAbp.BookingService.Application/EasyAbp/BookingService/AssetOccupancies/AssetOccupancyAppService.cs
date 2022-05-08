@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EasyAbp.BookingService.AssetOccupancies.Dtos;
@@ -16,6 +17,7 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
     protected override string CreatePolicyName { get; set; } = BookingServicePermissions.AssetOccupancy.Create;
     protected override string UpdatePolicyName { get; set; } = BookingServicePermissions.AssetOccupancy.Update;
     protected override string DeletePolicyName { get; set; } = BookingServicePermissions.AssetOccupancy.Delete;
+    protected virtual string SearchPolicyName { get; set; } = BookingServicePermissions.AssetOccupancy.Search;
 
     private readonly IAssetOccupancyRepository _repository;
     private readonly IAssetOccupancyManager _assetOccupancyManager;
@@ -55,5 +57,32 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
             updateInput.StartingTime,
             updateInput.Duration,
             updateInput.OccupierUserId);
+    }
+
+    public async Task<List<AssetBookableDateDto>> SearchAssetBookableDatesAsync(
+        SearchAssetBookableDatesRequestDto input)
+    {
+        await CheckSearchPolicyAsync();
+
+        var dates = await _assetOccupancyManager.SearchAssetBookableDatesAsync(
+            input.AssetId, input.BookingDateTime, input.StartingDate, input.Days);
+
+        return ObjectMapper.Map<List<AssetBookableDate>, List<AssetBookableDateDto>>(dates);
+    }
+
+    public async Task<List<CategoryBookableDateDto>> SearchCategoryBookableDatesAsync(
+        SearchCategoryBookableDatesRequestDto input)
+    {
+        await CheckSearchPolicyAsync();
+
+        var dates = await _assetOccupancyManager.SearchCategoryBookableDatesAsync(
+            input.CategoryId, input.BookingDateTime, input.StartingDate, input.Days);
+
+        return ObjectMapper.Map<List<CategoryBookableDate>, List<CategoryBookableDateDto>>(dates);
+    }
+
+    protected virtual async Task CheckSearchPolicyAsync()
+    {
+        await CheckPolicyAsync(SearchPolicyName);
     }
 }

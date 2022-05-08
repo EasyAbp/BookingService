@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using JetBrains.Annotations;
 using Volo.Abp.Domain.Values;
 
 namespace EasyAbp.BookingService;
@@ -57,5 +58,57 @@ public class TimeInAdvance : ValueObject
         yield return MaxTimespanInAdvance;
         yield return MinDaysInAdvance;
         yield return MinTimespanInAdvance;
+    }
+
+    public bool CanBook(TimeSpan timeSpan)
+    {
+        if (MaxDaysInAdvance == -1 || MaxTimespanInAdvance == TimeSpan.Zero)
+        {
+            return false;
+        }
+
+        var max = GetMaxTimespanInAdvance();
+        if (timeSpan > max)
+        {
+            return false;
+        }
+
+        var min = GetMinTimespanInAdvance();
+        if (min.HasValue && timeSpan < min.Value)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    [CanBeNull]
+    private TimeSpan? GetMinTimespanInAdvance()
+    {
+        if (MinDaysInAdvance.HasValue && MinTimespanInAdvance.HasValue)
+        {
+            return MinTimespanInAdvance.Value < TimeSpan.FromDays(MinDaysInAdvance.Value)
+                ? MinTimespanInAdvance.Value
+                : TimeSpan.FromDays(MinDaysInAdvance.Value);
+        }
+        else if (!MinDaysInAdvance.HasValue && MinTimespanInAdvance.HasValue)
+        {
+            return MinTimespanInAdvance.Value;
+        }
+        else if (!MinTimespanInAdvance.HasValue && MinDaysInAdvance.HasValue)
+        {
+            return TimeSpan.FromDays(MinDaysInAdvance.Value);
+        }
+        else
+        {
+            return default;
+        }
+    }
+
+    private TimeSpan GetMaxTimespanInAdvance()
+    {
+        return MaxTimespanInAdvance > TimeSpan.FromDays(MaxDaysInAdvance)
+            ? MaxTimespanInAdvance
+            : TimeSpan.FromDays(MaxDaysInAdvance);
     }
 }

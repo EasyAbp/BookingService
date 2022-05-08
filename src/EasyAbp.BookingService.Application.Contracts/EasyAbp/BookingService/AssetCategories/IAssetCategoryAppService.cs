@@ -12,5 +12,4 @@ public interface IAssetCategoryAppService :
         CreateAssetCategoryDto,
         UpdateAssetCategoryDto>
 {
-    // TODO Search for available asset category occupancy
 }
