@@ -7,22 +7,43 @@ namespace EasyAbp.BookingService.AssetOccupancies;
 public class AssetOccupancyResultEto : ExtensibleObject, IMultiTenant
 {
     public Guid? TenantId { get; set; }
-    
+
     public Guid AssetId { get; set; }
-    
+
     public string AssetName { get; set; }
-    
+
     public string AssetDefinitionName { get; set; }
-    
+
     public bool Success { get; set; }
-    
-    public virtual DateTime Date { get; protected set; }
-    
-    public virtual TimeSpan StartingTime { get; protected set; }
-    
-    public virtual TimeSpan Duration { get; protected set; }
-    
-    public virtual Guid? OccupierUserId { get; protected set; }
-    
-    public virtual string OccupierName { get; protected set; }
+
+    public DateTime Date { get; set; }
+
+    public TimeSpan StartingTime { get; set; }
+
+    public TimeSpan Duration { get; set; }
+
+    public Guid? OccupierUserId { get; set; }
+
+    public string OccupierName { get; set; }
+
+    protected AssetOccupancyResultEto()
+    {
+
+    }
+
+    public AssetOccupancyResultEto(Guid? tenantId, Guid assetId, string assetName, string assetDefinitionName,
+        bool success, DateTime date, TimeSpan startingTime, TimeSpan duration, Guid? occupierUserId,
+        string occupierName)
+    {
+        TenantId = tenantId;
+        AssetId = assetId;
+        AssetName = assetName;
+        AssetDefinitionName = assetDefinitionName;
+        Success = success;
+        Date = date;
+        StartingTime = startingTime;
+        Duration = duration;
+        OccupierUserId = occupierUserId;
+        OccupierName = occupierName;
+    }
 }
