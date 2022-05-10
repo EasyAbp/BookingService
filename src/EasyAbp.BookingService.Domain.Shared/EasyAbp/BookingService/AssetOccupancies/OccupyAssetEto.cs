@@ -4,7 +4,7 @@ using Volo.Abp.ObjectExtending;
 
 namespace EasyAbp.BookingService.AssetOccupancies;
 
-public class OccupyAssetEto : ExtensibleObject, IMultiTenant
+public class OccupyAssetEto : ExtensibleObject, IHasPeriodInfo, IMultiTenant
 {
     public Guid? TenantId { get; set; }
 
@@ -18,7 +18,7 @@ public class OccupyAssetEto : ExtensibleObject, IMultiTenant
 
     public Guid? OccupierUserId { get; set; }
 
-    OccupyAssetEto()
+    protected OccupyAssetEto()
     {
 
     }
