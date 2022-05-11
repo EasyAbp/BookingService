@@ -13,14 +13,19 @@ public class BulkOccupyAssetEto : ExtensibleObject, IMultiTenant
     public Guid? TenantId { get; set; }
 
     public List<OccupyAssetInfoModel> Models { get; set; }
+    
+    public List<OccupyAssetByCategoryInfoModel> ByCategoryModels { get; set; }
 
     protected BulkOccupyAssetEto()
     {
+        Models = new List<OccupyAssetInfoModel>();
+        ByCategoryModels = new List<OccupyAssetByCategoryInfoModel>();
     }
 
-    public BulkOccupyAssetEto(Guid? tenantId, List<OccupyAssetInfoModel> models)
+    public BulkOccupyAssetEto(Guid? tenantId, List<OccupyAssetInfoModel> models, List<OccupyAssetByCategoryInfoModel> byCategoryModels)
     {
         TenantId = tenantId;
-        Models = models;
+        Models = models ?? new List<OccupyAssetInfoModel>();
+        ByCategoryModels = byCategoryModels ?? new List<OccupyAssetByCategoryInfoModel>();
     }
 }
