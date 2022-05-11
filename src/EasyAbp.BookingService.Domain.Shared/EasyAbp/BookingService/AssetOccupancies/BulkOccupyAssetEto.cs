@@ -5,6 +5,9 @@ using Volo.Abp.ObjectExtending;
 
 namespace EasyAbp.BookingService.AssetOccupancies;
 
+/// <summary>
+/// Extra properties will fully map to <see cref="BulkAssetOccupancyResultEto"/> by default.
+/// </summary>
 public class BulkOccupyAssetEto : ExtensibleObject, IMultiTenant
 {
     public Guid? TenantId { get; set; }
