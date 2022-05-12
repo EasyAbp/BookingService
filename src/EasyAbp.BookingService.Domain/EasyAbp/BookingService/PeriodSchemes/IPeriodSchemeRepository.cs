@@ -6,5 +6,5 @@ namespace EasyAbp.BookingService.PeriodSchemes;
 
 public interface IPeriodSchemeRepository : IRepository<PeriodScheme, Guid>
 {
-    Task<PeriodScheme> GetDefaultSchemeAsync();
+    Task<PeriodScheme> FindDefaultSchemeAsync();
 }

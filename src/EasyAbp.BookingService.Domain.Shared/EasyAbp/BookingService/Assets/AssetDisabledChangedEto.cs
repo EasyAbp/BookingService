@@ -1,10 +1,13 @@
 ﻿using System;
+using Volo.Abp.MultiTenancy;
 
 namespace EasyAbp.BookingService.Assets;
 
 [Serializable]
-public class AssetDisabledChangedEto
+public class AssetDisabledChangedEto : IMultiTenant
 {
+    public Guid? TenantId { get; set; }
+
     public Guid AssetId { get; set; }
 
     /// <summary>

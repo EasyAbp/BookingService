@@ -64,7 +64,8 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
         Disabled = disabled;
     }
 
-    public void Update(string name, string assetDefinitionName, Guid assetCategoryId, Guid? periodSchemeId,
+    public void Update([NotNull] string name, [NotNull] string assetDefinitionName, Guid assetCategoryId,
+        Guid? periodSchemeId,
         AssetSchedulePolicy? defaultSchedulePolicy, int priority, TimeInAdvance timeInAdvance, bool disabled)
     {
         Name = name;
@@ -79,7 +80,8 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
             AddDistributedEvent(new AssetDisabledChangedEto
             {
                 Disabled = disabled,
-                AssetId = Id
+                AssetId = Id,
+                TenantId = TenantId
             });
             Disabled = disabled;
         }

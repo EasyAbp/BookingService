@@ -15,7 +15,7 @@ using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.AssetOccupancies;
 
-public class AssetOccupancyManager : DomainService, IAssetOccupancyManager, IUnitOfWorkEnabled
+public class AssetOccupancyManager : DomainService, IUnitOfWorkEnabled
 {
     private readonly IAssetOccupancyRepository _repository;
     private readonly IAssetRepository _assetRepository;
@@ -99,7 +99,7 @@ public class AssetOccupancyManager : DomainService, IAssetOccupancyManager, IUni
                     var effectiveTimeInAdvance = await CalculateEffectiveTimeInAdvanceAsync(
                         assetSchedule, asset, category);
 
-                    if (effectiveTimeInAdvance.CanBook(date + period.StartingTime - bookingDate))
+                    if (effectiveTimeInAdvance.CanOccupy(date + period.StartingTime, bookingDate))
                     {
                         // Check already occupied
                         var conflictedOccupancy =
@@ -111,6 +111,11 @@ public class AssetOccupancyManager : DomainService, IAssetOccupancyManager, IUni
                                 StartingTime = period.StartingTime,
                                 Duration = period.Duration
                             });
+                        }
+                        else
+                        {
+                            // TODO Divisible ?
+                            // TODO 钟点房如何实现？
                         }
                     }
                 }
@@ -210,7 +215,7 @@ public class AssetOccupancyManager : DomainService, IAssetOccupancyManager, IUni
             return Task.FromResult(category.DefaultSchedulePolicy.Value);
         }
 
-        var assetDefinition = _options.AssetDefinitions.FirstOrDefault(x => x.Name == asset.AssetDefinitionName);
+        var assetDefinition = _options.AssetDefinitionConfigurations.FirstOrDefault(x => x.Name == asset.AssetDefinitionName);
         if (assetDefinition is not null)
         {
             return Task.FromResult(assetDefinition.DefaultSchedulePolicy);
@@ -240,7 +245,7 @@ public class AssetOccupancyManager : DomainService, IAssetOccupancyManager, IUni
             return Task.FromResult(category.TimeInAdvance);
         }
 
-        var assetDefinition = _options.AssetDefinitions.FirstOrDefault(x => x.Name == asset.AssetDefinitionName);
+        var assetDefinition = _options.AssetDefinitionConfigurations.FirstOrDefault(x => x.Name == asset.AssetDefinitionName);
         if (assetDefinition is not null)
         {
             return Task.FromResult(assetDefinition.TimeInAdvance);

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using JetBrains.Annotations;
 using Volo.Abp.Domain.Values;
 
@@ -10,46 +9,18 @@ namespace EasyAbp.BookingService;
 /// This value object describes the time range for assets that can occupy.
 /// </summary>
 [Serializable]
-public class TimeInAdvance : ValueObject
+public class TimeInAdvance : ValueObject, ITimeInAdvance
 {
-    /// <summary>
-    /// The maximum number of days people can occupy assets in advance.
-    /// Given we are occupying from "March 10, 2022, 10:00".
-    /// Value <c>3</c> means can occupy AFTER "March 7, 2022, 0:00".
-    /// Value <c>0</c> means can occupy AFTER "March 10, 2022, 0:00".
-    /// Value <c>-1</c> means can not occupy.
-    /// Only the value with an EARLIER time of this property and the <see cref="MaxTimespanInAdvance"/> property will take effect.
-    /// </summary>
+    /// <inheritdoc/>
     public int MaxDaysInAdvance { get; set; }
 
-    /// <summary>
-    /// The maximum timespan people can occupy assets in advance.
-    /// Given we are occupying from "March 10, 2022, 10:00".
-    /// Value <c>3-days</c> means can occupy AFTER "March 7, 2022, 10:00".
-    /// Value <c>0</c> means can not occupy.
-    /// Only the value with an EARLIER time of this property and the <see cref="MaxDaysInAdvance"/> property will take effect.
-    /// </summary>
+    /// <inheritdoc/>
     public TimeSpan MaxTimespanInAdvance { get; set; }
 
-    /// <summary>
-    /// The minimum number of days people can occupy assets in advance.
-    /// Given we are occupying from "March 10, 2022, 10:00".
-    /// Value <c>3</c> means can occupy BEFORE "March 7, 2022, 0:00".
-    /// Value <c>0</c> means can occupy BEFORE "March 10, 2022, 0:00".
-    /// Value <c>-1</c> or <c>null</c> means unlimited.
-    /// Only the value with a LATER time of this property and the <see cref="MinTimespanInAdvance"/> property will take effect.
-    /// Null values have the lowest priority.
-    /// </summary>
+    /// <inheritdoc/>
     public int? MinDaysInAdvance { get; set; }
 
-    /// <summary>
-    /// The minimum timespan people can occupy assets in advance.
-    /// Given we are occupying from "March 10, 2022, 10:00".
-    /// Value <c>3-days</c> means can occupy BEFORE "March 7, 2022, 10:00".
-    /// Value <c>0</c> or <c>null</c> means unlimited.
-    /// Only the value with a LATER time of this property and the <see cref="MinDaysInAdvance"/> property will take effect.
-    /// Null values have the lowest priority.
-    /// </summary>
+    /// <inheritdoc/>
     public TimeSpan? MinTimespanInAdvance { get; set; }
 
     protected override IEnumerable<object> GetAtomicValues()
@@ -60,21 +31,25 @@ public class TimeInAdvance : ValueObject
         yield return MinTimespanInAdvance;
     }
 
-    public bool CanBook(TimeSpan timeSpan)
+    public bool CanOccupy(DateTime assetTime, DateTime bookingTime)
     {
+        // TODO assetTime?
+        // TODO MaxDaysInAdvance -1 value?
         if (MaxDaysInAdvance == -1 || MaxTimespanInAdvance == TimeSpan.Zero)
         {
             return false;
         }
 
+        var ts = assetTime - bookingTime;
+
         var max = GetMaxTimespanInAdvance();
-        if (timeSpan > max)
+        if (ts > max)
         {
             return false;
         }
 
         var min = GetMinTimespanInAdvance();
-        if (min.HasValue && timeSpan < min.Value)
+        if (min.HasValue && ts < min.Value)
         {
             return false;
         }
@@ -82,7 +57,6 @@ public class TimeInAdvance : ValueObject
         return true;
     }
 
-    [CanBeNull]
     private TimeSpan? GetMinTimespanInAdvance()
     {
         if (MinDaysInAdvance.HasValue && MinTimespanInAdvance.HasValue)

@@ -5,7 +5,7 @@ using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.AssetSchedules;
 
-public class AssetScheduleManager : DomainService, IAssetScheduleManager, IUnitOfWorkEnabled
+public class AssetScheduleManager : DomainService, IUnitOfWorkEnabled
 {
     private readonly IAssetScheduleRepository _repository;
     private readonly IAssetScheduleSelector _assetScheduleSelector;
@@ -56,6 +56,7 @@ public class AssetScheduleManager : DomainService, IAssetScheduleManager, IUnitO
     public virtual async Task<AssetSchedule> GetAssetScheduleAsync(Guid assetId,
         DateTime date, TimeSpan startingTime, TimeSpan duration)
     {
+        // TODO need check logic
         var assetSchedules = await _repository.GetAssetScheduleListAfterDateAsync(assetId, date);
 
         return await _assetScheduleSelector.SelectAsync(assetSchedules, date, startingTime, duration);

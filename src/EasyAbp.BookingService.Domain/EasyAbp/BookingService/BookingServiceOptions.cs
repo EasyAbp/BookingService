@@ -9,5 +9,5 @@ public class BookingServiceOptions
 {
     public const string ConfigurationKey = "BookingService";
 
-    public List<AssetDefinition> AssetDefinitions { get; set; } = new();
+    public List<AssetDefinition> AssetDefinitionConfigurations { get; set; } = new();
 }

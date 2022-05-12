@@ -20,10 +20,10 @@ public class PeriodSchemeAppService : CrudAppService<PeriodScheme, PeriodSchemeD
     protected override string DeletePolicyName { get; set; } = BookingServicePermissions.PeriodScheme.Delete;
 
     private readonly IPeriodSchemeRepository _repository;
-    private readonly IPeriodSchemeManager _periodSchemeManager;
+    private readonly PeriodSchemeManager _periodSchemeManager;
 
     public PeriodSchemeAppService(IPeriodSchemeRepository repository,
-        IPeriodSchemeManager periodSchemeManager) : base(repository)
+        PeriodSchemeManager periodSchemeManager) : base(repository)
     {
         _repository = repository;
         _periodSchemeManager = periodSchemeManager;
@@ -59,7 +59,7 @@ public class PeriodSchemeAppService : CrudAppService<PeriodScheme, PeriodSchemeD
         return _periodSchemeManager.DeleteAsync(id);
     }
 
-    public async Task<PeriodSchemeDto> SetAsDefaultAsync(Guid id)
+    public virtual async Task<PeriodSchemeDto> SetAsDefaultAsync(Guid id)
     {
         await CheckUpdatePolicyAsync();
 

@@ -16,7 +16,8 @@ public class AssetCategory : FullAuditedAggregateRoot<Guid>, ITree<AssetCategory
     public virtual Guid? TenantId { get; protected set; }
 
     /// <summary>
-    /// Assets should have the same AssetDefinitionName as here. 
+    /// Assets should have the same AssetDefinitionName as here.
+    /// This should be readonly because Assets should have the same AssetDefinitionName as it's category. 
     /// </summary>
     [CanBeNull]
     public virtual string AssetDefinitionName { get; protected set; }

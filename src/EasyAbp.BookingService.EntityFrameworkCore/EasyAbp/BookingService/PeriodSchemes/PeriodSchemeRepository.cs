@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using EasyAbp.BookingService.EntityFrameworkCore;
+using JetBrains.Annotations;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -14,7 +15,8 @@ namespace EasyAbp.BookingService.PeriodSchemes
         {
         }
 
-        public Task<PeriodScheme> GetDefaultSchemeAsync()
+        [ItemCanBeNull]
+        public virtual Task<PeriodScheme> FindDefaultSchemeAsync()
         {
             return FindAsync(x => x.IsDefault);
         }

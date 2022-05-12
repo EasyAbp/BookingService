@@ -7,7 +7,7 @@ using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.PeriodSchemes;
 
-public class PeriodSchemeManager : DomainService, IPeriodSchemeManager, IUnitOfWorkEnabled
+public class PeriodSchemeManager : DomainService, IUnitOfWorkEnabled
 {
     private readonly IPeriodSchemeRepository _repository;
     private readonly DefaultPeriodSchemeStore _defaultPeriodSchemeStore;
@@ -31,14 +31,14 @@ public class PeriodSchemeManager : DomainService, IPeriodSchemeManager, IUnitOfW
         await _repository.DeleteAsync(entity);
     }
 
-    [UnitOfWork]
+    [UnitOfWork(isTransactional: true)]
     public virtual async Task<PeriodScheme> SetAsDefaultAsync(Guid id)
     {
         var entity = await _repository.GetAsync(id);
         if (!entity.IsDefault)
         {
             await _defaultPeriodSchemeStore.ClearAsync();
-            
+
             var defaultPeriodScheme = await _repository.FindAsync(x => x.IsDefault);
             if (defaultPeriodScheme is not null)
             {

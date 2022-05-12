@@ -12,7 +12,7 @@ using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.Assets;
 
-public class AssetManager : DomainService, IAssetManager, IUnitOfWorkEnabled
+public class AssetManager : DomainService, IUnitOfWorkEnabled
 {
     private readonly IAssetRepository _repository;
     private readonly IAssetCategoryRepository _assetCategoryRepository;
@@ -35,7 +35,7 @@ public class AssetManager : DomainService, IAssetManager, IUnitOfWorkEnabled
     {
         Check.NotNullOrWhiteSpace(assetDefinitionName, nameof(assetDefinitionName));
 
-        if (_options.AssetDefinitions.All(x => x.Name != assetDefinitionName))
+        if (_options.AssetDefinitionConfigurations.All(x => x.Name != assetDefinitionName))
         {
             throw new AssetDefinitionNotExistsException(assetDefinitionName);
         }
@@ -66,7 +66,7 @@ public class AssetManager : DomainService, IAssetManager, IUnitOfWorkEnabled
     {
         Check.NotNullOrWhiteSpace(assetDefinitionName, nameof(assetDefinitionName));
 
-        if (_options.AssetDefinitions.All(x => x.Name != assetDefinitionName))
+        if (_options.AssetDefinitionConfigurations.All(x => x.Name != assetDefinitionName))
         {
             throw new AssetDefinitionNotExistsException(assetDefinitionName);
         }

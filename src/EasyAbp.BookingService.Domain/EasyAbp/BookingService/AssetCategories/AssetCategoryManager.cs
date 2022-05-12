@@ -9,7 +9,7 @@ using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.AssetCategories;
 
-public class AssetCategoryManager : DomainService, IAssetCategoryManager, IUnitOfWorkEnabled
+public class AssetCategoryManager : DomainService, IUnitOfWorkEnabled
 {
     private readonly IAssetCategoryRepository _repository;
     private readonly BookingServiceOptions _options;
@@ -25,7 +25,7 @@ public class AssetCategoryManager : DomainService, IAssetCategoryManager, IUnitO
         Guid? periodSchemeId,
         AssetSchedulePolicy? defaultSchedulePolicy, TimeInAdvance timeInAdvance, bool disabled)
     {
-        if (_options.AssetDefinitions.All(x => x.Name != assetDefinitionName))
+        if (_options.AssetDefinitionConfigurations.All(x => x.Name != assetDefinitionName))
         {
             throw new AssetDefinitionNotExistsException(assetDefinitionName);
         }

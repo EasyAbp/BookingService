@@ -13,7 +13,6 @@ public static class AssetCategoryEfCoreQueryableExtensions
             return queryable;
         }
 
-        return queryable
-            .Include(x => x.Children);
+        return queryable;
     }
 }

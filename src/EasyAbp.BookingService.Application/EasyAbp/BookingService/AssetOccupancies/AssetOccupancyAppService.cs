@@ -20,10 +20,10 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
     protected virtual string SearchPolicyName { get; set; } = BookingServicePermissions.AssetOccupancy.Search;
 
     private readonly IAssetOccupancyRepository _repository;
-    private readonly IAssetOccupancyManager _assetOccupancyManager;
+    private readonly AssetOccupancyManager _assetOccupancyManager;
 
     public AssetOccupancyAppService(IAssetOccupancyRepository repository,
-        IAssetOccupancyManager assetOccupancyManager) : base(repository)
+        AssetOccupancyManager assetOccupancyManager) : base(repository)
     {
         _repository = repository;
         _assetOccupancyManager = assetOccupancyManager;

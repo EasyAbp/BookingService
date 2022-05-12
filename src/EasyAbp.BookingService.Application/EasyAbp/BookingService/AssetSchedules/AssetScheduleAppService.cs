@@ -19,11 +19,11 @@ public class AssetScheduleAppService : CrudAppService<AssetSchedule, AssetSchedu
     protected override string DeletePolicyName { get; set; } = BookingServicePermissions.AssetSchedule.Delete;
 
     private readonly IAssetScheduleRepository _repository;
-    private readonly IAssetScheduleManager _assetScheduleManager;
+    private readonly AssetScheduleManager _assetScheduleManager;
 
 
     public AssetScheduleAppService(IAssetScheduleRepository repository,
-        IAssetScheduleManager assetScheduleManager) : base(repository)
+        AssetScheduleManager assetScheduleManager) : base(repository)
     {
         _repository = repository;
         _assetScheduleManager = assetScheduleManager;
@@ -41,6 +41,7 @@ public class AssetScheduleAppService : CrudAppService<AssetSchedule, AssetSchedu
 
     protected override async Task<AssetSchedule> MapToEntityAsync(CreateUpdateAssetScheduleDto createInput)
     {
+        // TODO check assetId exists here?
         return await _assetScheduleManager.CreateAsync(
             createInput.AssetId,
             createInput.Date,
@@ -53,6 +54,7 @@ public class AssetScheduleAppService : CrudAppService<AssetSchedule, AssetSchedu
 
     protected override async Task MapToEntityAsync(CreateUpdateAssetScheduleDto updateInput, AssetSchedule entity)
     {
+        // TODO check assetId exists here?
         await _assetScheduleManager.UpdateAsync(entity,
             updateInput.AssetId,
             updateInput.Date,

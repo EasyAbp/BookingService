@@ -19,10 +19,10 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
     protected override string DeletePolicyName { get; set; } = BookingServicePermissions.Asset.Delete;
 
     private readonly IAssetRepository _repository;
-    private readonly IAssetManager _assetManager;
+    private readonly AssetManager _assetManager;
 
     public AssetAppService(IAssetRepository repository,
-        IAssetManager assetManager) : base(repository)
+        AssetManager assetManager) : base(repository)
     {
         _repository = repository;
         _assetManager = assetManager;

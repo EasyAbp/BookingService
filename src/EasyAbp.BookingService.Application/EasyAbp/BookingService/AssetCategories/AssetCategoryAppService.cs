@@ -18,11 +18,11 @@ public class AssetCategoryAppService : CrudAppService<AssetCategory, AssetCatego
     protected override string UpdatePolicyName { get; set; } = BookingServicePermissions.AssetCategory.Update;
     protected override string DeletePolicyName { get; set; } = BookingServicePermissions.AssetCategory.Delete;
 
-    private readonly IAssetCategoryManager _assetCategoryManager;
+    private readonly AssetCategoryManager _assetCategoryManager;
     private readonly IAssetCategoryRepository _repository;
 
     public AssetCategoryAppService(
-        IAssetCategoryManager assetCategoryManager,
+        AssetCategoryManager assetCategoryManager,
         IAssetCategoryRepository repository) : base(repository)
     {
         _assetCategoryManager = assetCategoryManager;
@@ -44,6 +44,7 @@ public class AssetCategoryAppService : CrudAppService<AssetCategory, AssetCatego
 
     protected override async Task<AssetCategory> MapToEntityAsync(CreateAssetCategoryDto createInput)
     {
+        // TODO Check PeriodSchemeId
         return await _assetCategoryManager.CreateAsync(
             createInput.ParentId,
             createInput.DisplayName,
@@ -56,6 +57,7 @@ public class AssetCategoryAppService : CrudAppService<AssetCategory, AssetCatego
 
     protected override async Task MapToEntityAsync(UpdateAssetCategoryDto updateInput, AssetCategory entity)
     {
+        // TODO Check PeriodSchemeId
         await _assetCategoryManager.UpdateAsync(entity,
             updateInput.ParentId,
             updateInput.DisplayName,

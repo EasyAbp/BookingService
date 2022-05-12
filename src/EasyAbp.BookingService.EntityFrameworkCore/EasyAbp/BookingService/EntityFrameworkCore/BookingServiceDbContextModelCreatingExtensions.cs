@@ -55,6 +55,7 @@ public static class BookingServiceDbContextModelCreatingExtensions
             b.ConfigureByConvention();
 
             b.HasIndex(x => x.AssetId);
+            b.HasIndex(x => new { x.AssetId, x.Date });
 
             /* Configure more properties here */
         });
