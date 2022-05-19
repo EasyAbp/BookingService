@@ -9,4 +9,5 @@ public static class BookingServiceErrorCodes
     public const string CanNotDeleteDefaultPeriodScheme = "EasyAbp.BookingService:CanNotDeleteDefaultPeriodScheme";
     public const string AssetNotExists = "EasyAbp.BookingService:AssetNotExists";
     public const string AssetScheduleExists = "EasyAbp.BookingService:AssetScheduleExists";
+    public const string AssetDisabled = "EasyAbp.BookingService:AssetDisabled";
 }

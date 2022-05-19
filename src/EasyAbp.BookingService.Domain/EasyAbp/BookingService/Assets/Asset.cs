@@ -28,7 +28,7 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
     /// This property determines whether assets can be occupied by default when there is no schedule created.
     /// Will fall back to <see cref="AssetCategory"/> if the value here is <c>null</c>.
     /// </summary>
-    public virtual AssetSchedulePolicy? DefaultSchedulePolicy { get; protected set; }
+    public virtual PeriodUsable? DefaultPeriodUsable { get; protected set; }
 
     /// <summary>
     /// When occupying an Asset through AssetCategoryId, the Priority value determines to pick which Asset.
@@ -50,7 +50,7 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
     }
 
     public Asset(Guid id, Guid? tenantId, [NotNull] string name, [NotNull] string assetDefinitionName,
-        Guid assetCategoryId, Guid? periodSchemeId, AssetSchedulePolicy? defaultSchedulePolicy, int priority,
+        Guid assetCategoryId, Guid? periodSchemeId, PeriodUsable? defaultPeriodUsable, int priority,
         [CanBeNull] TimeInAdvance timeInAdvance, bool disabled) : base(id)
     {
         TenantId = tenantId;
@@ -58,7 +58,7 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
         AssetDefinitionName = assetDefinitionName;
         AssetCategoryId = assetCategoryId;
         PeriodSchemeId = periodSchemeId;
-        DefaultSchedulePolicy = defaultSchedulePolicy;
+        DefaultPeriodUsable = defaultPeriodUsable;
         Priority = priority;
         TimeInAdvance = timeInAdvance;
         Disabled = disabled;
@@ -66,24 +66,15 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
 
     public void Update([NotNull] string name, [NotNull] string assetDefinitionName, Guid assetCategoryId,
         Guid? periodSchemeId,
-        AssetSchedulePolicy? defaultSchedulePolicy, int priority, TimeInAdvance timeInAdvance, bool disabled)
+        PeriodUsable? defaultPeriodUsable, int priority, TimeInAdvance timeInAdvance, bool disabled)
     {
         Name = name;
         AssetDefinitionName = assetDefinitionName;
         AssetCategoryId = assetCategoryId;
         PeriodSchemeId = periodSchemeId;
-        DefaultSchedulePolicy = defaultSchedulePolicy;
+        DefaultPeriodUsable = defaultPeriodUsable;
         Priority = priority;
         TimeInAdvance = timeInAdvance;
-        if (Disabled != disabled)
-        {
-            AddDistributedEvent(new AssetDisabledChangedEto
-            {
-                Disabled = disabled,
-                AssetId = Id,
-                TenantId = TenantId
-            });
-            Disabled = disabled;
-        }
+        Disabled = disabled;
     }
 }

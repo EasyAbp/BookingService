@@ -16,7 +16,7 @@ public class AssetDto : ExtensibleFullAuditedEntityDto<Guid>
 
     public Guid? PeriodSchemeId { get; set; }
 
-    public AssetSchedulePolicy? DefaultSchedulePolicy { get; set; }
+    public PeriodUsable? DefaultPeriodUsable { get; set; }
 
     public int Priority { get; set; }
 

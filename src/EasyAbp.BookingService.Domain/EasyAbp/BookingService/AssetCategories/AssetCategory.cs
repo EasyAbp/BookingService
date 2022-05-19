@@ -35,7 +35,7 @@ public class AssetCategory : FullAuditedAggregateRoot<Guid>, ITree<AssetCategory
     /// The property value from <see cref="Asset"/> is preferred.
     /// Will fall back to <see cref="AssetDefinition"/> if the value here is <c>null</c>.
     /// </summary>
-    public virtual AssetSchedulePolicy? DefaultSchedulePolicy { get; protected set; }
+    public virtual PeriodUsable? DefaultPeriodUsable { get; protected set; }
 
     /// <summary>
     /// This value object describes the time range for assets that can occupy.
@@ -69,13 +69,13 @@ public class AssetCategory : FullAuditedAggregateRoot<Guid>, ITree<AssetCategory
     }
 
     public AssetCategory(Guid id, Guid? tenantId, [CanBeNull] string assetDefinitionName, Guid? periodSchemeId,
-        AssetSchedulePolicy? defaultSchedulePolicy, Guid? parentId, string displayName,
+        PeriodUsable? defaultPeriodUsable, Guid? parentId, string displayName,
         [CanBeNull] TimeInAdvance timeInAdvance, bool disabled) : base(id)
     {
         TenantId = tenantId;
         AssetDefinitionName = assetDefinitionName;
         PeriodSchemeId = periodSchemeId;
-        DefaultSchedulePolicy = defaultSchedulePolicy;
+        DefaultPeriodUsable = defaultPeriodUsable;
         ParentId = parentId;
         DisplayName = displayName;
         TimeInAdvance = timeInAdvance;
@@ -85,22 +85,13 @@ public class AssetCategory : FullAuditedAggregateRoot<Guid>, ITree<AssetCategory
     }
 
     public void Update(Guid? parentId, string displayName, Guid? periodSchemeId,
-        AssetSchedulePolicy? defaultSchedulePolicy, TimeInAdvance timeInAdvance, bool disabled)
+        PeriodUsable? defaultPeriodUsable, TimeInAdvance timeInAdvance, bool disabled)
     {
         ParentId = parentId;
         DisplayName = displayName;
         PeriodSchemeId = periodSchemeId;
-        DefaultSchedulePolicy = defaultSchedulePolicy;
+        DefaultPeriodUsable = defaultPeriodUsable;
         TimeInAdvance = timeInAdvance;
-
-        if (Disabled != disabled)
-        {
-            Disabled = disabled;
-            AddDistributedEvent(new AssetCategoryDisabledChangedEto
-            {
-                AssetCategoryId = Id,
-                Disabled = disabled
-            });
-        }
+        Disabled = disabled;
     }
 }

@@ -10,7 +10,7 @@ public class UpdateAssetCategoryDto : ExtensibleObject
 {
     public Guid? PeriodSchemeId { get; set; }
 
-    public AssetSchedulePolicy? DefaultSchedulePolicy { get; set; }
+    public PeriodUsable? DefaultPeriodUsable { get; set; }
 
     public TimeInAdvanceDto TimeInAdvance { get; set; }
 

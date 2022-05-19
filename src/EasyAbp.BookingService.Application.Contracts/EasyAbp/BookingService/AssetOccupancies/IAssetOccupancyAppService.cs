@@ -11,16 +11,15 @@ public interface IAssetOccupancyAppService :
         AssetOccupancyDto,
         Guid,
         GetAssetOccupanciesRequestDto,
-        CreateUpdateAssetOccupancyDto,
-        CreateUpdateAssetOccupancyDto>
+        CreateAssetOccupancyDto>
 {
     /// <summary>
-    /// Get asset's bookable dates in range of days
+    /// Search for asset's bookable periods on specific date
     /// </summary>
-    Task<List<AssetBookableDateDto>> SearchAssetBookableDatesAsync(SearchAssetBookableDatesRequestDto input);
+    Task<List<BookablePeriodDto>> SearchAssetBookablePeriodsAsync(SearchAssetBookablePeriodsRequestDto input);
 
     /// <summary>
-    /// Search for asset's bookable dates in all categories recursively
+    /// Search for category's bookable periods on specific date
     /// </summary>
-    Task<List<CategoryBookableDateDto>> SearchCategoryBookableDatesAsync(SearchCategoryBookableDatesRequestDto input);
+    Task<List<BookablePeriodDto>> SearchCategoryBookablePeriodsAsync(SearchCategoryBookablePeriodsRequestDto input);
 }

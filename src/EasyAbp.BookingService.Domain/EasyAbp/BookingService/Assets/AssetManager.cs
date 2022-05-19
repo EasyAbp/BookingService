@@ -30,7 +30,7 @@ public class AssetManager : DomainService, IUnitOfWorkEnabled
     public virtual async Task<Asset> CreateAsync(string name, [NotNull] string assetDefinitionName,
         Guid assetCategoryId,
         Guid? periodSchemeId,
-        AssetSchedulePolicy? defaultSchedulePolicy,
+        PeriodUsable? defaultPeriodUsable,
         int priority, TimeInAdvance timeInAdvance, bool disabled)
     {
         Check.NotNullOrWhiteSpace(assetDefinitionName, nameof(assetDefinitionName));
@@ -54,7 +54,7 @@ public class AssetManager : DomainService, IUnitOfWorkEnabled
             assetDefinitionName,
             assetCategoryId,
             periodSchemeId,
-            defaultSchedulePolicy,
+            defaultPeriodUsable,
             priority,
             timeInAdvance,
             disabled);
@@ -62,7 +62,7 @@ public class AssetManager : DomainService, IUnitOfWorkEnabled
 
     public async Task UpdateAsync(Asset asset, string name, string assetDefinitionName, Guid assetCategoryId,
         Guid? periodSchemeId,
-        AssetSchedulePolicy? defaultSchedulePolicy, int priority, TimeInAdvance timeInAdvance, bool disabled)
+        PeriodUsable? defaultPeriodUsable, int priority, TimeInAdvance timeInAdvance, bool disabled)
     {
         Check.NotNullOrWhiteSpace(assetDefinitionName, nameof(assetDefinitionName));
 
@@ -83,7 +83,7 @@ public class AssetManager : DomainService, IUnitOfWorkEnabled
             assetDefinitionName,
             assetCategoryId,
             periodSchemeId,
-            defaultSchedulePolicy,
+            defaultPeriodUsable,
             priority,
             timeInAdvance,
             disabled);

@@ -23,7 +23,7 @@ public class AssetCategoryManager : DomainService, IUnitOfWorkEnabled
 
     public virtual Task<AssetCategory> CreateAsync(Guid? parentId, string displayName, string assetDefinitionName,
         Guid? periodSchemeId,
-        AssetSchedulePolicy? defaultSchedulePolicy, TimeInAdvance timeInAdvance, bool disabled)
+        PeriodUsable? defaultPeriodUsable, TimeInAdvance timeInAdvance, bool disabled)
     {
         if (_options.AssetDefinitionConfigurations.All(x => x.Name != assetDefinitionName))
         {
@@ -34,7 +34,7 @@ public class AssetCategoryManager : DomainService, IUnitOfWorkEnabled
             CurrentTenant.Id,
             assetDefinitionName,
             periodSchemeId,
-            defaultSchedulePolicy,
+            defaultPeriodUsable,
             parentId,
             displayName,
             timeInAdvance,
@@ -42,9 +42,9 @@ public class AssetCategoryManager : DomainService, IUnitOfWorkEnabled
     }
 
     public virtual Task UpdateAsync(AssetCategory entity, Guid? parentId, string displayName, Guid? periodSchemeId,
-        AssetSchedulePolicy? defaultSchedulePolicy, TimeInAdvance timeInAdvance, bool disabled)
+        PeriodUsable? defaultPeriodUsable, TimeInAdvance timeInAdvance, bool disabled)
     {
-        entity.Update(parentId, displayName, periodSchemeId, defaultSchedulePolicy, timeInAdvance, disabled);
+        entity.Update(parentId, displayName, periodSchemeId, defaultPeriodUsable, timeInAdvance, disabled);
         return Task.CompletedTask;
     }
 }

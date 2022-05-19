@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Volo.Abp.ObjectExtending;
 
 namespace EasyAbp.BookingService.PeriodSchemes.Dtos;
@@ -6,7 +8,7 @@ namespace EasyAbp.BookingService.PeriodSchemes.Dtos;
 [Serializable]
 public class CreatePeriodDto : ExtensibleObject, IHasPeriodInfo
 {
-    // TODO validate this should less than 24 hours
+    [Range(typeof(TimeSpan), "00:00:00", "23:59:59.999")]
     public TimeSpan StartingTime { get; set; }
 
     public TimeSpan Duration { get; set; }
@@ -17,4 +19,36 @@ public class CreatePeriodDto : ExtensibleObject, IHasPeriodInfo
     /// You can occupy 10:00-10:30 when set to <c>true</c> but cannot when set to <c>false</c>.
     /// </summary>
     public bool Divisible { get; set; }
+
+    public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        foreach (var validationResult in base.Validate(validationContext))
+        {
+            yield return validationResult;
+        }
+
+        if (Divisible && StartingTime + Duration >= TimeSpan.FromDays(1))
+        {
+            // If divisible period can cross days, it will need to search back for infinite days to find any applicable divisible period when searching available period on specific date.
+            yield return new ValidationResult(
+                $"The divisible period cannot cross days",
+                new[]
+                {
+                    nameof(StartingTime),
+                    nameof(Duration)
+                }
+            );
+        }
+
+        if (Duration < TimeSpan.Zero)
+        {
+            yield return new ValidationResult(
+                $"The Duration of Period must be greater or equal 0, current StartingTime: {StartingTime}",
+                new[]
+                {
+                    nameof(Duration)
+                }
+            );
+        }
+    }
 }

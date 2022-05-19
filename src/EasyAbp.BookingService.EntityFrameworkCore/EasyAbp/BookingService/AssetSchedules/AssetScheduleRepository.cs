@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EasyAbp.BookingService.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -16,9 +18,19 @@ public class AssetScheduleRepository : EfCoreRepository<IBookingServiceDbContext
     {
     }
 
-    public Task<List<AssetSchedule>> GetAssetScheduleListAfterDateAsync(Guid assetId, DateTime date, bool includeDetails = false,
+    /// <inheritdoc/>
+    public async Task<List<AssetSchedule>> GetAssetSchedulesAsync(Guid assetId, DateTime startingDateTime,
+        DateTime endingDateTime,
+        PeriodUsable? policy = default, bool includeDetails = false,
         CancellationToken cancellationToken = default)
     {
-        return GetListAsync(x => x.AssetId == assetId && x.Date >= date, includeDetails, cancellationToken);
+        var queryable = includeDetails ? await WithDetailsAsync() : await GetDbSetAsync();
+
+        return await queryable.Where(x => x.AssetId == assetId)
+            .Where(x =>
+                !(x.StartingDateTime >= endingDateTime // new schedule is on the left side of the old schedule in timeline
+                  || x.EndingDateTime <= startingDateTime)) // new schedule is on the right side of the old schedule in timeline
+            .WhereIf(policy.HasValue, x => x.PeriodUsable == policy.Value)
+            .ToListAsync(GetCancellationToken(cancellationToken));
     }
 }

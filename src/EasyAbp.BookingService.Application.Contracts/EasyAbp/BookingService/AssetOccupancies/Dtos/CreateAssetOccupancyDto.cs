@@ -5,9 +5,12 @@ using Volo.Abp.ObjectExtending;
 namespace EasyAbp.BookingService.AssetOccupancies.Dtos;
 
 [Serializable]
-public class CreateUpdateAssetOccupancyDto : ExtensibleObject
+public class CreateAssetOccupancyDto : ExtensibleObject
 {
-    public Guid AssetId { get; set; }
+    // TODO create by categroy id
+    public Guid? AssetId { get; set; }
+    
+    public Guid? CategoryId { get; set; }
 
     public DateTime Date { get; set; }
 

@@ -9,13 +9,11 @@ public class AssetScheduleDto : ExtensibleFullAuditedEntityDto<Guid>
 {
     public Guid AssetId { get; set; }
 
-    public DateTime Date { get; set; }
+    public DateTime StartingDateTime { get; set; }
 
-    public TimeSpan StartingTime { get; set; }
+    public DateTime EndingDateTime { get; set; }
 
-    public TimeSpan Duration { get; set; }
-
-    public AssetSchedulePolicy SchedulePolicy { get; set; }
+    public PeriodUsable PeriodUsable { get; set; }
 
     public TimeInAdvanceDto TimeInAdvance { get; set; }
 }

@@ -49,7 +49,7 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
             createInput.AssetDefinitionName,
             createInput.AssetCategoryId,
             createInput.PeriodSchemeId,
-            createInput.DefaultSchedulePolicy,
+            createInput.DefaultPeriodUsable,
             createInput.Priority,
             ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(createInput.TimeInAdvance),
             createInput.Disabled);
@@ -62,7 +62,7 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
             updateInput.AssetDefinitionName,
             updateInput.AssetCategoryId,
             updateInput.PeriodSchemeId,
-            updateInput.DefaultSchedulePolicy,
+            updateInput.DefaultPeriodUsable,
             updateInput.Priority,
             ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(updateInput.TimeInAdvance),
             updateInput.Disabled);

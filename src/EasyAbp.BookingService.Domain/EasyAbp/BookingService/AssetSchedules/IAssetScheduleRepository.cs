@@ -8,6 +8,17 @@ namespace EasyAbp.BookingService.AssetSchedules;
 
 public interface IAssetScheduleRepository : IRepository<AssetSchedule, Guid>
 {
-    Task<List<AssetSchedule>> GetAssetScheduleListAfterDateAsync(Guid assetId, DateTime date,
-        bool includeDetails = false, CancellationToken cancellationToken = default);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="assetId"></param>
+    /// <param name="startingDateTime">Included</param>
+    /// <param name="endingDateTime">Excluded</param>
+    /// <param name="policy"></param>
+    /// <param name="includeDetails"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<List<AssetSchedule>> GetAssetSchedulesAsync(Guid assetId, DateTime startingDateTime, DateTime endingDateTime,
+        PeriodUsable? policy = default, bool includeDetails = false,
+        CancellationToken cancellationToken = default);
 }

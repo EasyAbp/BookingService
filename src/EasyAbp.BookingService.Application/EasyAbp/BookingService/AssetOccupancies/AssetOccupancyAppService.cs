@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EasyAbp.BookingService.AssetOccupancies.Dtos;
+using EasyAbp.BookingService.PeriodSchemes;
 using EasyAbp.BookingService.Permissions;
+using Volo.Abp;
 using Volo.Abp.Application.Services;
 
 namespace EasyAbp.BookingService.AssetOccupancies;
 
 public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccupancyDto, Guid,
-        GetAssetOccupanciesRequestDto, CreateUpdateAssetOccupancyDto, CreateUpdateAssetOccupancyDto>,
+        GetAssetOccupanciesRequestDto, CreateAssetOccupancyDto>,
     IAssetOccupancyAppService
 {
     protected override string GetPolicyName { get; set; } = BookingServicePermissions.AssetOccupancy.Default;
@@ -39,50 +41,50 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
                 x => x.Date == input.Date.Value);
     }
 
-    protected override async Task<AssetOccupancy> MapToEntityAsync(CreateUpdateAssetOccupancyDto createInput)
+    [RemoteService(false)]
+    public override Task<AssetOccupancyDto> UpdateAsync(Guid id, CreateAssetOccupancyDto input)
     {
-        return await _assetOccupancyManager.CreateAsync(
-            createInput.AssetId,
-            createInput.Date,
-            createInput.StartingTime,
-            createInput.Duration,
-            createInput.OccupierUserId);
+        throw new NotSupportedException();
     }
 
-    protected override async Task MapToEntityAsync(CreateUpdateAssetOccupancyDto updateInput, AssetOccupancy entity)
+    public override async Task<AssetOccupancyDto> CreateAsync(CreateAssetOccupancyDto input)
     {
-        await _assetOccupancyManager.UpdateAsync(entity,
-            updateInput.AssetId,
-            updateInput.Date,
-            updateInput.StartingTime,
-            updateInput.Duration,
-            updateInput.OccupierUserId);
-    }
+        await CheckCreatePolicyAsync();
 
-    public async Task<List<AssetBookableDateDto>> SearchAssetBookableDatesAsync(
-        SearchAssetBookableDatesRequestDto input)
-    {
-        await CheckSearchPolicyAsync();
+        var entity = await _assetOccupancyManager.CreateAsync(
+            input.AssetId,
+            input.CategoryId,
+            input.Date,
+            input.StartingTime,
+            input.Duration,
+            input.OccupierUserId);
 
-        var dates = await _assetOccupancyManager.SearchAssetBookableDatesAsync(
-            input.AssetId, input.BookingDateTime, input.StartingDate, input.Days);
-
-        return ObjectMapper.Map<List<AssetBookableDate>, List<AssetBookableDateDto>>(dates);
-    }
-
-    public async Task<List<CategoryBookableDateDto>> SearchCategoryBookableDatesAsync(
-        SearchCategoryBookableDatesRequestDto input)
-    {
-        await CheckSearchPolicyAsync();
-
-        var dates = await _assetOccupancyManager.SearchCategoryBookableDatesAsync(
-            input.CategoryId, input.BookingDateTime, input.StartingDate, input.Days);
-
-        return ObjectMapper.Map<List<CategoryBookableDate>, List<CategoryBookableDateDto>>(dates);
+        return await MapToGetOutputDtoAsync(entity);
     }
 
     protected virtual async Task CheckSearchPolicyAsync()
     {
         await CheckPolicyAsync(SearchPolicyName);
+    }
+
+    public async Task<List<BookablePeriodDto>> SearchAssetBookablePeriodsAsync(
+        SearchAssetBookablePeriodsRequestDto input)
+    {
+        await CheckSearchPolicyAsync();
+
+        var periods = await _assetOccupancyManager.SearchAssetBookablePeriodsAsync(
+            input.AssetId, input.BookingDateTime, input.SearchDate);
+
+        return ObjectMapper.Map<List<BookablePeriod>, List<BookablePeriodDto>>(periods);
+    }
+
+    public async Task<List<BookablePeriodDto>> SearchCategoryBookablePeriodsAsync(
+        SearchCategoryBookablePeriodsRequestDto input)
+    {
+        await CheckSearchPolicyAsync();
+        var periods = await _assetOccupancyManager.SearchCategoryBookablePeriodsAsync(
+            input.CategoryId, input.BookingDateTime, input.SearchDate);
+
+        return ObjectMapper.Map<List<Period>, List<BookablePeriodDto>>(periods);
     }
 }

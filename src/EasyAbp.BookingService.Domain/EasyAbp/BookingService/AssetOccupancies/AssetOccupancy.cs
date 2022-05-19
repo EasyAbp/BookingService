@@ -48,15 +48,7 @@ public class AssetOccupancy : CreationAuditedAggregateRoot<Guid>, IHasPeriodInfo
         OccupierName = occupierName;
     }
 
-    public bool IsConflicted(DateTime date, TimeSpan startingTime, TimeSpan duration)
-    {
-        var startDateTime = date + startingTime;
-        var endDateTime = startDateTime + duration;
-        var occupancyStartDateTime = Date + StartingTime;
-        var occupancyEndDateTime = occupancyStartDateTime + Duration;
-
-        return !(occupancyStartDateTime > endDateTime || occupancyEndDateTime < startDateTime);
-    }
-
     public DateTime GetStartingDateTime() => Date + StartingTime;
+
+    public TimeSpan GetEndingTime() => StartingTime + Duration;
 }

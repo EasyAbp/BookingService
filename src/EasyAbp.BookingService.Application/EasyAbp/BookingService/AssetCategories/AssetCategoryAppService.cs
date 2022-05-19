@@ -44,25 +44,23 @@ public class AssetCategoryAppService : CrudAppService<AssetCategory, AssetCatego
 
     protected override async Task<AssetCategory> MapToEntityAsync(CreateAssetCategoryDto createInput)
     {
-        // TODO Check PeriodSchemeId
         return await _assetCategoryManager.CreateAsync(
             createInput.ParentId,
             createInput.DisplayName,
             createInput.AssetDefinitionName,
             createInput.PeriodSchemeId,
-            createInput.DefaultSchedulePolicy,
+            createInput.DefaultPeriodUsable,
             MapToTimeInAdvance(createInput.TimeInAdvance),
             createInput.Disabled);
     }
 
     protected override async Task MapToEntityAsync(UpdateAssetCategoryDto updateInput, AssetCategory entity)
     {
-        // TODO Check PeriodSchemeId
         await _assetCategoryManager.UpdateAsync(entity,
             updateInput.ParentId,
             updateInput.DisplayName,
             updateInput.PeriodSchemeId,
-            updateInput.DefaultSchedulePolicy,
+            updateInput.DefaultPeriodUsable,
             MapToTimeInAdvance(updateInput.TimeInAdvance),
             updateInput.Disabled);
     }

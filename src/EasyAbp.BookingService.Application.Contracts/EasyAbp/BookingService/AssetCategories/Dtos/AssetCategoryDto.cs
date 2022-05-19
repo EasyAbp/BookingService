@@ -13,7 +13,7 @@ public class AssetCategoryDto : ExtensibleFullAuditedEntityDto<Guid>
 
     public Guid? PeriodSchemeId { get; set; }
 
-    public AssetSchedulePolicy? DefaultSchedulePolicy { get; set; }
+    public PeriodUsable? DefaultPeriodUsable { get; set; }
 
     public TimeInAdvanceDto TimeInAdvance { get; set; }
 

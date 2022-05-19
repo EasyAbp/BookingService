@@ -8,5 +8,7 @@ public class GetAssetSchedulesRequestDto : PagedAndSortedResultRequestDto
 {
     public Guid? AssetId { get; set; }
 
-    public DateTime? Date { get; set; }
+    public DateTime? StartingDateTime { get; set; }
+    
+    public DateTime? EndingDateTime { get; set; }
 }

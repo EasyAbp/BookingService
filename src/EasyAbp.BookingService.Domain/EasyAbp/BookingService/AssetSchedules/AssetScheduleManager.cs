@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.Uow;
@@ -8,57 +9,43 @@ namespace EasyAbp.BookingService.AssetSchedules;
 public class AssetScheduleManager : DomainService, IUnitOfWorkEnabled
 {
     private readonly IAssetScheduleRepository _repository;
-    private readonly IAssetScheduleSelector _assetScheduleSelector;
 
-    public AssetScheduleManager(IAssetScheduleRepository repository,
-        IAssetScheduleSelector assetScheduleSelector)
+    public AssetScheduleManager(IAssetScheduleRepository repository)
     {
         _repository = repository;
-        _assetScheduleSelector = assetScheduleSelector;
     }
 
     public virtual async Task<AssetSchedule> CreateAsync(Guid assetId,
-        DateTime date, TimeSpan startingTime, TimeSpan duration,
-        AssetSchedulePolicy schedulePolicy, TimeInAdvance timeInAdvance)
+        DateTime startingDateTime, DateTime endingDateTime,
+        PeriodUsable periodUsable, TimeInAdvance timeInAdvance)
     {
-        // Check schedule duplication
-        var schedule = await GetAssetScheduleAsync(assetId, date, startingTime, duration);
-        if (schedule is not null)
+        var assetSchedules =
+            await _repository.GetAssetSchedulesAsync(assetId, startingDateTime, endingDateTime, periodUsable);
+        if (!assetSchedules.IsNullOrEmpty())
         {
-            throw new AssetScheduleExistsException(assetId, date, startingTime, duration);
+            throw new AssetScheduleExistsException(assetId, startingDateTime, endingDateTime, periodUsable);
         }
 
         return new AssetSchedule(
             GuidGenerator.Create(),
             CurrentTenant.Id,
             assetId,
-            date,
-            startingTime,
-            duration,
-            schedulePolicy,
+            startingDateTime,
+            endingDateTime,
+            periodUsable,
             timeInAdvance);
     }
 
-    public virtual async Task UpdateAsync(AssetSchedule entity, Guid assetId, DateTime date, TimeSpan startingTime,
-        TimeSpan duration, AssetSchedulePolicy schedulePolicy, TimeInAdvance timeInAdvance)
+    public virtual async Task UpdateAsync(AssetSchedule entity, Guid assetId, DateTime startingDateTime,
+        DateTime endingDateTime, PeriodUsable periodUsable, TimeInAdvance timeInAdvance)
     {
-        // Check schedule duplication
-        var schedule = await GetAssetScheduleAsync(assetId, date, startingTime, duration);
-        if (schedule is not null)
+        var assetSchedules =
+            await _repository.GetAssetSchedulesAsync(assetId, startingDateTime, endingDateTime, periodUsable);
+        if (!assetSchedules.IsNullOrEmpty())
         {
-            throw new AssetScheduleExistsException(assetId, date, startingTime, duration);
+            throw new AssetScheduleExistsException(assetId, startingDateTime, endingDateTime, periodUsable);
         }
 
-        entity.Update(assetId, date, startingTime, duration, schedulePolicy, timeInAdvance);
-    }
-
-    /// <inheritdoc cref="IAssetScheduleManager"/>
-    public virtual async Task<AssetSchedule> GetAssetScheduleAsync(Guid assetId,
-        DateTime date, TimeSpan startingTime, TimeSpan duration)
-    {
-        // TODO need check logic
-        var assetSchedules = await _repository.GetAssetScheduleListAfterDateAsync(assetId, date);
-
-        return await _assetScheduleSelector.SelectAsync(assetSchedules, date, startingTime, duration);
+        entity.Update(assetId, startingDateTime, endingDateTime, periodUsable, timeInAdvance);
     }
 }

@@ -31,16 +31,15 @@ public class TimeInAdvance : ValueObject, ITimeInAdvance
         yield return MinTimespanInAdvance;
     }
 
-    public bool CanOccupy(DateTime assetTime, DateTime bookingTime)
+    /// <summary>
+    /// Check whether you can occupy startingDateTime(March 10, 2022, 10:00) in bookingDateTime(March 8, 2022, 10:00)?
+    /// </summary>
+    /// <param name="startingDateTime">The starting datetime of period to occupy</param>
+    /// <param name="bookingDateTime">The moment you want to occupy</param>
+    /// <returns>True: can occupy</returns>
+    public bool CanOccupy(DateTime startingDateTime, DateTime bookingDateTime)
     {
-        // TODO assetTime?
-        // TODO MaxDaysInAdvance -1 value?
-        if (MaxDaysInAdvance == -1 || MaxTimespanInAdvance == TimeSpan.Zero)
-        {
-            return false;
-        }
-
-        var ts = assetTime - bookingTime;
+        var ts = startingDateTime - bookingDateTime;
 
         var max = GetMaxTimespanInAdvance();
         if (ts > max)
@@ -49,12 +48,7 @@ public class TimeInAdvance : ValueObject, ITimeInAdvance
         }
 
         var min = GetMinTimespanInAdvance();
-        if (min.HasValue && ts < min.Value)
-        {
-            return false;
-        }
-
-        return true;
+        return !min.HasValue || ts >= min.Value;
     }
 
     private TimeSpan? GetMinTimespanInAdvance()

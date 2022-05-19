@@ -13,7 +13,7 @@ public class AssetDefinition
     /// This property determines whether assets can be occupied by default when there is no schedule created.
     /// The property value from <see cref="AssetCategory"/> is preferred.
     /// </summary>
-    public virtual AssetSchedulePolicy DefaultSchedulePolicy { get; }
+    public virtual PeriodUsable DefaultPeriodUsable { get; }
     
     /// <summary>
     /// This value object describes the time range for assets that can occupy.
@@ -22,11 +22,11 @@ public class AssetDefinition
     [NotNull]
     public virtual TimeInAdvance TimeInAdvance { get; }
 
-    public AssetDefinition([NotNull] string name, AssetSchedulePolicy defaultSchedulePolicy,
+    public AssetDefinition([NotNull] string name, PeriodUsable defaultPeriodUsable,
         [NotNull] TimeInAdvance timeInAdvance)
     {
         Name = name;
-        DefaultSchedulePolicy = defaultSchedulePolicy;
+        DefaultPeriodUsable = defaultPeriodUsable;
         TimeInAdvance = timeInAdvance;
     }
 }

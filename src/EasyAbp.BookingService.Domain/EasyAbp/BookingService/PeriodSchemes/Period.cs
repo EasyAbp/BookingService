@@ -33,4 +33,9 @@ public class Period : Entity<Guid>, IHasPeriodInfo
         Duration = duration;
         Divisible = divisible;
     }
+
+    public TimeSpan GetEndingTime()
+    {
+        return StartingTime + Duration;
+    }
 }

@@ -3,9 +3,11 @@
 namespace EasyAbp.BookingService.AssetOccupancies.Dtos;
 
 [Serializable]
-public class AssetBookablePeriodDto : IHasPeriodInfo
+public class BookablePeriodDto
 {
     public TimeSpan StartingTime { get; set; }
 
-    public TimeSpan Duration { get; set; }
+    public TimeSpan EndingTime { get; set; }
+
+    public bool Divisible { get; set; }
 }

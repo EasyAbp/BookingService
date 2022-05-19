@@ -35,32 +35,30 @@ public class AssetScheduleAppService : CrudAppService<AssetSchedule, AssetSchedu
         var query = await base.CreateFilteredQueryAsync(input);
         return query.WhereIf(input.AssetId.HasValue,
                 x => x.AssetId == input.AssetId.Value)
-            .WhereIf(input.Date.HasValue,
-                x => x.Date == input.Date.Value);
+            .WhereIf(input.StartingDateTime.HasValue,
+                x => x.StartingDateTime >= input.StartingDateTime.Value)
+            .WhereIf(input.EndingDateTime.HasValue,
+                x => x.EndingDateTime <= input.EndingDateTime.Value);
     }
 
     protected override async Task<AssetSchedule> MapToEntityAsync(CreateUpdateAssetScheduleDto createInput)
     {
-        // TODO check assetId exists here?
         return await _assetScheduleManager.CreateAsync(
             createInput.AssetId,
-            createInput.Date,
-            createInput.StartingTime,
-            createInput.Duration,
-            createInput.SchedulePolicy,
+            createInput.StartingDateTime,
+            createInput.EndingDateTime,
+            createInput.PeriodUsable,
             ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(createInput.TimeInAdvance)
         );
     }
 
     protected override async Task MapToEntityAsync(CreateUpdateAssetScheduleDto updateInput, AssetSchedule entity)
     {
-        // TODO check assetId exists here?
         await _assetScheduleManager.UpdateAsync(entity,
             updateInput.AssetId,
-            updateInput.Date,
-            updateInput.StartingTime,
-            updateInput.Duration,
-            updateInput.SchedulePolicy,
+            updateInput.StartingDateTime,
+            updateInput.EndingDateTime,
+            updateInput.PeriodUsable,
             ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(updateInput.TimeInAdvance)
         );
     }
