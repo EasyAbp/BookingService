@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using EasyAbp.BookingService.AssetCategories;
 using EasyAbp.BookingService.Assets.Dtos;
 using EasyAbp.BookingService.Dtos;
 using EasyAbp.BookingService.Permissions;
@@ -19,12 +20,15 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
     protected override string DeletePolicyName { get; set; } = BookingServicePermissions.Asset.Delete;
 
     private readonly IAssetRepository _repository;
+    private readonly IAssetCategoryRepository _assetCategoryRepository;
     private readonly AssetManager _assetManager;
 
     public AssetAppService(IAssetRepository repository,
+        IAssetCategoryRepository assetCategoryRepository,
         AssetManager assetManager) : base(repository)
     {
         _repository = repository;
+        _assetCategoryRepository = assetCategoryRepository;
         _assetManager = assetManager;
     }
 
@@ -44,10 +48,12 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
 
     protected override async Task<Asset> MapToEntityAsync(CreateUpdateAssetDto createInput)
     {
+        var category = await _assetCategoryRepository.GetAsync(createInput.AssetCategoryId);
+
         return await _assetManager.CreateAsync(
             createInput.Name,
             createInput.AssetDefinitionName,
-            createInput.AssetCategoryId,
+            category,
             createInput.PeriodSchemeId,
             createInput.DefaultPeriodUsable,
             createInput.Priority,
@@ -57,10 +63,12 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
 
     protected override async Task MapToEntityAsync(CreateUpdateAssetDto updateInput, Asset entity)
     {
+        var category = await _assetCategoryRepository.GetAsync(updateInput.AssetCategoryId);
+        
         await _assetManager.UpdateAsync(entity,
             updateInput.Name,
             updateInput.AssetDefinitionName,
-            updateInput.AssetCategoryId,
+            category,
             updateInput.PeriodSchemeId,
             updateInput.DefaultPeriodUsable,
             updateInput.Priority,

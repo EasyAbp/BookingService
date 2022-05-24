@@ -24,9 +24,8 @@ public class AssetManager : DomainService
         _options = options.Value;
     }
 
-    [UnitOfWork]
     public virtual async Task<Asset> CreateAsync(string name, [NotNull] string assetDefinitionName,
-        Guid assetCategoryId,
+        AssetCategory assetCategory,
         Guid? periodSchemeId,
         PeriodUsable? defaultPeriodUsable,
         int priority, TimeInAdvance timeInAdvance, bool disabled)
@@ -38,19 +37,17 @@ public class AssetManager : DomainService
             throw new AssetDefinitionNotExistsException(assetDefinitionName);
         }
 
-        var category = await _assetCategoryRepository.GetAsync(assetCategoryId);
-
         // assetDefinitionName should be same with AssetCategory
-        if (category.AssetDefinitionName != assetDefinitionName)
+        if (assetCategory.AssetDefinitionName != assetDefinitionName)
         {
-            throw new AssetDefinitionNameNotMatchException(assetDefinitionName, category.AssetDefinitionName);
+            throw new AssetDefinitionNameNotMatchException(assetDefinitionName, assetCategory.AssetDefinitionName);
         }
 
         return new Asset(GuidGenerator.Create(),
             CurrentTenant.Id,
             name,
             assetDefinitionName,
-            assetCategoryId,
+            assetCategory.Id,
             periodSchemeId,
             defaultPeriodUsable,
             priority,
@@ -58,8 +55,7 @@ public class AssetManager : DomainService
             disabled);
     }
 
-    [UnitOfWork]
-    public async Task UpdateAsync(Asset asset, string name, string assetDefinitionName, Guid assetCategoryId,
+    public async Task UpdateAsync(Asset asset, string name, string assetDefinitionName, AssetCategory assetCategory,
         Guid? periodSchemeId,
         PeriodUsable? defaultPeriodUsable, int priority, TimeInAdvance timeInAdvance, bool disabled)
     {
@@ -70,17 +66,15 @@ public class AssetManager : DomainService
             throw new AssetDefinitionNotExistsException(assetDefinitionName);
         }
 
-        var category = await _assetCategoryRepository.GetAsync(assetCategoryId);
-
         // assetDefinitionName should be same with AssetCategory
-        if (category.AssetDefinitionName != assetDefinitionName)
+        if (assetCategory.AssetDefinitionName != assetDefinitionName)
         {
-            throw new AssetDefinitionNameNotMatchException(assetDefinitionName, category.AssetDefinitionName);
+            throw new AssetDefinitionNameNotMatchException(assetDefinitionName, assetCategory.AssetDefinitionName);
         }
 
         asset.Update(name,
             assetDefinitionName,
-            assetCategoryId,
+            assetCategory.Id,
             periodSchemeId,
             defaultPeriodUsable,
             priority,

@@ -46,24 +46,13 @@ public class AssetOccupancyManager : DomainService
     }
 
     [UnitOfWork]
-    public virtual async Task<List<BookablePeriod>> SearchAssetBookablePeriodsAsync(Guid assetId,
+    public virtual async Task<List<BookablePeriod>> SearchAssetBookablePeriodsAsync(Asset asset,
+        AssetCategory category,
         DateTime bookingDateTime,
         DateTime searchDate)
     {
-        var asset = await _assetRepository.GetAsync(assetId);
-        if (asset.Disabled)
-        {
-            return new List<BookablePeriod>();
-        }
-
-        var category = await _assetCategoryRepository.GetAsync(asset.AssetCategoryId);
-        if (category.Disabled)
-        {
-            return new List<BookablePeriod>();
-        }
-
         var assetPeriodScheme = await _assetPeriodSchemeRepository.FindAsync(x =>
-            x.AssetId == assetId && x.Date == searchDate);
+            x.AssetId == asset.Id && x.Date == searchDate);
 
         var effectivePeriodScheme = await CalculateEffectivePeriodSchemeAsync(
             assetPeriodScheme, asset, category);
@@ -81,7 +70,7 @@ public class AssetOccupancyManager : DomainService
         var endingDateTime = searchDate.Add(endingTime);
 
         var appliedAssetSchedules =
-            await _assetScheduleRepository.GetAssetScheduleListInScopeAsync(assetId, searchDate, endingDateTime);
+            await _assetScheduleRepository.GetAssetScheduleListInScopeAsync(asset.Id, searchDate, endingDateTime);
 
         var effectiveSchedules =
             await CalculateEffectiveSchedulesAsync(searchDate, endingDateTime, appliedAssetSchedules, asset, category);

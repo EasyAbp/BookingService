@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EasyAbp.BookingService.AssetCategories;
 using EasyAbp.BookingService.AssetOccupancies.Dtos;
+using EasyAbp.BookingService.Assets;
 using EasyAbp.BookingService.PeriodSchemes;
 using EasyAbp.BookingService.Permissions;
 using Volo.Abp;
@@ -22,12 +24,18 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
     protected virtual string SearchPolicyName { get; set; } = BookingServicePermissions.AssetOccupancy.Search;
 
     private readonly IAssetOccupancyRepository _repository;
+    private readonly IAssetRepository _assetRepository;
+    private readonly IAssetCategoryRepository _assetCategoryRepository;
     private readonly AssetOccupancyManager _assetOccupancyManager;
 
     public AssetOccupancyAppService(IAssetOccupancyRepository repository,
+        IAssetRepository assetRepository,
+        IAssetCategoryRepository assetCategoryRepository,
         AssetOccupancyManager assetOccupancyManager) : base(repository)
     {
         _repository = repository;
+        _assetRepository = assetRepository;
+        _assetCategoryRepository = assetCategoryRepository;
         _assetOccupancyManager = assetOccupancyManager;
     }
 
@@ -72,8 +80,20 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
     {
         await CheckSearchPolicyAsync();
 
+        var asset = await _assetRepository.GetAsync(input.AssetId);
+        if (asset.Disabled)
+        {
+            return new List<BookablePeriodDto>();
+        }
+
+        var category = await _assetCategoryRepository.GetAsync(asset.AssetCategoryId);
+        if (category.Disabled)
+        {
+            return new List<BookablePeriodDto>();
+        }
+
         var periods = await _assetOccupancyManager.SearchAssetBookablePeriodsAsync(
-            input.AssetId, input.BookingDateTime, input.SearchDate);
+            asset, category, input.BookingDateTime, input.SearchDate);
 
         return ObjectMapper.Map<List<BookablePeriod>, List<BookablePeriodDto>>(periods);
     }
