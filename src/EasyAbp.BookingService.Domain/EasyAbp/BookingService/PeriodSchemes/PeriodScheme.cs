@@ -43,27 +43,4 @@ public class PeriodScheme : FullAuditedAggregateRoot<Guid>, IMultiTenant
         Name = name;
         Periods = periods;
     }
-
-    public TimeSpan GetLatestEndingTime(PeriodScheme effectivePeriodScheme)
-    {
-        TimeSpan endingTime;
-        if (effectivePeriodScheme.Periods.IsNullOrEmpty())
-        {
-            endingTime = TimeSpan.FromDays(1);
-        }
-        else
-        {
-            endingTime = effectivePeriodScheme.Periods
-                .Select(x => x.GetEndingTime())
-                .OrderByDescending(x => x)
-                .First();
-
-            if (endingTime < TimeSpan.FromDays(1))
-            {
-                endingTime = TimeSpan.FromDays(1);
-            }
-        }
-
-        return endingTime;
-    }
 }

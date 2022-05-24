@@ -67,7 +67,7 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         await CheckPolicyAsync(SearchPolicyName);
     }
 
-    public async Task<List<BookablePeriodDto>> SearchAssetBookablePeriodsAsync(
+    public virtual async Task<List<BookablePeriodDto>> SearchAssetBookablePeriodsAsync(
         SearchAssetBookablePeriodsRequestDto input)
     {
         await CheckSearchPolicyAsync();
@@ -78,7 +78,7 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         return ObjectMapper.Map<List<BookablePeriod>, List<BookablePeriodDto>>(periods);
     }
 
-    public async Task<List<BookablePeriodDto>> SearchCategoryBookablePeriodsAsync(
+    public virtual async Task<List<BookablePeriodDto>> SearchCategoryBookablePeriodsAsync(
         SearchCategoryBookablePeriodsRequestDto input)
     {
         await CheckSearchPolicyAsync();

@@ -18,7 +18,7 @@ public interface IAssetScheduleRepository : IRepository<AssetSchedule, Guid>
     /// <param name="includeDetails"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<List<AssetSchedule>> GetAssetSchedulesAsync(Guid assetId, DateTime startingDateTime, DateTime endingDateTime,
+    Task<List<AssetSchedule>> GetAssetScheduleListInScopeAsync(Guid assetId, DateTime startingDateTime, DateTime endingDateTime,
         PeriodUsable? policy = default, bool includeDetails = false,
         CancellationToken cancellationToken = default);
 }

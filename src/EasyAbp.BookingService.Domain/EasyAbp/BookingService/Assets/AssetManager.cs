@@ -12,21 +12,19 @@ using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.Assets;
 
-public class AssetManager : DomainService, IUnitOfWorkEnabled
+public class AssetManager : DomainService
 {
-    private readonly IAssetRepository _repository;
     private readonly IAssetCategoryRepository _assetCategoryRepository;
     private readonly BookingServiceOptions _options;
 
-    public AssetManager(IAssetRepository repository,
-        IAssetCategoryRepository assetCategoryRepository,
+    public AssetManager(IAssetCategoryRepository assetCategoryRepository,
         IOptions<BookingServiceOptions> options)
     {
-        _repository = repository;
         _assetCategoryRepository = assetCategoryRepository;
         _options = options.Value;
     }
 
+    [UnitOfWork]
     public virtual async Task<Asset> CreateAsync(string name, [NotNull] string assetDefinitionName,
         Guid assetCategoryId,
         Guid? periodSchemeId,
@@ -60,6 +58,7 @@ public class AssetManager : DomainService, IUnitOfWorkEnabled
             disabled);
     }
 
+    [UnitOfWork]
     public async Task UpdateAsync(Asset asset, string name, string assetDefinitionName, Guid assetCategoryId,
         Guid? periodSchemeId,
         PeriodUsable? defaultPeriodUsable, int priority, TimeInAdvance timeInAdvance, bool disabled)

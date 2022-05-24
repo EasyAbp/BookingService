@@ -5,19 +5,15 @@ using EasyAbp.BookingService.AssetDefinitions;
 using EasyAbp.BookingService.AssetSchedules;
 using Microsoft.Extensions.Options;
 using Volo.Abp.Domain.Services;
-using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.AssetCategories;
 
-public class AssetCategoryManager : DomainService, IUnitOfWorkEnabled
+public class AssetCategoryManager : DomainService
 {
-    private readonly IAssetCategoryRepository _repository;
     private readonly BookingServiceOptions _options;
 
-    public AssetCategoryManager(IAssetCategoryRepository repository,
-        IOptions<BookingServiceOptions> options)
+    public AssetCategoryManager(IOptions<BookingServiceOptions> options)
     {
-        _repository = repository;
         _options = options.Value;
     }
 

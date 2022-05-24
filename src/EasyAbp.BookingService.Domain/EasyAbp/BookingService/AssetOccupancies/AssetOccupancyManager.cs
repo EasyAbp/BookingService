@@ -15,7 +15,7 @@ using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.AssetOccupancies;
 
-public class AssetOccupancyManager : DomainService, IUnitOfWorkEnabled
+public class AssetOccupancyManager : DomainService
 {
     private readonly IAssetOccupancyRepository _repository;
     private readonly IAssetRepository _assetRepository;
@@ -65,7 +65,7 @@ public class AssetOccupancyManager : DomainService, IUnitOfWorkEnabled
         var assetPeriodScheme = await _assetPeriodSchemeRepository.FindAsync(x =>
             x.AssetId == assetId && x.Date == searchDate);
 
-        var effectivePeriodScheme = await CalculateEffectivePeriodSchemeIdAsync(
+        var effectivePeriodScheme = await CalculateEffectivePeriodSchemeAsync(
             assetPeriodScheme, asset, category);
 
         if (effectivePeriodScheme.Periods.IsNullOrEmpty())
@@ -73,11 +73,15 @@ public class AssetOccupancyManager : DomainService, IUnitOfWorkEnabled
             return new List<BookablePeriod>();
         }
 
-        var endingTime = effectivePeriodScheme.GetLatestEndingTime(effectivePeriodScheme);
+        var endingTime = effectivePeriodScheme.Periods
+            .Select(x => x.GetEndingTime())
+            .OrderByDescending(x => x)
+            .First();
+
         var endingDateTime = searchDate.Add(endingTime);
 
         var appliedAssetSchedules =
-            await _assetScheduleRepository.GetAssetSchedulesAsync(assetId, searchDate, endingDateTime);
+            await _assetScheduleRepository.GetAssetScheduleListInScopeAsync(assetId, searchDate, endingDateTime);
 
         var effectiveSchedules =
             await CalculateEffectiveSchedulesAsync(searchDate, endingDateTime, appliedAssetSchedules, asset, category);
@@ -107,7 +111,7 @@ public class AssetOccupancyManager : DomainService, IUnitOfWorkEnabled
         throw new NotImplementedException();
     }
 
-    protected virtual async Task<PeriodScheme> CalculateEffectivePeriodSchemeIdAsync(
+    protected virtual async Task<PeriodScheme> CalculateEffectivePeriodSchemeAsync(
         [CanBeNull] AssetPeriodScheme assetPeriodScheme,
         Asset asset,
         AssetCategory category)
@@ -133,7 +137,7 @@ public class AssetOccupancyManager : DomainService, IUnitOfWorkEnabled
 
     protected virtual Task<TimeInAdvance> CalculateEffectiveTimeInAdvanceAsync(Asset asset, AssetCategory category)
     {
-        // Fallback chain: Asset -> Category -> AssetDefinition
+        // Fallback chain when no schedule: Asset -> Category -> AssetDefinition
         if (asset.TimeInAdvance is not null)
         {
             return Task.FromResult(asset.TimeInAdvance);
@@ -165,10 +169,10 @@ public class AssetOccupancyManager : DomainService, IUnitOfWorkEnabled
         var assetOccupancies = await _repository.GetListAsync(x => x.AssetId == asset.Id && x.Date == searchDate);
         foreach (var bookablePeriod in bookablePeriods.OrderBy(x => x.StartingTime))
         {
-            var list = assetOccupancies
+            var conflictOccupancies = assetOccupancies
                 .Where(x => bookablePeriod.IsIntersected(x.StartingTime, x.GetEndingTime()))
                 .ToList();
-            if (list.Count > 0)
+            if (conflictOccupancies.Count > 0)
             {
                 if (!bookablePeriod.Divisible)
                 {
@@ -177,15 +181,17 @@ public class AssetOccupancyManager : DomainService, IUnitOfWorkEnabled
 
                 // Divide period
                 var startingPoint = bookablePeriod.StartingTime;
-                foreach (var assetOccupancy in list.OrderBy(x => x.StartingTime))
+                foreach (var assetOccupancy in conflictOccupancies.OrderBy(x => x.StartingTime))
                 {
                     if (assetOccupancy.StartingTime > startingPoint)
                     {
                         filtered.Add(new BookablePeriod
                         {
                             StartingTime = startingPoint,
+                            EndingTime = assetOccupancy.StartingTime,
                             Divisible = bookablePeriod.Divisible,
-                            EndingTime = assetOccupancy.StartingTime
+                            PeriodId = bookablePeriod.PeriodId,
+                            PeriodSchemeId = bookablePeriod.PeriodSchemeId
                         });
                     }
 
@@ -202,27 +208,22 @@ public class AssetOccupancyManager : DomainService, IUnitOfWorkEnabled
     }
 
     protected virtual Task<List<BookablePeriod>> CalculateBookablePeriodsAsync(PeriodScheme periodScheme,
-        List<Schedule> effectiveSchedules,
+        List<EffectiveScheduleModel> effectiveSchedules,
         DateTime searchDate,
         DateTime bookingDateTime)
     {
         var result = new List<BookablePeriod>();
+        if (periodScheme.Periods.IsNullOrEmpty())
+        {
+            return Task.FromResult(result);
+        }
+
         foreach (var effectiveSchedule in effectiveSchedules
                      .Where(x => x.PeriodUsable == PeriodUsable.Accept)
                      .OrderBy(x => x.StartingDateTime))
         {
-            // get current schedule's periods
-            var periods = periodScheme.Periods
-                .Where(x => effectiveSchedule.IsTimeRangeIntersected(searchDate + x.StartingTime,
-                    searchDate + x.GetEndingTime()))
-                .ToList();
-            if (periods.IsNullOrEmpty())
-            {
-                continue;
-            }
-
             // get bookable period
-            var bookablePeriods = effectiveSchedule.CalculateBookablePeriods(searchDate, periods);
+            var bookablePeriods = effectiveSchedule.CalculateBookablePeriods(searchDate, periodScheme);
 
             // remove periods which cannot be occupied
             bookablePeriods.RemoveAll(x =>
@@ -234,46 +235,43 @@ public class AssetOccupancyManager : DomainService, IUnitOfWorkEnabled
         return Task.FromResult(result);
     }
 
-    protected virtual async Task<List<Schedule>> CalculateEffectiveSchedulesAsync(
+    protected virtual async Task<List<EffectiveScheduleModel>> CalculateEffectiveSchedulesAsync(
         DateTime startingDateTime,
         DateTime endingDateTime,
         List<AssetSchedule> appliedAssetSchedules,
         Asset asset,
         AssetCategory category)
     {
-        var effectiveSchedules = new List<Schedule>();
+        var effectiveSchedules = new List<EffectiveScheduleModel>();
 
         foreach (var assetSchedule in appliedAssetSchedules
                      .Where(x => x.PeriodUsable == PeriodUsable.Accept))
         {
-            effectiveSchedules.Add(new Schedule
-            {
-                PeriodUsable = PeriodUsable.Accept,
-                StartingDateTime = assetSchedule.StartingDateTime <= startingDateTime
+            effectiveSchedules.Add(new EffectiveScheduleModel(
+                assetSchedule.StartingDateTime <= startingDateTime
                     ? startingDateTime
                     : assetSchedule.StartingDateTime,
-                EndingDateTime = assetSchedule.EndingDateTime >= endingDateTime
+                assetSchedule.EndingDateTime >= endingDateTime
                     ? endingDateTime
                     : assetSchedule.EndingDateTime,
-                TimeInAdvance = assetSchedule.TimeInAdvance
-            });
+                PeriodUsable.Accept,
+                assetSchedule.TimeInAdvance
+            ));
         }
 
         foreach (var assetSchedule in appliedAssetSchedules
                      .Where(x => x.PeriodUsable == PeriodUsable.Reject))
         {
             // override accept policy
-            var rejectSchedule = new Schedule
-            {
-                PeriodUsable = PeriodUsable.Reject,
-                StartingDateTime = assetSchedule.StartingDateTime <= startingDateTime
+            var rejectSchedule = new EffectiveScheduleModel(
+                assetSchedule.StartingDateTime <= startingDateTime
                     ? startingDateTime
                     : assetSchedule.StartingDateTime,
-                EndingDateTime = assetSchedule.EndingDateTime >= endingDateTime
+                assetSchedule.EndingDateTime >= endingDateTime
                     ? endingDateTime
                     : assetSchedule.EndingDateTime,
-                TimeInAdvance = assetSchedule.TimeInAdvance
-            };
+                PeriodUsable.Reject,
+                assetSchedule.TimeInAdvance);
 
             var conflictedSchedule = effectiveSchedules.FirstOrDefault(x =>
                 x.IsTimeRangeIntersected(rejectSchedule.StartingDateTime, rejectSchedule.EndingDateTime));
@@ -282,7 +280,7 @@ public class AssetOccupancyManager : DomainService, IUnitOfWorkEnabled
                 effectiveSchedules.Remove(conflictedSchedule);
                 // split conflicted schedule
                 effectiveSchedules.AddRange(
-                    conflictedSchedule.RemoveIntersectingTimeRange(
+                    conflictedSchedule.ExcludeIntersectedAndCreateNewSchedules(
                         rejectSchedule.StartingDateTime,
                         rejectSchedule.EndingDateTime));
             }
@@ -299,20 +297,58 @@ public class AssetOccupancyManager : DomainService, IUnitOfWorkEnabled
             effectiveSchedule.TimeInAdvance ??= effectiveTimeInAdvance;
         }
 
-        // use default policy and it's fallback to fill the time gap 
-        var gaps = FindTimeGaps(startingDateTime, endingDateTime, effectiveSchedules);
-        if (gaps.Count > 0)
+        // Get no-schedule time ranges of the day and convert them to EffectiveScheduleModel and fall back to the default PeriodUsable.
+        var scheduleModels = await GenerateFallbackEffectiveScheduleModelsAsync(
+            startingDateTime, endingDateTime, asset, category, effectiveSchedules, effectiveTimeInAdvance);
+
+        effectiveSchedules.AddRange(scheduleModels);
+
+        return effectiveSchedules;
+    }
+
+    protected virtual async Task<List<EffectiveScheduleModel>> GenerateFallbackEffectiveScheduleModelsAsync(
+        DateTime startingDateTime, DateTime endingDateTime,
+        Asset asset, AssetCategory category, List<EffectiveScheduleModel> effectiveSchedules,
+        TimeInAdvance effectiveTimeInAdvance)
+    {
+        var scheduleModels = new List<EffectiveScheduleModel>();
+        var effectivePeriodUsable = await CalculateEffectivePeriodUsableAsync(asset, category);
+        if (effectiveSchedules.Count == 0)
         {
-            var effectivePeriodUsable = await CalculateEffectivePeriodUsableAsync(asset, category);
-            foreach (var schedule in gaps)
+            scheduleModels.Add(new EffectiveScheduleModel(
+                startingDateTime,
+                endingDateTime,
+                effectivePeriodUsable,
+                effectiveTimeInAdvance));
+        }
+        else
+        {
+            var start = startingDateTime;
+            foreach (var schedule in effectiveSchedules.OrderBy(x => x.StartingDateTime))
             {
-                schedule.PeriodUsable = effectivePeriodUsable;
-                schedule.TimeInAdvance = effectiveTimeInAdvance;
-                effectiveSchedules.Add(schedule);
+                if (schedule.StartingDateTime != start)
+                {
+                    scheduleModels.Add(new EffectiveScheduleModel(
+                        start,
+                        schedule.StartingDateTime,
+                        effectivePeriodUsable,
+                        effectiveTimeInAdvance));
+                }
+
+                start = schedule.EndingDateTime;
+            }
+
+            if (start != endingDateTime)
+            {
+                scheduleModels.Add(new EffectiveScheduleModel(
+                    start,
+                    endingDateTime,
+                    effectivePeriodUsable,
+                    effectiveTimeInAdvance));
             }
         }
 
-        return effectiveSchedules;
+        return scheduleModels;
     }
 
     protected virtual Task<PeriodUsable> CalculateEffectivePeriodUsableAsync(Asset asset,
@@ -339,47 +375,5 @@ public class AssetOccupancyManager : DomainService, IUnitOfWorkEnabled
         {
             throw new AssetDefinitionNotExistsException(asset.AssetDefinitionName);
         }
-    }
-
-    protected virtual List<Schedule> FindTimeGaps(DateTime startingDateTime, DateTime endingDateTime,
-        List<Schedule> effectiveSchedules)
-    {
-        var gaps = new List<Schedule>();
-        if (effectiveSchedules.Count == 0)
-        {
-            gaps.Add(new Schedule
-            {
-                StartingDateTime = startingDateTime,
-                EndingDateTime = endingDateTime
-            });
-        }
-        else
-        {
-            var start = startingDateTime;
-            foreach (var schedule in effectiveSchedules.OrderBy(x => x.StartingDateTime))
-            {
-                if (schedule.StartingDateTime != start)
-                {
-                    gaps.Add(new Schedule
-                    {
-                        StartingDateTime = start,
-                        EndingDateTime = schedule.StartingDateTime
-                    });
-                }
-
-                start = schedule.EndingDateTime;
-            }
-
-            if (start != endingDateTime)
-            {
-                gaps.Add(new Schedule
-                {
-                    StartingDateTime = start,
-                    EndingDateTime = endingDateTime
-                });
-            }
-        }
-
-        return gaps;
     }
 }

@@ -29,7 +29,7 @@ public class CreatePeriodDto : ExtensibleObject, IHasPeriodInfo
 
         if (Divisible && StartingTime + Duration >= TimeSpan.FromDays(1))
         {
-            // If divisible period can cross days, it will need to search back for infinite days to find any applicable divisible period when searching available period on specific date.
+            // Divisible period cannot cross days.
             yield return new ValidationResult(
                 $"The divisible period cannot cross days",
                 new[]

@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
-using Volo.Abp.Domain.Services;
-using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.PeriodSchemes;
 
@@ -18,25 +17,31 @@ public class DefaultPeriodSchemeStore : ITransientDependency
         _distributedCache = distributedCache;
     }
 
+    [ItemCanBeNull]
     public virtual async Task<PeriodScheme> GetAsync()
     {
-        var item = await _distributedCache.GetOrAddAsync(DefaultPeriodSchemeCacheItem.Key, DefaultPeriodSchemeFactory);
-        return item.Value;
+        var item = await _distributedCache.GetAsync(DefaultPeriodSchemeCacheItem.Key);
+        if (item is null)
+        {
+            var defaultPeriodScheme = await _periodSchemeRepository.FindDefaultSchemeAsync();
+            if (defaultPeriodScheme is not null)
+            {
+                await _distributedCache.SetAsync(DefaultPeriodSchemeCacheItem.Key, new DefaultPeriodSchemeCacheItem
+                {
+                    PeriodSchemeId = defaultPeriodScheme.Id,
+                });
+            }
+
+            return defaultPeriodScheme;
+        }
+        else
+        {
+            return await _periodSchemeRepository.GetAsync(item.PeriodSchemeId);
+        }
     }
 
     public virtual async Task ClearAsync()
     {
         await _distributedCache.RemoveAsync(DefaultPeriodSchemeCacheItem.Key, considerUow: true);
-    }
-
-    [UnitOfWork]
-    protected virtual async Task<DefaultPeriodSchemeCacheItem> DefaultPeriodSchemeFactory()
-    {
-        var item = new DefaultPeriodSchemeCacheItem
-        {
-            Value = await _periodSchemeRepository.FindDefaultSchemeAsync()
-        };
-
-        return item;
     }
 }

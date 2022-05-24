@@ -19,7 +19,7 @@ public class AssetScheduleRepository : EfCoreRepository<IBookingServiceDbContext
     }
 
     /// <inheritdoc/>
-    public async Task<List<AssetSchedule>> GetAssetSchedulesAsync(Guid assetId, DateTime startingDateTime,
+    public async Task<List<AssetSchedule>> GetAssetScheduleListInScopeAsync(Guid assetId, DateTime startingDateTime,
         DateTime endingDateTime,
         PeriodUsable? policy = default, bool includeDetails = false,
         CancellationToken cancellationToken = default)

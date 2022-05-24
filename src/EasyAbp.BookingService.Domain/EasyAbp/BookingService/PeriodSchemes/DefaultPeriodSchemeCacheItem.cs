@@ -7,5 +7,5 @@ public class DefaultPeriodSchemeCacheItem
 {
     public const string Key = "DefaultPeriodScheme";
 
-    public PeriodScheme Value { get; set; }
+    public Guid PeriodSchemeId { get; set; }
 }

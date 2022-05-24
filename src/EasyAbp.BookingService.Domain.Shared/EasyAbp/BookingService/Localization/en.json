@@ -3,7 +3,6 @@
   "texts": {
     "EasyAbp.BookingService:AssetDefinitionNotExists": "Asset definition is not exists: {assetDefinitionName}",
     "EasyAbp.BookingService:AssetDefinitionNameNotMatch": "AssetDefinitionName must be equal to AssetCategory's AssetDefinitionName, Current: {assetDefinitionName}, AssetCategory: {categoryAssetDefinitionName}",
-    "EasyAbp.BookingService:CanNotDeleteDefaultPeriodScheme": "Cannot delete default Period Scheme: {name}",
     "EasyAbp.BookingService:AssetNotExists": "Cannot find asset with assetId: {assetId}",
     "EasyAbp.BookingService:AssetScheduleExists": "Asset schedule with same time range already exists, AssetId: {assetId}, StartingDateTime: {startingDateTime}, EndingDateTime: {endingDateTime}, Policy: {periodUsable}",
     "EasyAbp.BookingService:AssetDisabled": "Asset has been disabled: {assetId}"

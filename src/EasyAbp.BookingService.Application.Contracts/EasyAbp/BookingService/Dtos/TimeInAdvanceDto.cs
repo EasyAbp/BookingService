@@ -26,7 +26,7 @@ public class TimeInAdvanceDto : IValidatableObject, ITimeInAdvance
         if (MinDaysInAdvance > MaxDaysInAdvance)
         {
             yield return new ValidationResult(
-                "MinDaysInAdvance should be less than MaxDaysInAdvance!",
+                "MinDaysInAdvance should be less than or equal to MaxDaysInAdvance!",
                 new[]
                 {
                     nameof(MinDaysInAdvance), nameof(MaxDaysInAdvance)
@@ -37,7 +37,7 @@ public class TimeInAdvanceDto : IValidatableObject, ITimeInAdvance
         if (MinTimespanInAdvance > MaxTimespanInAdvance)
         {
             yield return new ValidationResult(
-                "MinTimespanInAdvance should be less than MaxTimespanInAdvance!",
+                "MinTimespanInAdvance should be less than or equal to MaxTimespanInAdvance!",
                 new[]
                 {
                     nameof(MinTimespanInAdvance), nameof(MinTimespanInAdvance)

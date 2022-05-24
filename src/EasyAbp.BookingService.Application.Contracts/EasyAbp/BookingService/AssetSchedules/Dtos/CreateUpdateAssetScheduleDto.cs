@@ -26,10 +26,10 @@ public class CreateUpdateAssetScheduleDto : ExtensibleObject
             yield return validationResult;
         }
 
-        if (EndingDateTime < StartingDateTime)
+        if (EndingDateTime <= StartingDateTime)
         {
             yield return new ValidationResult(
-                $"The EndingDateTime must greater or equal than StartingDateTime, StartingDateTime: {StartingDateTime}, EndingDateTime: {EndingDateTime}",
+                $"The EndingDateTime must greater than StartingDateTime, StartingDateTime: {StartingDateTime}, EndingDateTime: {EndingDateTime}",
                 new[]
                 {
                     nameof(StartingDateTime),
