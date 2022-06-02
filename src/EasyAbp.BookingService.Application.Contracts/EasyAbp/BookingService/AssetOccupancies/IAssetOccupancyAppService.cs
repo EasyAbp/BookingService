@@ -13,6 +13,8 @@ public interface IAssetOccupancyAppService :
         GetAssetOccupanciesRequestDto,
         CreateAssetOccupancyDto>
 {
+    Task<AssetOccupancyDto> CreateByCategoryIdAsync(CreateAssetOccupancyByCategoryIdDto input);
+
     /// <summary>
     /// Search for asset's bookable periods on specific date
     /// </summary>

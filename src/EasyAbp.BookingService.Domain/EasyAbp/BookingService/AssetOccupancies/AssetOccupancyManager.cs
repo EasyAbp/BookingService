@@ -90,13 +90,16 @@ public class AssetOccupancyManager : DomainService
     }
 
     [UnitOfWork]
-    public virtual async Task<AssetOccupancy> CreateAsync(Guid? assetId, Guid? categoryId, DateTime date,
-        TimeSpan startingTime,
-        TimeSpan duration,
-        Guid? occupierUserId)
+    public virtual async Task<AssetOccupancy> CreateAsync(Guid? assetId, DateTime date, TimeSpan startingTime,
+        TimeSpan duration, Guid? occupierUserId)
     {
-        // TODO create new uow
+        throw new NotImplementedException();
+    }
 
+    [UnitOfWork]
+    public virtual async Task<AssetOccupancy> CreateByCategoryIdAsync(Guid? assetCategoryId, DateTime date,
+        TimeSpan startingTime, TimeSpan duration, Guid? occupierUserId)
+    {
         throw new NotImplementedException();
     }
 

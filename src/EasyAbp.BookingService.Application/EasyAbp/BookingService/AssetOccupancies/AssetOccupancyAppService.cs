@@ -61,11 +61,24 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
 
         var entity = await _assetOccupancyManager.CreateAsync(
             input.AssetId,
-            input.CategoryId,
             input.Date,
             input.StartingTime,
             input.Duration,
-            input.OccupierUserId);
+            input.OccupierUserId);  // Todo: create a permission for occupying assets with a specified OccupierUserId.
+
+        return await MapToGetOutputDtoAsync(entity);
+    }
+
+    public virtual async Task<AssetOccupancyDto> CreateByCategoryIdAsync(CreateAssetOccupancyByCategoryIdDto input)
+    {
+        await CheckCreatePolicyAsync();
+
+        var entity = await _assetOccupancyManager.CreateByCategoryIdAsync(
+            input.AssetCategoryId,
+            input.Date,
+            input.StartingTime,
+            input.Duration,
+            input.OccupierUserId);  // Todo: create a permission for occupying assets with a specified OccupierUserId.
 
         return await MapToGetOutputDtoAsync(entity);
     }
