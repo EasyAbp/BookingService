@@ -90,15 +90,21 @@ public class AssetOccupancyManager : DomainService
     }
 
     [UnitOfWork]
-    public virtual async Task<AssetOccupancy> CreateAsync(Guid? assetId, DateTime date, TimeSpan startingTime,
-        TimeSpan duration, Guid? occupierUserId)
+    public virtual async Task<AssetOccupancy> CreateAsync(OccupyAssetInfoModel model, Guid? occupierUserId)
     {
         throw new NotImplementedException();
     }
 
     [UnitOfWork]
-    public virtual async Task<AssetOccupancy> CreateByCategoryIdAsync(Guid? assetCategoryId, DateTime date,
-        TimeSpan startingTime, TimeSpan duration, Guid? occupierUserId)
+    public virtual async Task<AssetOccupancy> CreateByCategoryIdAsync(OccupyAssetByCategoryInfoModel model,
+        Guid? occupierUserId)
+    {
+        throw new NotImplementedException();
+    }
+
+    [UnitOfWork(true)]
+    public virtual async Task<AssetOccupancy> BulkCreateAsync(List<OccupyAssetInfoModel> models,
+        List<OccupyAssetByCategoryInfoModel> byCateModels, Guid? occupierUserId)
     {
         throw new NotImplementedException();
     }

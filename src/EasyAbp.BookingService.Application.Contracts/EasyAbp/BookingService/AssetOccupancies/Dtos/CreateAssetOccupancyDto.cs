@@ -8,7 +8,7 @@ namespace EasyAbp.BookingService.AssetOccupancies.Dtos;
 [Serializable]
 public class CreateAssetOccupancyDto : ExtensibleObject
 {
-    public Guid? AssetId { get; set; }
+    public Guid AssetId { get; set; }
     
     public DateTime Date { get; set; }
 

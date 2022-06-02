@@ -60,10 +60,11 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         await CheckCreatePolicyAsync();
 
         var entity = await _assetOccupancyManager.CreateAsync(
-            input.AssetId,
-            input.Date,
-            input.StartingTime,
-            input.Duration,
+            new OccupyAssetInfoModel(
+                input.AssetId,
+                input.Date,
+                input.StartingTime,
+                input.Duration),
             input.OccupierUserId);  // Todo: create a permission for occupying assets with a specified OccupierUserId.
 
         return await MapToGetOutputDtoAsync(entity);
@@ -74,10 +75,11 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         await CheckCreatePolicyAsync();
 
         var entity = await _assetOccupancyManager.CreateByCategoryIdAsync(
-            input.AssetCategoryId,
-            input.Date,
-            input.StartingTime,
-            input.Duration,
+            new OccupyAssetByCategoryInfoModel(
+                input.AssetCategoryId,
+                input.Date,
+                input.StartingTime,
+                input.Duration),
             input.OccupierUserId);  // Todo: create a permission for occupying assets with a specified OccupierUserId.
 
         return await MapToGetOutputDtoAsync(entity);
