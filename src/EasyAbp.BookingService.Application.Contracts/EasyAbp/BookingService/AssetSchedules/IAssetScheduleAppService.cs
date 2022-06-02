@@ -9,7 +9,7 @@ public interface IAssetScheduleAppService :
         AssetScheduleDto,
         Guid,
         GetAssetSchedulesRequestDto,
-        CreateUpdateAssetScheduleDto,
-        CreateUpdateAssetScheduleDto>
+        CreateAssetScheduleDto,
+        UpdateAssetScheduleDto>
 {
 }

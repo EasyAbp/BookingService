@@ -38,9 +38,8 @@ public class PeriodScheme : FullAuditedAggregateRoot<Guid>, IMultiTenant
         IsDefault = v;
     }
 
-    public void Update(string name, List<Period> periods)
+    public void Update(string name)
     {
         Name = name;
-        Periods = periods;
     }
 }

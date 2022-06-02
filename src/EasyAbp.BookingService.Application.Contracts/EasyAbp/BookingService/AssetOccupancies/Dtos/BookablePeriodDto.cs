@@ -9,8 +9,6 @@ public class BookablePeriodDto
 
     public TimeSpan EndingTime { get; set; }
 
-    public bool Divisible { get; set; }
-
     public Guid PeriodSchemeId { get; set; }
 
     public Guid PeriodId { get; set; }

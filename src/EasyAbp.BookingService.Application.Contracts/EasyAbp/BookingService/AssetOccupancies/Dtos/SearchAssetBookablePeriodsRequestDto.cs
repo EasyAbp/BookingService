@@ -14,10 +14,10 @@ public class SearchAssetBookablePeriodsRequestDto
     /// <summary>
     /// The moment of a user is going to book
     /// </summary>
-    [Required] public DateTime BookingDateTime { get; set; }
+    [Required] public DateTime CurrentTime { get; set; }
 
     /// <summary>
     /// Search for the asset's bookable period on this date
     /// </summary>
-    [Required] public DateTime SearchDate { get; set; }
+    [Required] public DateTime TargetDate { get; set; }
 }

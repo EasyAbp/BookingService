@@ -108,9 +108,9 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         }
 
         var periods = await _assetOccupancyManager.SearchAssetBookablePeriodsAsync(
-            asset, category, input.BookingDateTime, input.SearchDate);
+            asset, category, input.CurrentTime, input.TargetDate);
 
-        return ObjectMapper.Map<List<BookablePeriod>, List<BookablePeriodDto>>(periods);
+        return ObjectMapper.Map<List<PeriodOccupancyModel>, List<BookablePeriodDto>>(periods);
     }
 
     public virtual async Task<List<BookablePeriodDto>> SearchCategoryBookablePeriodsAsync(
@@ -118,7 +118,7 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
     {
         await CheckSearchPolicyAsync();
         var periods = await _assetOccupancyManager.SearchCategoryBookablePeriodsAsync(
-            input.CategoryId, input.BookingDateTime, input.SearchDate);
+            input.CategoryId, input.CurrentTime, input.TargetDate);
 
         return ObjectMapper.Map<List<Period>, List<BookablePeriodDto>>(periods);
     }

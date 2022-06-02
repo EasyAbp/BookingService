@@ -10,19 +10,13 @@ public class AssetSchedule : FullAuditedAggregateRoot<Guid>, IMultiTenant
 {
     public virtual Guid? TenantId { get; protected set; }
 
+    public virtual DateTime Date { get; protected set; }
+
     public virtual Guid AssetId { get; protected set; }
 
-    /// <summary>
-    /// The start of this time frame.
-    /// The starting time is included, example: [11:30, 12:00)
-    /// </summary>
-    public virtual DateTime StartingDateTime { get; protected set; }
+    public virtual Guid PeriodSchemeId { get; protected set; }
 
-    /// <summary>
-    /// The end of this time frame.
-    /// The ending time is excluded, example: [11:30, 12:00)
-    /// </summary>
-    public virtual DateTime EndingDateTime { get; protected set; }
+    public virtual Guid PeriodId { get; protected set; }
 
     /// <summary>
     /// Accept or reject occupying within this time frame.
@@ -40,23 +34,20 @@ public class AssetSchedule : FullAuditedAggregateRoot<Guid>, IMultiTenant
     {
     }
 
-    public AssetSchedule(Guid id, Guid? tenantId, Guid assetId, DateTime startingDateTime, DateTime endingDateTime,
+    public AssetSchedule(Guid id, Guid? tenantId, DateTime date, Guid assetId, Guid periodSchemeId, Guid periodId,
         PeriodUsable periodUsable, [CanBeNull] TimeInAdvance timeInAdvance) : base(id)
     {
         TenantId = tenantId;
+        Date = date;
         AssetId = assetId;
-        StartingDateTime = startingDateTime;
-        EndingDateTime = endingDateTime;
+        PeriodSchemeId = periodSchemeId;
+        PeriodId = periodId;
         PeriodUsable = periodUsable;
         TimeInAdvance = timeInAdvance;
     }
 
-    public void Update(Guid assetId, DateTime startingDateTime, DateTime endingDateTime,
-        PeriodUsable periodUsable, TimeInAdvance timeInAdvance)
+    public void Update(PeriodUsable periodUsable, TimeInAdvance timeInAdvance)
     {
-        AssetId = assetId;
-        StartingDateTime = startingDateTime;
-        EndingDateTime = endingDateTime;
         PeriodUsable = periodUsable;
         TimeInAdvance = timeInAdvance;
     }

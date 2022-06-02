@@ -9,6 +9,4 @@ public class PeriodDto : ExtensibleEntityDto<Guid>, IHasPeriodInfo
     public TimeSpan StartingTime { get; set; }
 
     public TimeSpan Duration { get; set; }
-
-    public bool Divisible { get; set; }
 }

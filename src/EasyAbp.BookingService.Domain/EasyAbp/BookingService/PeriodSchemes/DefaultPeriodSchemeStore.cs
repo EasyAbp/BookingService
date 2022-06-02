@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using JetBrains.Annotations;
+using Volo.Abp;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 
@@ -21,23 +22,26 @@ public class DefaultPeriodSchemeStore : ITransientDependency
     public virtual async Task<PeriodScheme> GetAsync()
     {
         var item = await _distributedCache.GetAsync(DefaultPeriodSchemeCacheItem.Key);
-        if (item is null)
-        {
-            var defaultPeriodScheme = await _periodSchemeRepository.FindDefaultSchemeAsync();
-            if (defaultPeriodScheme is not null)
-            {
-                await _distributedCache.SetAsync(DefaultPeriodSchemeCacheItem.Key, new DefaultPeriodSchemeCacheItem
-                {
-                    PeriodSchemeId = defaultPeriodScheme.Id,
-                });
-            }
-
-            return defaultPeriodScheme;
-        }
-        else
+        if (item is not null)
         {
             return await _periodSchemeRepository.GetAsync(item.PeriodSchemeId);
         }
+
+        var defaultPeriodScheme = await _periodSchemeRepository.FindDefaultSchemeAsync();
+
+        if (defaultPeriodScheme is null)
+        {
+            // Todo: use a custom exception.
+            throw new BusinessException();
+        }
+
+        await _distributedCache.SetAsync(DefaultPeriodSchemeCacheItem.Key, new DefaultPeriodSchemeCacheItem
+        {
+            PeriodSchemeId = defaultPeriodScheme.Id,
+        });
+
+        return defaultPeriodScheme;
+
     }
 
     public virtual async Task ClearAsync()

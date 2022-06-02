@@ -9,7 +9,7 @@ using Volo.Abp.Application.Services;
 namespace EasyAbp.BookingService.AssetSchedules;
 
 public class AssetScheduleAppService : CrudAppService<AssetSchedule, AssetScheduleDto, Guid,
-        GetAssetSchedulesRequestDto, CreateUpdateAssetScheduleDto, CreateUpdateAssetScheduleDto>,
+        GetAssetSchedulesRequestDto, CreateAssetScheduleDto, UpdateAssetScheduleDto>,
     IAssetScheduleAppService
 {
     protected override string GetPolicyName { get; set; } = BookingServicePermissions.AssetSchedule.Default;
@@ -33,33 +33,31 @@ public class AssetScheduleAppService : CrudAppService<AssetSchedule, AssetSchedu
         GetAssetSchedulesRequestDto input)
     {
         var query = await base.CreateFilteredQueryAsync(input);
-        return query.WhereIf(input.AssetId.HasValue,
-                x => x.AssetId == input.AssetId.Value)
-            .WhereIf(input.StartingDateTime.HasValue,
-                x => x.StartingDateTime >= input.StartingDateTime.Value)
-            .WhereIf(input.EndingDateTime.HasValue,
-                x => x.EndingDateTime <= input.EndingDateTime.Value);
+        return query.WhereIf(input.Date.HasValue,
+                x => x.Date == input.Date.Value)
+            .WhereIf(input.AssetId.HasValue,
+                x => x.AssetId == input.AssetId.Value); // Todo: Support the CategoryId filter
     }
 
-    protected override async Task<AssetSchedule> MapToEntityAsync(CreateUpdateAssetScheduleDto createInput)
+    protected override async Task<AssetSchedule> MapToEntityAsync(CreateAssetScheduleDto createInput)
     {
         return await _assetScheduleManager.CreateAsync(
+            createInput.Date,
             createInput.AssetId,
-            createInput.StartingDateTime,
-            createInput.EndingDateTime,
+            createInput.PeriodSchemeId,
+            createInput.PeriodId,
             createInput.PeriodUsable,
             ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(createInput.TimeInAdvance)
         );
     }
 
-    protected override async Task MapToEntityAsync(CreateUpdateAssetScheduleDto updateInput, AssetSchedule entity)
+    protected override Task MapToEntityAsync(UpdateAssetScheduleDto updateInput, AssetSchedule entity)
     {
-        await _assetScheduleManager.UpdateAsync(entity,
-            updateInput.AssetId,
-            updateInput.StartingDateTime,
-            updateInput.EndingDateTime,
+        entity.Update(
             updateInput.PeriodUsable,
             ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(updateInput.TimeInAdvance)
         );
+
+        return Task.CompletedTask;
     }
 }

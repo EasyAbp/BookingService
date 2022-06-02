@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Volo.Abp.Domain.Services;
 
 namespace EasyAbp.BookingService.PeriodSchemes;
@@ -16,33 +17,25 @@ public class PeriodSchemeManager : DomainService
             periods));
     }
 
-    public virtual Task UpdateAsync(PeriodScheme entity, string name, List<Period> periods)
+    public virtual Task UpdateAsync(PeriodScheme entity, string name, [NotNull] List<Period> inputPeriods)
     {
-        var newPeriods = new List<Period>();
-        if (!periods.IsNullOrEmpty())
-        {
-            for (var i = 0; i < periods.Count; i++)
-            {
-                var period = entity.Periods.ElementAtOrDefault(i);
-                if (period is null)
-                {
-                    period = new Period(GuidGenerator.Create(),
-                        periods[i].StartingTime,
-                        periods[i].Duration,
-                        periods[i].Divisible);
-                }
-                else
-                {
-                    period.Update(periods[i].StartingTime,
-                        periods[i].Duration,
-                        periods[i].Divisible);
-                }
+        entity.Periods.RemoveAll(x => !inputPeriods.Select(y => y.Id).Contains(x.Id));
 
-                newPeriods.Add(period);
+        foreach (var inputPeriod in inputPeriods)
+        {
+            var period = entity.Periods.Find(x => x.Id == inputPeriod.Id);
+
+            if (period is null)
+            {
+                entity.Periods.Add(new Period(GuidGenerator.Create(), inputPeriod.StartingTime, inputPeriod.Duration));
+            }
+            else
+            {
+                period.Update(inputPeriod.StartingTime, inputPeriod.Duration);
             }
         }
 
-        entity.Update(name, newPeriods);
+        entity.Update(name);
         return Task.CompletedTask;
     }
 }
