@@ -1,6 +1,6 @@
 ﻿namespace EasyAbp.BookingService.AssetSchedules;
 
-public enum AssetSchedulePolicy
+public enum PeriodUsable
 {
     /// <summary>
     /// Periods are available.

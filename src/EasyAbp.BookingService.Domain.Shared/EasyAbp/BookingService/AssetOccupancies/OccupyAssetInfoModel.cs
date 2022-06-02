@@ -2,7 +2,7 @@
 
 namespace EasyAbp.BookingService.AssetOccupancies;
 
-public class OccupyAssetInfoModel : IHasPeriodInfo
+public class OccupyAssetInfoModel : IHasOccupyingTimeInfo
 {
     public Guid AssetId { get; set; }
 
@@ -12,19 +12,15 @@ public class OccupyAssetInfoModel : IHasPeriodInfo
 
     public TimeSpan Duration { get; set; }
 
-    public Guid? OccupierUserId { get; set; }
-
     protected OccupyAssetInfoModel()
     {
     }
 
-    public OccupyAssetInfoModel(Guid assetId, DateTime date, TimeSpan startingTime, TimeSpan duration,
-        Guid? occupierUserId)
+    public OccupyAssetInfoModel(Guid assetId, DateTime date, TimeSpan startingTime, TimeSpan duration)
     {
         AssetId = assetId;
         Date = date;
         StartingTime = startingTime;
         Duration = duration;
-        OccupierUserId = occupierUserId;
     }
 }

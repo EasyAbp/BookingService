@@ -12,6 +12,8 @@ public class BulkOccupyAssetEto : ExtensibleObject, IMultiTenant
 {
     public Guid? TenantId { get; set; }
 
+    public Guid? OccupierUserId { get; set; }
+
     public List<OccupyAssetInfoModel> Models { get; set; }
     
     public List<OccupyAssetByCategoryInfoModel> ByCategoryModels { get; set; }
@@ -22,9 +24,11 @@ public class BulkOccupyAssetEto : ExtensibleObject, IMultiTenant
         ByCategoryModels = new List<OccupyAssetByCategoryInfoModel>();
     }
 
-    public BulkOccupyAssetEto(Guid? tenantId, List<OccupyAssetInfoModel> models, List<OccupyAssetByCategoryInfoModel> byCategoryModels)
+    public BulkOccupyAssetEto(Guid? tenantId, Guid? occupierUserId, List<OccupyAssetInfoModel> models,
+        List<OccupyAssetByCategoryInfoModel> byCategoryModels)
     {
         TenantId = tenantId;
+        OccupierUserId = occupierUserId;
         Models = models ?? new List<OccupyAssetInfoModel>();
         ByCategoryModels = byCategoryModels ?? new List<OccupyAssetByCategoryInfoModel>();
     }

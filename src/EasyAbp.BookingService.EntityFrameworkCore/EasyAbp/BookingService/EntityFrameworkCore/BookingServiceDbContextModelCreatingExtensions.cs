@@ -1,5 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+using EasyAbp.BookingService.PeriodSchemes;
+using EasyAbp.BookingService.AssetSchedules;
+using EasyAbp.BookingService.Assets;
+using EasyAbp.BookingService.AssetPeriodSchemes;
+using EasyAbp.BookingService.AssetOccupancies;
+using EasyAbp.BookingService.AssetCategories;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp;
+using Volo.Abp.EntityFrameworkCore.Modeling;
 
 namespace EasyAbp.BookingService.EntityFrameworkCore;
 
@@ -29,5 +36,67 @@ public static class BookingServiceDbContextModelCreatingExtensions
             b.HasIndex(q => q.CreationTime);
         });
         */
+
+        builder.Entity<AssetCategory>(b =>
+        {
+            b.ToTable(BookingServiceDbProperties.DbTablePrefix + "AssetCategories",
+                BookingServiceDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            b.OwnsOne(x => x.TimeInAdvance);
+            /* Configure more properties here */
+        });
+
+
+        builder.Entity<AssetOccupancy>(b =>
+        {
+            b.ToTable(BookingServiceDbProperties.DbTablePrefix + "AssetOccupancies",
+                BookingServiceDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            b.HasIndex(x => x.AssetId);
+            b.HasIndex(x => new { x.AssetId, x.Date });
+
+            /* Configure more properties here */
+        });
+
+
+        builder.Entity<AssetPeriodScheme>(b =>
+        {
+            b.ToTable(BookingServiceDbProperties.DbTablePrefix + "AssetPeriodSchemes",
+                BookingServiceDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            /* Configure more properties here */
+        });
+
+
+        builder.Entity<Asset>(b =>
+        {
+            b.ToTable(BookingServiceDbProperties.DbTablePrefix + "Assets", BookingServiceDbProperties.DbSchema);
+            b.ConfigureByConvention();
+            b.OwnsOne(x => x.TimeInAdvance);
+
+            /* Configure more properties here */
+        });
+
+
+        builder.Entity<AssetSchedule>(b =>
+        {
+            b.ToTable(BookingServiceDbProperties.DbTablePrefix + "AssetSchedules", BookingServiceDbProperties.DbSchema);
+            b.ConfigureByConvention();
+            b.OwnsOne(x => x.TimeInAdvance);
+
+            /* Configure more properties here */
+        });
+
+
+        builder.Entity<PeriodScheme>(b =>
+        {
+            b.ToTable(BookingServiceDbProperties.DbTablePrefix + "PeriodSchemes", BookingServiceDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            /* Configure more properties here */
+        });
     }
 }

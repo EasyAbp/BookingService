@@ -1,5 +1,10 @@
 {
   "culture": "zh-Hans",
   "texts": {
+    "EasyAbp.BookingService:AssetDefinitionNotExists": "资产定义不存在：{assetDefinitionName}",
+    "EasyAbp.BookingService:AssetDefinitionNameNotMatch": "资产定义必须与所属类型的定义保持一直，当前资产定义: {assetDefinitionName}，所属类型资产定义:{categoryAssetDefinitionName}",
+    "EasyAbp.BookingService:AssetNotExists": "找不到资产：{assetId}",
+    "EasyAbp.BookingService:AssetScheduleExists": "已存在相同时间范围的排期, 资产: {assetId}, 开始时间: {startingDateTime}, 结束时间: {endingDateTime}, 策略: {periodUsable}",
+    "EasyAbp.BookingService:AssetDisabled": "资产已被禁用： {assetId}"
   }
 }

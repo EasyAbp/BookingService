@@ -11,15 +11,18 @@ public class OccupyAssetByCategoryEto : ExtensibleObject, IMultiTenant
 {
     public Guid? TenantId { get; set; }
 
+    public Guid? OccupierUserId { get; set; }
+
     public OccupyAssetByCategoryInfoModel Model { get; set; }
 
     protected OccupyAssetByCategoryEto()
     {
     }
 
-    public OccupyAssetByCategoryEto(Guid? tenantId, OccupyAssetByCategoryInfoModel model)
+    public OccupyAssetByCategoryEto(Guid? tenantId, Guid? occupierUserId, OccupyAssetByCategoryInfoModel model)
     {
         TenantId = tenantId;
+        OccupierUserId = occupierUserId;
         Model = model;
     }
 }
