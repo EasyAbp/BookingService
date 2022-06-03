@@ -2,19 +2,17 @@
 
 public static class BookingServiceUrls
 {
-    public static string HostUrl { get; set; } = string.Empty;
+    public const string RouteBase = "/api/booking-service";
 
-    public static string RouteBase { get; set; } = $"{HostUrl}/api/booking-service";
+    public const string GetAssetListedDataSourceUrl = $"{RouteBase}/asset";
 
-    public static string GetAssetListedDataSourceUrl { get; set; } = $"{RouteBase}/asset";
+    public const string GetAssetSingleDataSourceUrl = $"{RouteBase}/asset/{{id}}";
 
-    public static string GetAssetSingleDataSourceUrl { get; set; } = $"{RouteBase}/asset/{{id}}";
+    public const string GetAssetCategoryListedDataSourceUrl = $"{RouteBase}/asset-category";
 
-    public static string GetAssetCategoryListedDataSourceUrl { get; set; } = $"{RouteBase}/asset-category";
+    public const string GetAssetCategorySingleDataSourceUrl = $"{RouteBase}/asset-category/{{id}}";
 
-    public static string GetAssetCategorySingleDataSourceUrl { get; set; } = $"{RouteBase}/asset-category/{{id}}";
+    public const string GetPeriodSchemeListedDataSourceUrl = $"{RouteBase}/period-scheme";
 
-    public static string GetPeriodSchemeListedDataSourceUrl { get; set; } = $"{RouteBase}/period-scheme";
-
-    public static string GetPeriodSchemeSingleDataSourceUrl { get; set; } = $"{RouteBase}/period-scheme/{{id}}";
+    public const string GetPeriodSchemeSingleDataSourceUrl = $"{RouteBase}/period-scheme/{{id}}";
 }
