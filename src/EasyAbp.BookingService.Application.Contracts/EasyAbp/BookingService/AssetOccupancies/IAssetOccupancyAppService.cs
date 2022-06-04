@@ -24,4 +24,10 @@ public interface IAssetOccupancyAppService :
     /// Search for category's bookable periods on specific date
     /// </summary>
     Task<List<BookablePeriodDto>> SearchCategoryBookablePeriodsAsync(SearchCategoryBookablePeriodsRequestDto input);
+
+    Task CheckCreateAsync(CreateAssetOccupancyDto input);
+
+    Task CheckCreateByCategoryIdAsync(CreateAssetOccupancyByCategoryIdDto input);
+    
+    Task CheckBulkCreateAsync(BulkCreateAssetOccupancyDto input);
 }

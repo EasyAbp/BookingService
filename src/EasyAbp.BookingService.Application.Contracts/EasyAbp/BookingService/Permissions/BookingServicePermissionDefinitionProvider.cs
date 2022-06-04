@@ -19,6 +19,8 @@ public class BookingServicePermissionDefinitionProvider : PermissionDefinitionPr
             assetOccupancyPermission.AddChild(BookingServicePermissions.AssetOccupancy.Create, L("Permission:Create"));
             assetOccupancyPermission.AddChild(BookingServicePermissions.AssetOccupancy.Update, L("Permission:Update"));
             assetOccupancyPermission.AddChild(BookingServicePermissions.AssetOccupancy.Delete, L("Permission:Delete"));
+            assetOccupancyPermission.AddChild(BookingServicePermissions.AssetOccupancy.Search, L("Permission:Search"));
+            assetOccupancyPermission.AddChild(BookingServicePermissions.AssetOccupancy.Check, L("Permission:Check"));
 
             var assetPeriodSchemePermission = myGroup.AddPermission(BookingServicePermissions.AssetPeriodScheme.Default, L("Permission:AssetPeriodScheme"));
             assetPeriodSchemePermission.AddChild(BookingServicePermissions.AssetPeriodScheme.Create, L("Permission:Create"));

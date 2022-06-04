@@ -57,6 +57,28 @@ public class AssetOccupancyController : BookingServiceController, IAssetOccupanc
         return _service.SearchCategoryBookablePeriodsAsync(input);
     }
 
+    [HttpPost]
+    [Route("check-create")]
+    public virtual Task CheckCreateAsync(CreateAssetOccupancyDto input)
+    {
+        return _service.CheckCreateAsync(input);
+    }
+
+    [HttpPost]
+    [Route("check-create-by-category-id")]
+    public virtual Task CheckCreateByCategoryIdAsync(
+        CreateAssetOccupancyByCategoryIdDto input)
+    {
+        return _service.CheckCreateByCategoryIdAsync(input);
+    }
+
+    [HttpPost]
+    [Route("check-bulk-create")]
+    public virtual Task CheckBulkCreateAsync(BulkCreateAssetOccupancyDto input)
+    {
+        return _service.CheckBulkCreateAsync(input);
+    }
+
     [HttpDelete]
     [Route("{id}")]
     public virtual Task DeleteAsync(Guid id)
