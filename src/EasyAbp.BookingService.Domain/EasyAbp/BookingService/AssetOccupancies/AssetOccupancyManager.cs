@@ -185,7 +185,7 @@ public class AssetOccupancyManager : DomainService
         foreach (var occupancy in occupancies)
         {
             foreach (var model in models.Where(x =>
-                         x.IsIntersected(x.Date, occupancy.StartingTime, occupancy.GetEndingTime())))
+                         x.IsIntersected(occupancy.Date, occupancy.StartingTime, occupancy.GetEndingTime())))
             {
                 model.Available = false;
             }
