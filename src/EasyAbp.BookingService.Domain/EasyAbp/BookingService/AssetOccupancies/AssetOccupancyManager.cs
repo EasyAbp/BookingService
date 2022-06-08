@@ -62,7 +62,7 @@ public class AssetOccupancyManager : DomainService
     }
 
     [UnitOfWork]
-    public virtual async Task<List<Period>> SearchCategoryBookablePeriodsAsync(Guid categoryId,
+    public virtual async Task<List<PeriodOccupancyModel>> SearchCategoryBookablePeriodsAsync(Guid categoryId,
         DateTime currentTime, DateTime targetDate)
     {
         throw new NotImplementedException();
@@ -140,7 +140,7 @@ public class AssetOccupancyManager : DomainService
             throw new AssetDefinitionNotExistsException(asset.AssetDefinitionName);
         }
     }
-    
+
     protected virtual Task<TimeInAdvance> GetEffectiveTimeInAdvanceAsync(Asset asset, AssetCategory category)
     {
         // Fallback chain when no schedule: Asset -> Category -> AssetDefinition
@@ -191,7 +191,7 @@ public class AssetOccupancyManager : DomainService
             }
         }
     }
-    
+
     protected virtual void UpdatePeriodsUsableByTimeInAdvances(
         IEnumerable<PeriodOccupancyModel> models,
         TimeInAdvance timeInAdvance,
