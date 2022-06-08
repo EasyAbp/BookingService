@@ -19,6 +19,8 @@ public class AssetOccupancy : CreationAuditedAggregateRoot<Guid>, IHasPeriodInfo
 
     [NotNull] public virtual string AssetDefinitionName { get; protected set; }
 
+    public virtual int Volume { get; protected set; }
+
     public virtual DateTime Date { get; protected set; }
 
     public virtual TimeSpan StartingTime { get; protected set; }
@@ -38,13 +40,14 @@ public class AssetOccupancy : CreationAuditedAggregateRoot<Guid>, IHasPeriodInfo
     }
 
     public AssetOccupancy(Guid id, Guid? tenantId, Guid assetId, [NotNull] string asset,
-        [NotNull] string assetDefinitionName, DateTime date, TimeSpan startingTime, TimeSpan duration,
+        [NotNull] string assetDefinitionName, int volume, DateTime date, TimeSpan startingTime, TimeSpan duration,
         Guid? occupierUserId, [CanBeNull] string occupierName) : base(id)
     {
         TenantId = tenantId;
         AssetId = assetId;
         Asset = asset;
         AssetDefinitionName = assetDefinitionName;
+        Volume = volume;
         Date = date;
         StartingTime = startingTime;
         Duration = duration;

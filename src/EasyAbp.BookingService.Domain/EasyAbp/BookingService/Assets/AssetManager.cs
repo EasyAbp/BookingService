@@ -25,10 +25,8 @@ public class AssetManager : DomainService
     }
 
     public virtual async Task<Asset> CreateAsync(string name, [NotNull] string assetDefinitionName,
-        AssetCategory assetCategory,
-        Guid? periodSchemeId,
-        PeriodUsable? defaultPeriodUsable,
-        int priority, TimeInAdvance timeInAdvance, bool disabled)
+        AssetCategory assetCategory, Guid? periodSchemeId, PeriodUsable? defaultPeriodUsable, int volume, int priority,
+        TimeInAdvance timeInAdvance, bool disabled)
     {
         Check.NotNullOrWhiteSpace(assetDefinitionName, nameof(assetDefinitionName));
 
@@ -50,14 +48,15 @@ public class AssetManager : DomainService
             assetCategory.Id,
             periodSchemeId,
             defaultPeriodUsable,
+            volume,
             priority,
             timeInAdvance,
             disabled);
     }
 
     public async Task UpdateAsync(Asset asset, string name, string assetDefinitionName, AssetCategory assetCategory,
-        Guid? periodSchemeId,
-        PeriodUsable? defaultPeriodUsable, int priority, TimeInAdvance timeInAdvance, bool disabled)
+        Guid? periodSchemeId, PeriodUsable? defaultPeriodUsable, int volume, int priority, TimeInAdvance timeInAdvance,
+        bool disabled)
     {
         Check.NotNullOrWhiteSpace(assetDefinitionName, nameof(assetDefinitionName));
 
@@ -77,6 +76,7 @@ public class AssetManager : DomainService
             assetCategory.Id,
             periodSchemeId,
             defaultPeriodUsable,
+            volume,
             priority,
             timeInAdvance,
             disabled);

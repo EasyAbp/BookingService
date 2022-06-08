@@ -185,7 +185,7 @@ public class AssetOccupancyEventsHandler :
     protected virtual AssetOccupancyInfoModel MapToAssetOccupancyInfoModel(AssetOccupancy assetOccupancy)
     {
         return new AssetOccupancyInfoModel(assetOccupancy.Id, assetOccupancy.AssetId, assetOccupancy.Asset,
-            assetOccupancy.AssetDefinitionName, assetOccupancy.Date, assetOccupancy.StartingTime,
+            assetOccupancy.AssetDefinitionName, assetOccupancy.Volume, assetOccupancy.Date, assetOccupancy.StartingTime,
             assetOccupancy.Duration, assetOccupancy.OccupierUserId, assetOccupancy.OccupierName);
     }
 }

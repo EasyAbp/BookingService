@@ -46,17 +46,18 @@ public class AssetOccupancyManager : DomainService
     {
         var periodScheme = await GetEffectivePeriodSchemeAsync(targetDate, asset, category);
         var defaultAvailable = await GetEffectivePeriodUsableAsync(asset, category) is PeriodUsable.Accept;
+        var defaultAvailableVolume = defaultAvailable ? asset.Volume : 0;
         var timeInAdvance = await GetEffectiveTimeInAdvanceAsync(asset, category);
 
         var models = periodScheme.Periods.Select(x => new PeriodOccupancyModel(targetDate, x.StartingTime,
-            x.GetEndingTime(), periodScheme.Id, x.Id, defaultAvailable)).ToList();
+            x.GetEndingTime(), periodScheme.Id, x.Id, asset.Volume, defaultAvailableVolume)).ToList();
 
         var schedules = await _assetScheduleRepository.GetListAsync(targetDate, asset.Id, periodScheme.Id);
         var occupancies = await _repository.GetListAsync(targetDate, asset.Id);
 
         UpdatePeriodsUsableBySchedules(models, schedules);
-        UpdatePeriodsUsableByOccupancies(models, occupancies);
         UpdatePeriodsUsableByTimeInAdvances(models, timeInAdvance, currentTime);
+        UpdatePeriodsUsableByOccupancies(models, occupancies);
 
         return models;
     }
@@ -168,12 +169,12 @@ public class AssetOccupancyManager : DomainService
         List<PeriodOccupancyModel> models,
         List<AssetSchedule> schedules)
     {
-        foreach (var schedule in schedules)
+        foreach (var model in models)
         {
-            foreach (var model in models.Where(x =>
-                         x.PeriodSchemeId == schedule.PeriodSchemeId && x.PeriodId == schedule.PeriodId))
+            foreach (var schedule in schedules.Where(x =>
+                         x.PeriodSchemeId == model.PeriodSchemeId && x.PeriodId == model.PeriodId))
             {
-                model.Available = schedule.PeriodUsable is PeriodUsable.Accept;
+                model.AvailableVolume = schedule.PeriodUsable is PeriodUsable.Accept ? model.TotalVolume : 0;
             }
         }
     }
@@ -182,12 +183,19 @@ public class AssetOccupancyManager : DomainService
         List<PeriodOccupancyModel> models,
         List<AssetOccupancy> occupancies)
     {
-        foreach (var occupancy in occupancies)
+        foreach (var model in models.Where(x => x.AvailableVolume > 0))
         {
-            foreach (var model in models.Where(x =>
-                         x.IsIntersected(occupancy.Date, occupancy.StartingTime, occupancy.GetEndingTime())))
+            foreach (var occupancy in occupancies.Where(x =>
+                         model.IsIntersected(x.Date, x.StartingTime, x.GetEndingTime())))
             {
-                model.Available = false;
+                var newAvailableVolume = model.AvailableVolume - occupancy.Volume;
+
+                model.AvailableVolume = newAvailableVolume >= 0 ? newAvailableVolume : 0;
+                
+                if (newAvailableVolume == 0)
+                {
+                    break;
+                }
             }
         }
     }
@@ -197,9 +205,10 @@ public class AssetOccupancyManager : DomainService
         TimeInAdvance timeInAdvance,
         DateTime currentTime)
     {
-        foreach (var model in models.Where(x => !timeInAdvance.CanOccupy(x.GetStartingDateTime(), currentTime)))
+        foreach (var model in models.Where(x =>
+                     x.AvailableVolume > 0 && !timeInAdvance.CanOccupy(x.GetStartingDateTime(), currentTime)))
         {
-            model.Available = false;
+            model.AvailableVolume = 0;
         }
     }
 }
