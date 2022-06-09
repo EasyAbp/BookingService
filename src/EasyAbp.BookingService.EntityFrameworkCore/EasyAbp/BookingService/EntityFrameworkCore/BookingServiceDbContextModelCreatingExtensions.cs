@@ -43,8 +43,8 @@ public static class BookingServiceDbContextModelCreatingExtensions
                 BookingServiceDbProperties.DbSchema);
             b.ConfigureByConvention();
 
-            b.OwnsOne(x => x.TimeInAdvance);
             /* Configure more properties here */
+            b.OwnsOne(x => x.TimeInAdvance);
         });
 
 
@@ -54,10 +54,9 @@ public static class BookingServiceDbContextModelCreatingExtensions
                 BookingServiceDbProperties.DbSchema);
             b.ConfigureByConvention();
 
+            /* Configure more properties here */
             b.HasIndex(x => x.AssetId);
             b.HasIndex(x => new { x.AssetId, x.Date });
-
-            /* Configure more properties here */
         });
 
 
@@ -68,6 +67,7 @@ public static class BookingServiceDbContextModelCreatingExtensions
             b.ConfigureByConvention();
 
             /* Configure more properties here */
+            b.HasKey(x => new { x.AssetId, x.Date });
         });
 
 
@@ -75,9 +75,9 @@ public static class BookingServiceDbContextModelCreatingExtensions
         {
             b.ToTable(BookingServiceDbProperties.DbTablePrefix + "Assets", BookingServiceDbProperties.DbSchema);
             b.ConfigureByConvention();
-            b.OwnsOne(x => x.TimeInAdvance);
 
             /* Configure more properties here */
+            b.OwnsOne(x => x.TimeInAdvance);
         });
 
 
@@ -85,9 +85,9 @@ public static class BookingServiceDbContextModelCreatingExtensions
         {
             b.ToTable(BookingServiceDbProperties.DbTablePrefix + "AssetSchedules", BookingServiceDbProperties.DbSchema);
             b.ConfigureByConvention();
-            b.OwnsOne(x => x.TimeInAdvance);
 
             /* Configure more properties here */
+            b.OwnsOne(x => x.TimeInAdvance);
         });
 
 

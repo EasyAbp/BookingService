@@ -9,9 +9,9 @@ public class AssetScheduleDto : ExtensibleFullAuditedEntityDto<Guid>
 {
     public Guid AssetId { get; set; }
 
-    public DateTime StartingDateTime { get; set; }
+    public Guid PeriodSchemeId { get; set; }
 
-    public DateTime EndingDateTime { get; set; }
+    public Guid PeriodId { get; set; }
 
     public PeriodUsable PeriodUsable { get; set; }
 
