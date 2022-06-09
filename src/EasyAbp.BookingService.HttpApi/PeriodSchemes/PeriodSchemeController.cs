@@ -29,14 +29,14 @@ public class PeriodSchemeController : BookingServiceController, IPeriodSchemeApp
 
     [HttpPost]
     [Route("")]
-    public virtual Task<PeriodSchemeDto> CreateAsync(CreateUpdatePeriodSchemeDto input)
+    public virtual Task<PeriodSchemeDto> CreateAsync(CreatePeriodSchemeDto input)
     {
         return _service.CreateAsync(input);
     }
 
     [HttpPut]
     [Route("{id}")]
-    public virtual Task<PeriodSchemeDto> UpdateAsync(Guid id, CreateUpdatePeriodSchemeDto input)
+    public virtual Task<PeriodSchemeDto> UpdateAsync(Guid id, UpdatePeriodSchemeDto input)
     {
         return _service.UpdateAsync(id, input);
     }
@@ -60,5 +60,27 @@ public class PeriodSchemeController : BookingServiceController, IPeriodSchemeApp
     public virtual Task<PagedResultDto<PeriodSchemeDto>> GetListAsync(GetPeriodSchemesRequestDto input)
     {
         return _service.GetListAsync(input);
+    }
+
+    [HttpPost]
+    [Route("{periodSchemeId}/period")]
+    public virtual Task<PeriodSchemeDto> CreatePeriodAsync(Guid periodSchemeId, CreateUpdatePeriodDto input)
+    {
+        return _service.CreatePeriodAsync(periodSchemeId, input);
+    }
+
+    [HttpPut]
+    [Route("{periodSchemeId}/period/{periodId}")]
+    public virtual Task<PeriodSchemeDto> UpdatePeriodAsync(Guid periodSchemeId, Guid periodId,
+        CreateUpdatePeriodDto input)
+    {
+        return _service.UpdatePeriodAsync(periodSchemeId, periodId, input);
+    }
+
+    [HttpDelete]
+    [Route("{periodSchemeId}/period/{periodId}")]
+    public virtual Task<PeriodSchemeDto> DeletePeriodAsync(Guid periodSchemeId, Guid periodId)
+    {
+        return _service.DeletePeriodAsync(periodSchemeId, periodId);
     }
 }

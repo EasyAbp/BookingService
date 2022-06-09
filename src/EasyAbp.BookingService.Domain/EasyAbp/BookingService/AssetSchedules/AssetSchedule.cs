@@ -34,7 +34,7 @@ public class AssetSchedule : FullAuditedAggregateRoot<Guid>, IMultiTenant
     {
     }
 
-    public AssetSchedule(Guid id, Guid? tenantId, DateTime date, Guid assetId, Guid periodSchemeId, Guid periodId,
+    internal AssetSchedule(Guid id, Guid? tenantId, DateTime date, Guid assetId, Guid periodSchemeId, Guid periodId,
         PeriodUsable periodUsable, [CanBeNull] TimeInAdvance timeInAdvance) : base(id)
     {
         TenantId = tenantId;
