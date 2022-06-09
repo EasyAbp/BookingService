@@ -39,7 +39,7 @@ public class AssetOccupancy : CreationAuditedAggregateRoot<Guid>, IHasPeriodInfo
     {
     }
 
-    public AssetOccupancy(Guid id, Guid? tenantId, Guid assetId, [NotNull] string asset,
+    internal AssetOccupancy(Guid id, Guid? tenantId, Guid assetId, [NotNull] string asset,
         [NotNull] string assetDefinitionName, int volume, DateTime date, TimeSpan startingTime, TimeSpan duration,
         Guid? occupierUserId, [CanBeNull] string occupierName) : base(id)
     {

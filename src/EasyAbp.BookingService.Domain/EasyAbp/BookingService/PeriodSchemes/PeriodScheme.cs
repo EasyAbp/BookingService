@@ -21,10 +21,9 @@ public class PeriodScheme : FullAuditedAggregateRoot<Guid>, IMultiTenant
 
     protected PeriodScheme()
     {
-        Periods = new List<Period>();
     }
 
-    public PeriodScheme(Guid id, Guid? tenantId, string name, bool isDefault, List<Period> periods) : base(id)
+    internal PeriodScheme(Guid id, Guid? tenantId, string name, bool isDefault, List<Period> periods) : base(id)
     {
         TenantId = tenantId;
         Name = name;
@@ -33,7 +32,7 @@ public class PeriodScheme : FullAuditedAggregateRoot<Guid>, IMultiTenant
         Periods = periods ?? new List<Period>();
     }
 
-    public void UpdateIsDefault(bool v)
+    internal void UpdateIsDefault(bool v)
     {
         IsDefault = v;
     }

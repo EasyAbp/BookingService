@@ -33,7 +33,5 @@ public class BookingServiceApplicationAutoMapperProfile : Profile
         CreateMap<PeriodScheme, PeriodSchemeDto>();
         CreateMap<Period, PeriodDto>();
         CreateMap<PeriodOccupancyModel, BookablePeriodDto>();
-        CreateMap<CreatePeriodDto, Period>(MemberList.Source)
-            .ForSourceMember(x => x.ExtraProperties, x => x.DoNotValidate());
     }
 }

@@ -19,21 +19,21 @@ public class AssetOccupancyManager : DomainService
     private readonly IAssetOccupancyRepository _repository;
     private readonly IPeriodSchemeRepository _periodSchemeRepository;
     private readonly IAssetPeriodSchemeRepository _assetPeriodSchemeRepository;
-    private readonly DefaultPeriodSchemeStore _defaultPeriodSchemeStore;
+    private readonly DefaultPeriodSchemeProvider _defaultPeriodSchemeProvider;
     private readonly IAssetScheduleRepository _assetScheduleRepository;
     private readonly BookingServiceOptions _options;
 
     public AssetOccupancyManager(IAssetOccupancyRepository repository,
         IPeriodSchemeRepository periodSchemeRepository,
         IAssetPeriodSchemeRepository assetPeriodSchemeRepository,
-        DefaultPeriodSchemeStore defaultPeriodSchemeStore,
+        DefaultPeriodSchemeProvider defaultPeriodSchemeProvider,
         IAssetScheduleRepository assetScheduleRepository,
         IOptions<BookingServiceOptions> options)
     {
         _repository = repository;
         _periodSchemeRepository = periodSchemeRepository;
         _assetPeriodSchemeRepository = assetPeriodSchemeRepository;
-        _defaultPeriodSchemeStore = defaultPeriodSchemeStore;
+        _defaultPeriodSchemeProvider = defaultPeriodSchemeProvider;
         _assetScheduleRepository = assetScheduleRepository;
         _options = options.Value;
     }
@@ -113,7 +113,7 @@ public class AssetOccupancyManager : DomainService
             return await _periodSchemeRepository.GetAsync(category.PeriodSchemeId.Value);
         }
 
-        return await _defaultPeriodSchemeStore.GetAsync();
+        return await _defaultPeriodSchemeProvider.GetAsync();
     }
 
 

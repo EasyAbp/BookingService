@@ -54,7 +54,7 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
     {
     }
 
-    public Asset(Guid id, Guid? tenantId, [NotNull] string name, [NotNull] string assetDefinitionName,
+    internal Asset(Guid id, Guid? tenantId, [NotNull] string name, [NotNull] string assetDefinitionName,
         Guid assetCategoryId, Guid? periodSchemeId, PeriodUsable? defaultPeriodUsable, int volume, int priority,
         [CanBeNull] TimeInAdvance timeInAdvance, bool disabled) : base(id)
     {
@@ -70,7 +70,7 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
         Disabled = disabled;
     }
 
-    public void Update([NotNull] string name, [NotNull] string assetDefinitionName, Guid assetCategoryId,
+    internal void Update([NotNull] string name, [NotNull] string assetDefinitionName, Guid assetCategoryId,
         Guid? periodSchemeId, PeriodUsable? defaultPeriodUsable, int volume, int priority, TimeInAdvance timeInAdvance,
         bool disabled)
     {
