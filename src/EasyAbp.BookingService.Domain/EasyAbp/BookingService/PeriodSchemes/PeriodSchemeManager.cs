@@ -1,12 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using Volo.Abp;
 using Volo.Abp.Domain.Services;
 
 namespace EasyAbp.BookingService.PeriodSchemes;
 
 public class PeriodSchemeManager : DomainService
 {
+    protected IPeriodSchemeRepository Repository { get; }
+
+    public PeriodSchemeManager(IPeriodSchemeRepository repository)
+    {
+        Repository = repository;
+    }
+
     public virtual Task<PeriodScheme> CreateAsync(string name, List<Period> periods)
     {
         return Task.FromResult(new PeriodScheme(GuidGenerator.Create(),
@@ -16,33 +26,44 @@ public class PeriodSchemeManager : DomainService
             periods));
     }
 
-    public virtual Task UpdateAsync(PeriodScheme entity, string name, List<Period> periods)
+    public virtual Task<Period> CreatePeriodAsync(TimeSpan startingTime, TimeSpan duration)
     {
-        var newPeriods = new List<Period>();
-        if (!periods.IsNullOrEmpty())
-        {
-            for (var i = 0; i < periods.Count; i++)
-            {
-                var period = entity.Periods.ElementAtOrDefault(i);
-                if (period is null)
-                {
-                    period = new Period(GuidGenerator.Create(),
-                        periods[i].StartingTime,
-                        periods[i].Duration,
-                        periods[i].Divisible);
-                }
-                else
-                {
-                    period.Update(periods[i].StartingTime,
-                        periods[i].Duration,
-                        periods[i].Divisible);
-                }
+        return Task.FromResult(new Period(GuidGenerator.Create(), startingTime, duration));
+    }
 
-                newPeriods.Add(period);
-            }
+    public virtual Task<Period> UpdatePeriodAsync(PeriodScheme periodScheme, Guid periodId, TimeSpan startingTime,
+        TimeSpan duration)
+    {
+        var period = periodScheme.Periods.Single(x => x.Id == periodId);
+
+        period.Update(startingTime, duration);
+
+        return Task.FromResult(period);
+    }
+
+    public virtual async Task UnsetDefaultAsync(PeriodScheme entity)
+    {
+        if (!entity.IsDefault)
+        {
+            return;
         }
 
-        entity.Update(name, newPeriods);
-        return Task.CompletedTask;
+        entity.UpdateIsDefault(false);
+    }
+
+    public virtual async Task SetAsDefaultAsync(PeriodScheme entity)
+    {
+        if (entity.IsDefault)
+        {
+            return;
+        }
+
+        var defaultPeriodScheme = await Repository.FindDefaultSchemeAsync();
+        if (defaultPeriodScheme is not null)
+        {
+            throw new BusinessException(BookingServiceErrorCodes.DefaultPeriodSchemeAlreadyExists);
+        }
+
+        entity.UpdateIsDefault(true);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.Uow;
 
@@ -16,38 +16,22 @@ public class AssetScheduleManager : DomainService
     }
 
     [UnitOfWork]
-    public virtual async Task<AssetSchedule> CreateAsync(Guid assetId,
-        DateTime startingDateTime, DateTime endingDateTime,
-        PeriodUsable periodUsable, TimeInAdvance timeInAdvance)
+    public virtual async Task<AssetSchedule> CreateAsync(DateTime date, Guid assetId, Guid periodSchemeId,
+        Guid periodId, PeriodUsable periodUsable, [CanBeNull] TimeInAdvance timeInAdvance)
     {
-        var assetSchedules =
-            await _repository.GetAssetScheduleListInScopeAsync(assetId, startingDateTime, endingDateTime, periodUsable);
-        if (!assetSchedules.IsNullOrEmpty())
+        if (await _repository.FindAsync(date, assetId, periodSchemeId, periodId) is not null)
         {
-            throw new AssetScheduleExistsException(assetId, startingDateTime, endingDateTime, periodUsable);
+            throw new AssetScheduleExistsException(date, assetId, periodSchemeId, periodId);
         }
 
         return new AssetSchedule(
             GuidGenerator.Create(),
             CurrentTenant.Id,
+            date,
             assetId,
-            startingDateTime,
-            endingDateTime,
+            periodSchemeId,
+            periodId,
             periodUsable,
             timeInAdvance);
-    }
-
-    [UnitOfWork]
-    public virtual async Task UpdateAsync(AssetSchedule entity, Guid assetId, DateTime startingDateTime,
-        DateTime endingDateTime, PeriodUsable periodUsable, TimeInAdvance timeInAdvance)
-    {
-        var assetSchedules =
-            await _repository.GetAssetScheduleListInScopeAsync(assetId, startingDateTime, endingDateTime, periodUsable);
-        if (!assetSchedules.IsNullOrEmpty())
-        {
-            throw new AssetScheduleExistsException(assetId, startingDateTime, endingDateTime, periodUsable);
-        }
-
-        entity.Update(assetId, startingDateTime, endingDateTime, periodUsable, timeInAdvance);
     }
 }

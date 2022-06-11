@@ -19,6 +19,10 @@ public class AssetPeriodScheme : AuditedAggregateRoot, IMultiTenant
 
     public virtual DateTime Date { get; protected set; }
 
+    protected AssetPeriodScheme()
+    {
+    }
+
     public AssetPeriodScheme([NotNull] AssetPeriodSchemeKey id, Guid? tenantId, Guid periodSchemeId)
     {
         TenantId = tenantId;

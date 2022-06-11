@@ -26,6 +26,7 @@ public class BookingServicePermissions
         public const string Create = Default + ".Create";
         public const string Delete = Default + ".Delete";
         public const string Search = Default + ".Search";
+        public const string Check = Default + ".Check";
     }
 
     public class AssetPeriodScheme

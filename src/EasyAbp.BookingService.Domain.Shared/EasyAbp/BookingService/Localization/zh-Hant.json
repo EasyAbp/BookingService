@@ -1,6 +1,11 @@
 {
   "culture": "zh-Hant",
   "texts": {
-    "EasyAbp.BookingService:AssetDefinitionNotExists": ""
+    "EasyAbp.BookingService:AssetDefinitionNotExists": "資產定義不存在：{assetDefinitionName}",
+    "EasyAbp.BookingService:AssetDefinitionNameNotMatch": "資產定義必須與所屬類型的定義保持一直，當前資產定義: {assetDefinitionName}，所屬類型資產定義:{categoryAssetDefinitionName}",
+    "EasyAbp.BookingService:AssetNotExists": "找不到資產：{assetId}",
+    "EasyAbp.BookingService:AssetScheduleExists": "已存在相同時間範圍的排期, 日期: {date}, 資產: {assetId}, 時段方案: {periodSchemeId}, 時段: {periodId}, 策略: {periodUsable}",
+    "EasyAbp.BookingService:AssetDisabled": "資產已被禁用： {assetId}",
+    "EasyAbp.BookingService:DefaultPeriodSchemeAlreadyExists": "已存在默認時段方案，請先將其設為非默認，再重新操作"
   }
 }

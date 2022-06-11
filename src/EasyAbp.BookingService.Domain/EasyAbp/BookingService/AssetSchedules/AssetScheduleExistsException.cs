@@ -5,13 +5,12 @@ namespace EasyAbp.BookingService.AssetSchedules;
 
 public class AssetScheduleExistsException : BusinessException
 {
-    public AssetScheduleExistsException(Guid assetId, DateTime startingDateTime, DateTime endingDateTime,
-        PeriodUsable periodUsable)
-        : base(BookingServiceErrorCodes.AssetScheduleExists)
+    public AssetScheduleExistsException(DateTime date, Guid assetId, Guid periodSchemeId, Guid periodId) : base(
+        BookingServiceErrorCodes.AssetScheduleExists)
     {
+        WithData(nameof(date), date);
         WithData(nameof(assetId), assetId);
-        WithData(nameof(startingDateTime), startingDateTime);
-        WithData(nameof(endingDateTime), endingDateTime);
-        WithData(nameof(periodUsable), periodUsable);
+        WithData(nameof(periodSchemeId), periodSchemeId);
+        WithData(nameof(periodId), periodId);
     }
 }

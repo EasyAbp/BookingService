@@ -10,8 +10,8 @@ public interface IPeriodSchemeAppService :
         PeriodSchemeDto,
         Guid,
         GetPeriodSchemesRequestDto,
-        CreateUpdatePeriodSchemeDto,
-        CreateUpdatePeriodSchemeDto>
+        CreatePeriodSchemeDto,
+        UpdatePeriodSchemeDto>
 {
     /// <summary>
     /// This method will change the default Period Scheme entity by Id.
@@ -19,4 +19,10 @@ public interface IPeriodSchemeAppService :
     /// <param name="id"></param>
     /// <returns></returns>
     Task<PeriodSchemeDto> SetAsDefaultAsync(Guid id);
+    
+    Task<PeriodSchemeDto> CreatePeriodAsync(Guid periodSchemeId, CreateUpdatePeriodDto input);
+
+    Task<PeriodSchemeDto> UpdatePeriodAsync(Guid periodSchemeId, Guid periodId, CreateUpdatePeriodDto input);
+
+    Task<PeriodSchemeDto> DeletePeriodAsync(Guid periodSchemeId, Guid periodId);
 }

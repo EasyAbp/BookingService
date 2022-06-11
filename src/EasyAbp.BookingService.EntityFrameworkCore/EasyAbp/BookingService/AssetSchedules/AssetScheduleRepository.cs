@@ -18,19 +18,19 @@ public class AssetScheduleRepository : EfCoreRepository<IBookingServiceDbContext
     {
     }
 
-    /// <inheritdoc/>
-    public async Task<List<AssetSchedule>> GetAssetScheduleListInScopeAsync(Guid assetId, DateTime startingDateTime,
-        DateTime endingDateTime,
-        PeriodUsable? policy = default, bool includeDetails = false,
+    public virtual async Task<List<AssetSchedule>> GetListAsync(DateTime date, Guid assetId, Guid periodSchemeId,
         CancellationToken cancellationToken = default)
     {
-        var queryable = includeDetails ? await WithDetailsAsync() : await GetDbSetAsync();
+        return await (await GetQueryableAsync())
+            .Where(x => x.Date == date && x.AssetId == assetId && x.PeriodSchemeId == periodSchemeId)
+            .ToListAsync(cancellationToken: cancellationToken);
+    }
 
-        return await queryable.Where(x => x.AssetId == assetId)
-            .Where(x =>
-                !(x.StartingDateTime >= endingDateTime // new schedule is on the left side of the old schedule in timeline
-                  || x.EndingDateTime <= startingDateTime)) // new schedule is on the right side of the old schedule in timeline
-            .WhereIf(policy.HasValue, x => x.PeriodUsable == policy.Value)
-            .ToListAsync(GetCancellationToken(cancellationToken));
+    public virtual async Task<AssetSchedule> FindAsync(DateTime date, Guid assetId, Guid periodSchemeId, Guid periodId,
+        CancellationToken cancellationToken = default)
+    {
+        return await (await GetQueryableAsync()).FirstOrDefaultAsync(
+            x => x.Date == date && x.AssetId == assetId && x.PeriodSchemeId == periodSchemeId && x.PeriodId == periodId,
+            cancellationToken);
     }
 }

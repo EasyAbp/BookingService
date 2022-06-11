@@ -8,9 +8,9 @@ using Volo.Abp.Application.Services;
 
 namespace EasyAbp.BookingService.PeriodSchemes;
 
-public class PeriodSchemeAppService : CrudAppService<PeriodScheme, PeriodSchemeDto, Guid, GetPeriodSchemesRequestDto
-        , CreateUpdatePeriodSchemeDto, CreateUpdatePeriodSchemeDto>,
-    IPeriodSchemeAppService
+public class PeriodSchemeAppService :
+    CrudAppService<PeriodScheme, PeriodSchemeDto, Guid, GetPeriodSchemesRequestDto, CreatePeriodSchemeDto,
+        UpdatePeriodSchemeDto>, IPeriodSchemeAppService
 {
     protected override string GetPolicyName { get; set; } = BookingServicePermissions.PeriodScheme.Default;
     protected override string GetListPolicyName { get; set; } = BookingServicePermissions.PeriodScheme.Default;
@@ -19,15 +19,12 @@ public class PeriodSchemeAppService : CrudAppService<PeriodScheme, PeriodSchemeD
     protected override string DeletePolicyName { get; set; } = BookingServicePermissions.PeriodScheme.Delete;
 
     private readonly IPeriodSchemeRepository _repository;
-    private readonly DefaultPeriodSchemeStore _defaultPeriodSchemeStore;
     private readonly PeriodSchemeManager _periodSchemeManager;
 
     public PeriodSchemeAppService(IPeriodSchemeRepository repository,
-        DefaultPeriodSchemeStore defaultPeriodSchemeStore,
         PeriodSchemeManager periodSchemeManager) : base(repository)
     {
         _repository = repository;
-        _defaultPeriodSchemeStore = defaultPeriodSchemeStore;
         _periodSchemeManager = periodSchemeManager;
     }
 
@@ -40,42 +37,100 @@ public class PeriodSchemeAppService : CrudAppService<PeriodScheme, PeriodSchemeD
                 x => x.Name == input.Name);
     }
 
-    protected override async Task<PeriodScheme> MapToEntityAsync(CreateUpdatePeriodSchemeDto createInput)
+    protected override async Task<PeriodScheme> MapToEntityAsync(CreatePeriodSchemeDto createInput)
     {
         return await _periodSchemeManager.CreateAsync(
             createInput.Name,
-            ObjectMapper.Map<List<CreatePeriodDto>, List<Period>>(createInput.Periods)
+            await MapToPeriodEntitiesAsync(createInput.Periods)
         );
     }
 
-    protected override async Task MapToEntityAsync(CreateUpdatePeriodSchemeDto updateInput, PeriodScheme entity)
+    protected override Task MapToEntityAsync(UpdatePeriodSchemeDto input, PeriodScheme entity)
     {
-        await _periodSchemeManager.UpdateAsync(entity,
-            updateInput.Name,
-            ObjectMapper.Map<List<CreatePeriodDto>, List<Period>>(updateInput.Periods)
-        );
+        entity.Update(input.Name);
+
+        return Task.CompletedTask;
+    }
+
+    protected virtual async Task<List<Period>> MapToPeriodEntitiesAsync(List<CreateUpdatePeriodDto> createInput)
+    {
+        var periods = new List<Period>();
+
+        foreach (var createPeriodDto in createInput)
+        {
+            periods.Add(
+                await _periodSchemeManager.CreatePeriodAsync(createPeriodDto.StartingTime, createPeriodDto.Duration));
+        }
+
+        return periods;
     }
 
     public virtual async Task<PeriodSchemeDto> SetAsDefaultAsync(Guid id)
     {
         await CheckUpdatePolicyAsync();
 
-        var entity = await _repository.GetAsync(id);
-        if (entity.IsDefault)
+        var scheme = await GetEntityByIdAsync(id);
+
+        var defaultScheme = await _repository.FindDefaultSchemeAsync();
+
+        if (defaultScheme is not null)
         {
-            return await MapToGetOutputDtoAsync(entity);
+            await _periodSchemeManager.UnsetDefaultAsync(defaultScheme);
+
+            await _repository.UpdateAsync(defaultScheme, true);
         }
 
-        var defaultPeriodScheme = await _defaultPeriodSchemeStore.GetAsync();
-        if (defaultPeriodScheme is not null)
-        {
-            await _defaultPeriodSchemeStore.ClearAsync();
-            defaultPeriodScheme.UpdateIsDefault(false);
-            await _repository.UpdateAsync(defaultPeriodScheme);
-        }
+        await _periodSchemeManager.SetAsDefaultAsync(scheme);
 
-        entity.UpdateIsDefault(true);
-        await _repository.UpdateAsync(entity);
-        return await MapToGetOutputDtoAsync(entity);
+        await _repository.UpdateAsync(scheme, true);
+
+        return await MapToGetOutputDtoAsync(scheme);
+    }
+
+    public virtual async Task<PeriodSchemeDto> CreatePeriodAsync(Guid periodSchemeId, CreateUpdatePeriodDto input)
+    {
+        var periodScheme = await GetEntityByIdAsync(periodSchemeId);
+
+        var period = await _periodSchemeManager.CreatePeriodAsync(input.StartingTime, input.Duration);
+
+        periodScheme.Periods.Add(period);
+
+        await _repository.UpdateAsync(periodScheme, true);
+
+        return await MapToGetOutputDtoAsync(periodScheme);
+    }
+
+    public virtual async Task<PeriodSchemeDto> UpdatePeriodAsync(Guid periodSchemeId, Guid periodId,
+        CreateUpdatePeriodDto input)
+    {
+        var periodScheme = await GetEntityByIdAsync(periodSchemeId);
+
+        await _periodSchemeManager.UpdatePeriodAsync(periodScheme, periodId, input.StartingTime, input.Duration);
+
+        await _repository.UpdateAsync(periodScheme, true);
+
+        return await MapToGetOutputDtoAsync(periodScheme);
+    }
+
+    public virtual async Task<PeriodSchemeDto> DeletePeriodAsync(Guid periodSchemeId, Guid periodId)
+    {
+        var periodScheme = await GetEntityByIdAsync(periodSchemeId);
+
+        var period = periodScheme.Periods.Single(x => x.Id == periodId);
+
+        periodScheme.Periods.Remove(period);
+
+        await _repository.UpdateAsync(periodScheme, true);
+
+        return await MapToGetOutputDtoAsync(periodScheme);
+    }
+
+    protected override async Task<PeriodSchemeDto> MapToGetOutputDtoAsync(PeriodScheme entity)
+    {
+        var dto = await base.MapToGetOutputDtoAsync(entity);
+
+        dto.Periods = dto.Periods.OrderBy(x => x.StartingTime).ThenBy(x => x.Duration).ToList();
+
+        return dto;
     }
 }

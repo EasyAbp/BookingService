@@ -6,9 +6,9 @@ namespace EasyAbp.BookingService.AssetSchedules.Dtos;
 [Serializable]
 public class GetAssetSchedulesRequestDto : PagedAndSortedResultRequestDto
 {
+    public DateTime? Date { get; set; }
+
     public Guid? AssetId { get; set; }
 
-    public DateTime? StartingDateTime { get; set; }
-    
-    public DateTime? EndingDateTime { get; set; }
+    public Guid? AssetCategoryId { get; set; }
 }
