@@ -41,7 +41,7 @@ public class AssetOccupancyManager : DomainService
     [UnitOfWork]
     public virtual async Task<List<PeriodOccupancyModel>> SearchAssetBookablePeriodsAsync(Asset asset,
         AssetCategory category,
-        DateTime currentTime,
+        DateTime currentDateTime,
         DateTime targetDate)
     {
         var periodScheme = await GetEffectivePeriodSchemeAsync(targetDate, asset, category);
@@ -56,14 +56,14 @@ public class AssetOccupancyManager : DomainService
 
         UpdatePeriodsUsableBySchedules(models, schedules);
         UpdatePeriodsUsableByOccupancies(models, occupancies);
-        UpdatePeriodsUsableByTimeInAdvances(models, timeInAdvance, currentTime);
+        UpdatePeriodsUsableByTimeInAdvances(models, timeInAdvance, currentDateTime);
 
         return models;
     }
 
     [UnitOfWork]
     public virtual async Task<List<PeriodOccupancyModel>> SearchCategoryBookablePeriodsAsync(Guid categoryId,
-        DateTime currentTime, DateTime targetDate)
+        DateTime currentDateTime, DateTime targetDate)
     {
         throw new NotImplementedException();
     }
@@ -195,9 +195,9 @@ public class AssetOccupancyManager : DomainService
     protected virtual void UpdatePeriodsUsableByTimeInAdvances(
         IEnumerable<PeriodOccupancyModel> models,
         TimeInAdvance timeInAdvance,
-        DateTime currentTime)
+        DateTime currentDateTime)
     {
-        foreach (var model in models.Where(x => !timeInAdvance.CanOccupy(x.GetStartingDateTime(), currentTime)))
+        foreach (var model in models.Where(x => !timeInAdvance.CanOccupy(x.GetStartingDateTime(), currentDateTime)))
         {
             model.Available = false;
         }

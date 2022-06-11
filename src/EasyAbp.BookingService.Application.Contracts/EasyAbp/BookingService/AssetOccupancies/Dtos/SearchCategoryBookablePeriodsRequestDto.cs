@@ -16,7 +16,7 @@ public class SearchCategoryBookablePeriodsRequestDto
     /// The moment of a user is going to book
     /// </summary>
     [Required]
-    public DateTime CurrentTime { get; set; }
+    public DateTime CurrentDateTime { get; set; }
 
     /// <summary>
     /// Search for the asset's bookable period on this date
