@@ -124,13 +124,4 @@ public class PeriodSchemeAppService :
 
         return await MapToGetOutputDtoAsync(periodScheme);
     }
-
-    protected override async Task<PeriodSchemeDto> MapToGetOutputDtoAsync(PeriodScheme entity)
-    {
-        var dto = await base.MapToGetOutputDtoAsync(entity);
-
-        dto.Periods = dto.Periods.OrderBy(x => x.StartingTime).ThenBy(x => x.Duration).ToList();
-
-        return dto;
-    }
 }
