@@ -32,14 +32,14 @@ public class TimeInAdvance : ValueObject, ITimeInAdvance
     }
 
     /// <summary>
-    /// Check whether you can occupy startingDateTime(March 10, 2022, 10:00) in currentTime(March 8, 2022, 10:00)?
+    /// Check whether you can occupy startingDateTime(March 10, 2022, 10:00) in currentDateTime(March 8, 2022, 10:00)?
     /// </summary>
     /// <param name="startingDateTime">The starting datetime of period to occupy</param>
-    /// <param name="currentTime">The moment you want to occupy</param>
+    /// <param name="currentDateTime">The moment you want to occupy</param>
     /// <returns>True: can occupy</returns>
-    public bool CanOccupy(DateTime startingDateTime, DateTime currentTime)
+    public bool CanOccupy(DateTime startingDateTime, DateTime currentDateTime)
     {
-        var ts = startingDateTime - currentTime;
+        var ts = startingDateTime - currentDateTime;
 
         var max = GetMaxTimespanInAdvance();
         if (ts > max)

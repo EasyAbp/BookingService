@@ -41,7 +41,7 @@ public class AssetOccupancyManager : DomainService
     [UnitOfWork]
     public virtual async Task<List<PeriodOccupancyModel>> SearchAssetBookablePeriodsAsync(Asset asset,
         AssetCategory category,
-        DateTime currentTime,
+        DateTime currentDateTime,
         DateTime targetDate)
     {
         var periodScheme = await GetEffectivePeriodSchemeAsync(targetDate, asset, category);
@@ -56,7 +56,7 @@ public class AssetOccupancyManager : DomainService
         var occupancies = await _repository.GetListAsync(targetDate, asset.Id);
 
         UpdatePeriodsUsableBySchedules(models, schedules);
-        UpdatePeriodsUsableByTimeInAdvances(models, timeInAdvance, currentTime);
+        UpdatePeriodsUsableByTimeInAdvances(models, timeInAdvance, currentDateTime);
         UpdatePeriodsUsableByOccupancies(models, occupancies);
 
         return models;
@@ -64,7 +64,7 @@ public class AssetOccupancyManager : DomainService
 
     [UnitOfWork]
     public virtual async Task<List<PeriodOccupancyModel>> SearchCategoryBookablePeriodsAsync(Guid categoryId,
-        DateTime currentTime, DateTime targetDate)
+        DateTime currentDateTime, DateTime targetDate)
     {
         throw new NotImplementedException();
     }
@@ -203,10 +203,10 @@ public class AssetOccupancyManager : DomainService
     protected virtual void UpdatePeriodsUsableByTimeInAdvances(
         IEnumerable<PeriodOccupancyModel> models,
         TimeInAdvance timeInAdvance,
-        DateTime currentTime)
+        DateTime currentDateTime)
     {
         foreach (var model in models.Where(x =>
-                     x.AvailableVolume > 0 && !timeInAdvance.CanOccupy(x.GetStartingDateTime(), currentTime)))
+                     x.AvailableVolume > 0 && !timeInAdvance.CanOccupy(x.GetStartingDateTime(), currentDateTime)))
         {
             model.AvailableVolume = 0;
         }

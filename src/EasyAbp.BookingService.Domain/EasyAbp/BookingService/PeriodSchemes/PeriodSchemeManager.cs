@@ -61,7 +61,7 @@ public class PeriodSchemeManager : DomainService
         var defaultPeriodScheme = await Repository.FindDefaultSchemeAsync();
         if (defaultPeriodScheme is not null)
         {
-            throw new BusinessException("Should unset the existing default scheme first.");
+            throw new BusinessException(BookingServiceErrorCodes.DefaultPeriodSchemeAlreadyExists);
         }
 
         entity.UpdateIsDefault(true);
