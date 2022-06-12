@@ -27,7 +27,7 @@ public class PeriodOccupancyModel
         int totalVolume,
         int availableVolume)
     {
-        Date = date;
+        Date = date.Date;
         StartingTime = startingTime;
         EndingTime = endingTime;
         PeriodSchemeId = periodSchemeId;
@@ -46,5 +46,8 @@ public class PeriodOccupancyModel
         return !(targetStartingTime >= EndingTime || targetEndingTime <= StartingTime);
     }
 
+
     public DateTime GetStartingDateTime() => Date + StartingTime;
+
+    public DateTime GetEndingDateTime() => Date + EndingTime;
 }
