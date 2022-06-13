@@ -56,6 +56,7 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
             category,
             createInput.PeriodSchemeId,
             createInput.DefaultPeriodUsable,
+            createInput.Volume,
             createInput.Priority,
             ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(createInput.TimeInAdvance),
             createInput.Disabled);
@@ -71,6 +72,7 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
             category,
             updateInput.PeriodSchemeId,
             updateInput.DefaultPeriodUsable,
+            updateInput.Volume,
             updateInput.Priority,
             ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(updateInput.TimeInAdvance),
             updateInput.Disabled);

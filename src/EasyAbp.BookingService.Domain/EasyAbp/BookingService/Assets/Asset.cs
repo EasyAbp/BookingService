@@ -31,6 +31,11 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
     public virtual PeriodUsable? DefaultPeriodUsable { get; protected set; }
 
     /// <summary>
+    /// Assets can occupy if the rest volume is enough.
+    /// </summary>
+    public virtual int Volume { get; protected set; }
+
+    /// <summary>
     /// When occupying an Asset through AssetCategoryId, the Priority value determines to pick which Asset.
     /// </summary>
     public virtual int Priority { get; protected set; }
@@ -50,7 +55,7 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
     }
 
     internal Asset(Guid id, Guid? tenantId, [NotNull] string name, [NotNull] string assetDefinitionName,
-        Guid assetCategoryId, Guid? periodSchemeId, PeriodUsable? defaultPeriodUsable, int priority,
+        Guid assetCategoryId, Guid? periodSchemeId, PeriodUsable? defaultPeriodUsable, int volume, int priority,
         [CanBeNull] TimeInAdvance timeInAdvance, bool disabled) : base(id)
     {
         TenantId = tenantId;
@@ -59,20 +64,22 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
         AssetCategoryId = assetCategoryId;
         PeriodSchemeId = periodSchemeId;
         DefaultPeriodUsable = defaultPeriodUsable;
+        Volume = volume;
         Priority = priority;
         TimeInAdvance = timeInAdvance;
         Disabled = disabled;
     }
 
     internal void Update([NotNull] string name, [NotNull] string assetDefinitionName, Guid assetCategoryId,
-        Guid? periodSchemeId,
-        PeriodUsable? defaultPeriodUsable, int priority, TimeInAdvance timeInAdvance, bool disabled)
+        Guid? periodSchemeId, PeriodUsable? defaultPeriodUsable, int volume, int priority, TimeInAdvance timeInAdvance,
+        bool disabled)
     {
         Name = name;
         AssetDefinitionName = assetDefinitionName;
         AssetCategoryId = assetCategoryId;
         PeriodSchemeId = periodSchemeId;
         DefaultPeriodUsable = defaultPeriodUsable;
+        Volume = volume;
         Priority = priority;
         TimeInAdvance = timeInAdvance;
         Disabled = disabled;

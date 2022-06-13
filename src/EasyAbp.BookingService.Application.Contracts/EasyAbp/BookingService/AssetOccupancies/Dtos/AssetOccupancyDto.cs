@@ -12,6 +12,8 @@ public class AssetOccupancyDto : ExtensibleCreationAuditedEntityDto<Guid>, IHasP
 
     public string AssetDefinitionName { get; set; }
 
+    public int Volume { get; set; }
+
     public DateTime Date { get; set; }
 
     public TimeSpan StartingTime { get; set; }

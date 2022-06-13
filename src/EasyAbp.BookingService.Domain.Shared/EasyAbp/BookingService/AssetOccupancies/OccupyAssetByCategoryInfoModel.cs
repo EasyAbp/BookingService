@@ -6,6 +6,8 @@ public class OccupyAssetByCategoryInfoModel : IHasOccupyingTimeInfo
 {
     public Guid AssetCategoryId { get; set; }
 
+    public int Volume { get; set; }
+
     public DateTime Date { get; set; }
 
     public TimeSpan StartingTime { get; set; }

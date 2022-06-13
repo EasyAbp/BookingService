@@ -18,6 +18,8 @@ public class AssetDto : ExtensibleFullAuditedEntityDto<Guid>
 
     public PeriodUsable? DefaultPeriodUsable { get; set; }
 
+    public int Volume { get; set; }
+
     public int Priority { get; set; }
 
     public TimeInAdvanceDto TimeInAdvance { get; set; }

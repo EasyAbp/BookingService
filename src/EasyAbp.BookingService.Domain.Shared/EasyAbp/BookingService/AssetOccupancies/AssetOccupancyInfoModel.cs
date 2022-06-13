@@ -12,6 +12,8 @@ public class AssetOccupancyInfoModel : IHasPeriodInfo
 
     public string AssetDefinitionName { get; set; }
 
+    public int Volume { get; set; }
+
     public DateTime Date { get; set; }
 
     public TimeSpan StartingTime { get; set; }
@@ -23,12 +25,13 @@ public class AssetOccupancyInfoModel : IHasPeriodInfo
     public string OccupierName { get; set; }
 
     public AssetOccupancyInfoModel(Guid assetOccupancyId, Guid assetId, string asset, string assetDefinitionName,
-        DateTime date, TimeSpan startingTime, TimeSpan duration, Guid? occupierUserId, string occupierName)
+        int volume, DateTime date, TimeSpan startingTime, TimeSpan duration, Guid? occupierUserId, string occupierName)
     {
         AssetOccupancyId = assetOccupancyId;
         AssetId = assetId;
         Asset = asset;
         AssetDefinitionName = assetDefinitionName;
+        Volume = volume;
         Date = date;
         StartingTime = startingTime;
         Duration = duration;

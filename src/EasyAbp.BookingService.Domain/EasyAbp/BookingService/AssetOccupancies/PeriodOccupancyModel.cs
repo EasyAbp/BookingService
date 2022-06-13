@@ -13,8 +13,10 @@ public class PeriodOccupancyModel
     public Guid PeriodSchemeId { get; set; }
 
     public Guid PeriodId { get; set; }
-    
-    public bool Available { get; set; }
+
+    public int TotalVolume { get; set; }
+
+    public int AvailableVolume { get; set; }
 
     public PeriodOccupancyModel(
         DateTime date,
@@ -22,14 +24,16 @@ public class PeriodOccupancyModel
         TimeSpan endingTime,
         Guid periodSchemeId,
         Guid periodId,
-        bool available)
+        int totalVolume,
+        int availableVolume)
     {
-        Date = date;
+        Date = date.Date;
         StartingTime = startingTime;
         EndingTime = endingTime;
         PeriodSchemeId = periodSchemeId;
         PeriodId = periodId;
-        Available = available;
+        TotalVolume = totalVolume;
+        AvailableVolume = availableVolume;
     }
 
     public bool IsIntersected(DateTime date, TimeSpan targetStartingTime, TimeSpan targetEndingTime)
@@ -38,9 +42,12 @@ public class PeriodOccupancyModel
         {
             return false;
         }
-        
+
         return !(targetStartingTime >= EndingTime || targetEndingTime <= StartingTime);
     }
 
+
     public DateTime GetStartingDateTime() => Date + StartingTime;
+
+    public DateTime GetEndingDateTime() => Date + EndingTime;
 }
