@@ -83,7 +83,7 @@ public class AssetOccupancyManager : DomainService
     }
 
     [UnitOfWork(true)]
-    public virtual async Task<AssetOccupancy> BulkCreateAsync(List<OccupyAssetInfoModel> models,
+    public virtual async Task<List<AssetOccupancy>> BulkCreateAsync(List<OccupyAssetInfoModel> models,
         List<OccupyAssetByCategoryInfoModel> byCateModels, Guid? occupierUserId)
     {
         throw new NotImplementedException();
