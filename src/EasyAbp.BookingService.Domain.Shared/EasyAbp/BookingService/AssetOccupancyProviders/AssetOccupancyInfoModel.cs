@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace EasyAbp.BookingService.AssetOccupancies;
+namespace EasyAbp.BookingService.AssetOccupancyProviders;
 
-public class AssetOccupancyInfoModel : IHasPeriodInfo
+public class AssetOccupancyInfoModel : IOccupyingBaseInfo
 {
     public Guid AssetOccupancyId { get; set; }
 

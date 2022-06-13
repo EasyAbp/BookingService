@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace EasyAbp.BookingService.AssetOccupancies;
+namespace EasyAbp.BookingService.AssetOccupancyProviders;
 
-public class OccupyAssetInfoModel : IHasOccupyingTimeInfo
+public class OccupyAssetInfoModel : IOccupyingBaseInfo
 {
     public Guid AssetId { get; set; }
 
@@ -18,9 +18,10 @@ public class OccupyAssetInfoModel : IHasOccupyingTimeInfo
     {
     }
 
-    public OccupyAssetInfoModel(Guid assetId, DateTime date, TimeSpan startingTime, TimeSpan duration)
+    public OccupyAssetInfoModel(Guid assetId, int volume, DateTime date, TimeSpan startingTime, TimeSpan duration)
     {
         AssetId = assetId;
+        Volume = volume;
         Date = date;
         StartingTime = startingTime;
         Duration = duration;

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using EasyAbp.BookingService.AssetOccupancyProviders;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.MultiTenancy;
@@ -17,20 +19,20 @@ public class AssetOccupancyEventsHandler :
     private readonly ICurrentTenant _currentTenant;
     private readonly IUnitOfWorkManager _unitOfWorkManager;
     private readonly IDistributedEventBus _distributedEventBus;
-    private readonly AssetOccupancyManager _assetOccupancyManager;
+    private readonly IAssetOccupancyProvider _assetOccupancyProvider;
     private readonly IAssetOccupancyRepository _assetOccupancyRepository;
 
     public AssetOccupancyEventsHandler(
         ICurrentTenant currentTenant,
         IUnitOfWorkManager unitOfWorkManager,
         IDistributedEventBus distributedEventBus,
-        AssetOccupancyManager assetOccupancyManager,
+        IAssetOccupancyProvider assetOccupancyProvider,
         IAssetOccupancyRepository assetOccupancyRepository)
     {
         _currentTenant = currentTenant;
         _unitOfWorkManager = unitOfWorkManager;
         _distributedEventBus = distributedEventBus;
-        _assetOccupancyManager = assetOccupancyManager;
+        _assetOccupancyProvider = assetOccupancyProvider;
         _assetOccupancyRepository = assetOccupancyRepository;
     }
 
@@ -42,12 +44,10 @@ public class AssetOccupancyEventsHandler :
         {
             using var uow = _unitOfWorkManager.Begin(new AbpUnitOfWorkOptions(isTransactional: true));
 
-            var occupancy = await _assetOccupancyManager.CreateAsync(eventData.Model, eventData.OccupierUserId);
-
-            await _assetOccupancyRepository.InsertAsync(occupancy, true);
+            var (_, occupancy) = await _assetOccupancyProvider.OccupyAsync(eventData.Model, eventData.OccupierUserId);
 
             await CreatePublishSuccessResultEventAsync(occupancy, eventData);
-            
+
             await uow.CompleteAsync();
         }
         catch
@@ -65,13 +65,13 @@ public class AssetOccupancyEventsHandler :
         {
             using var uow = _unitOfWorkManager.Begin(new AbpUnitOfWorkOptions(isTransactional: true));
 
-            var occupancy =
-                await _assetOccupancyManager.CreateByCategoryIdAsync(eventData.Model, eventData.OccupierUserId);
+            var (_, occupancy) =
+                await _assetOccupancyProvider.OccupyByCategoryAsync(eventData.Model, eventData.OccupierUserId);
 
             await _assetOccupancyRepository.InsertAsync(occupancy, true);
 
             await CreatePublishSuccessResultEventAsync(occupancy, eventData);
-            
+
             await uow.CompleteAsync();
         }
         catch
@@ -87,27 +87,13 @@ public class AssetOccupancyEventsHandler :
 
         try
         {
-            var occupancies = new List<AssetOccupancy>();
             using var uow = _unitOfWorkManager.Begin(new AbpUnitOfWorkOptions(isTransactional: true));
 
-            foreach (var model in eventData.Models)
-            {
-                var occupancy = await _assetOccupancyManager.CreateAsync(model, eventData.OccupierUserId);
+            var result = await _assetOccupancyProvider.BulkOccupyAsync(eventData.Models, eventData.ByCategoryModels,
+                eventData.OccupierUserId);
 
-                await _assetOccupancyRepository.InsertAsync(occupancy);
-            
-                occupancies.Add(occupancy);
-            }
-        
-            foreach (var model in eventData.ByCategoryModels)
-            {
-                var occupancy = await _assetOccupancyManager.CreateByCategoryIdAsync(model, eventData.OccupierUserId);
+            var occupancies = result.Select(x => x.Item2);
 
-                await _assetOccupancyRepository.InsertAsync(occupancy);
-                
-                occupancies.Add(occupancy);
-            }
-            
             await CreatePublishSuccessResultEventAsync(occupancies, eventData);
 
             await uow.CompleteAsync();
@@ -124,23 +110,25 @@ public class AssetOccupancyEventsHandler :
     {
         var resultEto = new AssetOccupancyResultEto(occupancy.TenantId, inputEto.RequestId, true,
             MapToAssetOccupancyInfoModel(occupancy));
-        
+
         inputEto.MapExtraPropertiesTo(resultEto, MappingPropertyDefinitionChecks.None);
-        
+
         await _distributedEventBus.PublishAsync(resultEto);
     }
 
-    protected virtual async Task CreatePublishSuccessResultEventAsync(AssetOccupancy occupancy, OccupyAssetByCategoryEto inputEto)
+    protected virtual async Task CreatePublishSuccessResultEventAsync(AssetOccupancy occupancy,
+        OccupyAssetByCategoryEto inputEto)
     {
         var resultEto = new AssetOccupancyResultEto(occupancy.TenantId, inputEto.RequestId, true,
             MapToAssetOccupancyInfoModel(occupancy));
-        
+
         inputEto.MapExtraPropertiesTo(resultEto, MappingPropertyDefinitionChecks.None);
-        
+
         await _distributedEventBus.PublishAsync(resultEto);
     }
 
-    protected virtual async Task CreatePublishSuccessResultEventAsync(List<AssetOccupancy> occupancies, BulkOccupyAssetEto inputEto)
+    protected virtual async Task CreatePublishSuccessResultEventAsync(IEnumerable<AssetOccupancy> occupancies,
+        BulkOccupyAssetEto inputEto)
     {
         var resultEto = new BulkAssetOccupancyResultEto(inputEto.TenantId, inputEto.RequestId, true,
             new List<AssetOccupancyInfoModel>());
@@ -151,7 +139,7 @@ public class AssetOccupancyEventsHandler :
         }
 
         inputEto.MapExtraPropertiesTo(resultEto, MappingPropertyDefinitionChecks.None);
-        
+
         await _distributedEventBus.PublishAsync(resultEto);
     }
 
@@ -160,7 +148,7 @@ public class AssetOccupancyEventsHandler :
         var resultEto = new AssetOccupancyResultEto(inputEto.TenantId, inputEto.RequestId, false, null);
 
         inputEto.MapExtraPropertiesTo(resultEto, MappingPropertyDefinitionChecks.None);
-        
+
         await _distributedEventBus.PublishAsync(resultEto);
     }
 
@@ -169,7 +157,7 @@ public class AssetOccupancyEventsHandler :
         var resultEto = new AssetOccupancyResultEto(inputEto.TenantId, inputEto.RequestId, false, null);
 
         inputEto.MapExtraPropertiesTo(resultEto, MappingPropertyDefinitionChecks.None);
-        
+
         await _distributedEventBus.PublishAsync(resultEto);
     }
 
@@ -178,7 +166,7 @@ public class AssetOccupancyEventsHandler :
         var resultEto = new AssetOccupancyResultEto(inputEto.TenantId, inputEto.RequestId, false, null);
 
         inputEto.MapExtraPropertiesTo(resultEto, MappingPropertyDefinitionChecks.None);
-        
+
         await _distributedEventBus.PublishAsync(resultEto);
     }
 

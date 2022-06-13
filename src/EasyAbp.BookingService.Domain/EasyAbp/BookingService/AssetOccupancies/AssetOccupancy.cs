@@ -1,11 +1,12 @@
 ﻿using System;
+using EasyAbp.BookingService.AssetOccupancyProviders;
 using JetBrains.Annotations;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.MultiTenancy;
 
 namespace EasyAbp.BookingService.AssetOccupancies;
 
-public class AssetOccupancy : CreationAuditedAggregateRoot<Guid>, IHasPeriodInfo, IMultiTenant
+public class AssetOccupancy : CreationAuditedAggregateRoot<Guid>, IOccupyingBaseInfo, IMultiTenant
 {
     public virtual Guid? TenantId { get; protected set; }
 
@@ -39,7 +40,7 @@ public class AssetOccupancy : CreationAuditedAggregateRoot<Guid>, IHasPeriodInfo
     {
     }
 
-    internal AssetOccupancy(Guid id, Guid? tenantId, Guid assetId, [NotNull] string asset,
+    public AssetOccupancy(Guid id, Guid? tenantId, Guid assetId, [NotNull] string asset,
         [NotNull] string assetDefinitionName, int volume, DateTime date, TimeSpan startingTime, TimeSpan duration,
         Guid? occupierUserId, [CanBeNull] string occupierName) : base(id)
     {
@@ -54,8 +55,4 @@ public class AssetOccupancy : CreationAuditedAggregateRoot<Guid>, IHasPeriodInfo
         OccupierUserId = occupierUserId;
         OccupierName = occupierName;
     }
-
-    public DateTime GetStartingDateTime() => Date + StartingTime;
-
-    public TimeSpan GetEndingTime() => StartingTime + Duration;
 }

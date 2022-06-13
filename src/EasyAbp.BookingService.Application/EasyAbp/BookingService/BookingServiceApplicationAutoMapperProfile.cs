@@ -3,6 +3,7 @@ using EasyAbp.BookingService.AssetCategories.Dtos;
 using AutoMapper;
 using EasyAbp.BookingService.AssetOccupancies;
 using EasyAbp.BookingService.AssetOccupancies.Dtos;
+using EasyAbp.BookingService.AssetOccupancyProviders;
 using EasyAbp.BookingService.AssetPeriodSchemes;
 using EasyAbp.BookingService.AssetPeriodSchemes.Dtos;
 using EasyAbp.BookingService.Assets;

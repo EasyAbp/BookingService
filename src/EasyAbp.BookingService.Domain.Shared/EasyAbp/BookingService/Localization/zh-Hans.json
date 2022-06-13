@@ -6,6 +6,7 @@
     "EasyAbp.BookingService:AssetNotExists": "找不到资产：{assetId}",
     "EasyAbp.BookingService:AssetScheduleExists": "已存在相同时间范围的排期, 日期: {date}, 资产: {assetId}, 时段方案: {periodSchemeId}, 时段: {periodId}, 策略: {periodUsable}",
     "EasyAbp.BookingService:AssetDisabled": "资产已被禁用： {assetId}",
-    "EasyAbp.BookingService:DefaultPeriodSchemeAlreadyExists": "已存在默认时段方案，请先将其设为非默认，再重新操作"
+    "EasyAbp.BookingService:DefaultPeriodSchemeAlreadyExists": "已存在默认时段方案，请先将其设为非默认，再重新操作",
+    "EasyAbp.BookingService:InsufficientAssetVolume": "由于资产剩余容量不足而占用失败"
   }
 }
