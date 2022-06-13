@@ -94,7 +94,7 @@ public class AssetOccupancyManager : DomainService
         AssetCategory category)
     {
         var assetPeriodScheme = await _assetPeriodSchemeRepository.FindAsync(x =>
-            x.AssetId == asset.Id && x.Date == date);
+            x.Date == date && x.AssetId == asset.Id);
 
         // Fallback chain: AssetPeriodScheme -> Asset -> Category -> DefaultPeriodScheme
         if (assetPeriodScheme is not null)

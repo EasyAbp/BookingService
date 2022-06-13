@@ -17,26 +17,6 @@ public static class BookingServiceDbContextModelCreatingExtensions
     {
         Check.NotNull(builder, nameof(builder));
 
-        /* Configure all entities here. Example:
-
-        builder.Entity<Question>(b =>
-        {
-            //Configure table & schema name
-            b.ToTable(BookingServiceDbProperties.DbTablePrefix + "Questions", BookingServiceDbProperties.DbSchema);
-
-            b.ConfigureByConvention();
-
-            //Properties
-            b.Property(q => q.Title).IsRequired().HasMaxLength(QuestionConsts.MaxTitleLength);
-
-            //Relations
-            b.HasMany(question => question.Tags).WithOne().HasForeignKey(qt => qt.QuestionId);
-
-            //Indexes
-            b.HasIndex(q => q.CreationTime);
-        });
-        */
-
         builder.Entity<AssetCategory>(b =>
         {
             b.ToTable(BookingServiceDbProperties.DbTablePrefix + "AssetCategories",
@@ -47,7 +27,6 @@ public static class BookingServiceDbContextModelCreatingExtensions
             b.OwnsOne(x => x.TimeInAdvance);
         });
 
-
         builder.Entity<AssetOccupancy>(b =>
         {
             b.ToTable(BookingServiceDbProperties.DbTablePrefix + "AssetOccupancies",
@@ -55,10 +34,9 @@ public static class BookingServiceDbContextModelCreatingExtensions
             b.ConfigureByConvention();
 
             /* Configure more properties here */
-            b.HasIndex(x => x.AssetId);
-            b.HasIndex(x => new { x.AssetId, x.Date });
+            b.HasIndex(x => new { x.Date, x.AssetId, x.StartingTime, x.Duration });
+            b.HasIndex(x => new { x.Date, x.OccupierUserId });
         });
-
 
         builder.Entity<AssetPeriodScheme>(b =>
         {
@@ -67,9 +45,8 @@ public static class BookingServiceDbContextModelCreatingExtensions
             b.ConfigureByConvention();
 
             /* Configure more properties here */
-            b.HasKey(x => new { x.AssetId, x.Date });
+            b.HasKey(x => new { x.Date, x.AssetId });
         });
-
 
         builder.Entity<Asset>(b =>
         {
@@ -80,7 +57,6 @@ public static class BookingServiceDbContextModelCreatingExtensions
             b.OwnsOne(x => x.TimeInAdvance);
         });
 
-
         builder.Entity<AssetSchedule>(b =>
         {
             b.ToTable(BookingServiceDbProperties.DbTablePrefix + "AssetSchedules", BookingServiceDbProperties.DbSchema);
@@ -88,8 +64,8 @@ public static class BookingServiceDbContextModelCreatingExtensions
 
             /* Configure more properties here */
             b.OwnsOne(x => x.TimeInAdvance);
+            b.HasIndex(x => new { x.Date, x.AssetId, x.PeriodSchemeId });
         });
-
 
         builder.Entity<PeriodScheme>(b =>
         {

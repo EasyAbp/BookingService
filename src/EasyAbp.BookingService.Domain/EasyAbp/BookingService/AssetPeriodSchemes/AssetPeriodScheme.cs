@@ -33,6 +33,6 @@ public class AssetPeriodScheme : AuditedAggregateRoot, IMultiTenant
 
     public override object[] GetKeys()
     {
-        return new object[] { AssetId, Date };
+        return new object[] { Date, AssetId };
     }
 }
