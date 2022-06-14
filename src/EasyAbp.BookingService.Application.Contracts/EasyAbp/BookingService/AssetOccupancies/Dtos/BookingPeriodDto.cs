@@ -3,7 +3,7 @@
 namespace EasyAbp.BookingService.AssetOccupancies.Dtos;
 
 [Serializable]
-public class BookablePeriodDto
+public class BookingPeriodDto
 {
     public DateTime Date { get; set; }
 

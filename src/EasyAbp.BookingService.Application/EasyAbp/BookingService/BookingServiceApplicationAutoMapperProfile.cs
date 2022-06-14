@@ -33,6 +33,6 @@ public class BookingServiceApplicationAutoMapperProfile : Profile
         CreateMap<AssetSchedule, AssetScheduleDto>();
         CreateMap<PeriodScheme, PeriodSchemeDto>();
         CreateMap<Period, PeriodDto>();
-        CreateMap<PeriodOccupancyModel, BookablePeriodDto>();
+        CreateMap<PeriodOccupancyModel, BookingPeriodDto>();
     }
 }

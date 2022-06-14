@@ -44,17 +44,18 @@ public class AssetOccupancyController : BookingServiceController, IAssetOccupanc
     }
 
     [HttpPost]
-    [Route("search-asset-bookable-periods")]
-    public virtual Task<SearchBookablePeriodResultDto> SearchAssetBookablePeriodsAsync(SearchAssetBookablePeriodsRequestDto input)
+    [Route("search-booking-periods")]
+    public virtual Task<SearchBookingPeriodsResultDto> SearchBookingPeriodsAsync(SearchBookingPeriodsInputDto input)
     {
-        return _service.SearchAssetBookablePeriodsAsync(input);
+        return _service.SearchBookingPeriodsAsync(input);
     }
 
     [HttpPost]
-    [Route("search-category-bookable-periods")]
-    public virtual Task<SearchBookablePeriodResultDto> SearchCategoryBookablePeriodsAsync(SearchCategoryBookablePeriodsRequestDto input)
+    [Route("search-category-booking-periods")]
+    public virtual Task<SearchBookingPeriodsResultDto> SearchCategoryBookingPeriodsAsync(
+        SearchCategoryBookingPeriodsInputDto input)
     {
-        return _service.SearchCategoryBookablePeriodsAsync(input);
+        return _service.SearchCategoryBookingPeriodsAsync(input);
     }
 
     [HttpPost]

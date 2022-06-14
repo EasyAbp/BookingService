@@ -98,32 +98,32 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         await CheckPolicyAsync(CheckPolicyName);
     }
 
-    public virtual async Task<SearchBookablePeriodResultDto> SearchAssetBookablePeriodsAsync(
-        SearchAssetBookablePeriodsRequestDto input)
+    public virtual async Task<SearchBookingPeriodsResultDto> SearchBookingPeriodsAsync(
+        SearchBookingPeriodsInputDto input)
     {
         await CheckSearchPolicyAsync();
 
         var asset = await _assetRepository.GetAsync(input.AssetId);
         if (asset.Disabled)
         {
-            return new SearchBookablePeriodResultDto();
+            return new SearchBookingPeriodsResultDto();
         }
 
         var category = await _assetCategoryRepository.GetAsync(asset.AssetCategoryId);
         if (category.Disabled)
         {
-            return new SearchBookablePeriodResultDto();
+            return new SearchBookingPeriodsResultDto();
         }
 
         var periods = await _assetOccupancyProvider.GetPeriodsAsync(
             asset, category, input.CurrentDateTime, input.TargetDate);
 
-        return new SearchBookablePeriodResultDto(
-            ObjectMapper.Map<List<PeriodOccupancyModel>, List<BookablePeriodDto>>(periods));
+        return new SearchBookingPeriodsResultDto(
+            ObjectMapper.Map<List<PeriodOccupancyModel>, List<BookingPeriodDto>>(periods));
     }
 
-    public virtual async Task<SearchBookablePeriodResultDto> SearchCategoryBookablePeriodsAsync(
-        SearchCategoryBookablePeriodsRequestDto input)
+    public virtual async Task<SearchBookingPeriodsResultDto> SearchCategoryBookingPeriodsAsync(
+        SearchCategoryBookingPeriodsInputDto input)
     {
         await CheckSearchPolicyAsync();
 
@@ -132,8 +132,8 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         var periods = await _assetOccupancyProvider.GetPeriodsAsync(
             category, input.CurrentDateTime, input.TargetDate);
 
-        return new SearchBookablePeriodResultDto(
-            ObjectMapper.Map<List<PeriodOccupancyModel>, List<BookablePeriodDto>>(periods));
+        return new SearchBookingPeriodsResultDto(
+            ObjectMapper.Map<List<PeriodOccupancyModel>, List<BookingPeriodDto>>(periods));
     }
 
     public virtual async Task CheckCreateAsync(CreateAssetOccupancyDto input)
