@@ -324,11 +324,6 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
         try
         {
-            if (result.AssetId != asset.Id)
-            {
-                throw new AbpException("Unexpected asset occupancy!");
-            }
-
             return (result, await CreateInsertAssetOccupancyEntityAsync(asset, model, model.Volume, occupierUserId));
         }
         catch (Exception e)
