@@ -69,8 +69,6 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
                 input.Duration),
             input.OccupierUserId); // Todo: create a permission for occupying assets with a specified OccupierUserId.
 
-        await _repository.InsertAsync(entity, true);
-
         return await MapToGetOutputDtoAsync(entity);
     }
 
@@ -86,8 +84,6 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
                 input.StartingTime,
                 input.Duration),
             input.OccupierUserId); // Todo: create a permission for occupying assets with a specified OccupierUserId.
-
-        await _repository.InsertAsync(entity, true);
 
         return await MapToGetOutputDtoAsync(entity);
     }
