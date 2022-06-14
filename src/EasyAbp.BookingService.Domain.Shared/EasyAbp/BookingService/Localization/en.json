@@ -6,6 +6,8 @@
     "EasyAbp.BookingService:AssetNotExists": "Cannot find asset with assetId: {assetId}",
     "EasyAbp.BookingService:AssetScheduleExists": "Asset schedule with same time range already exists. Date: {date}, AssetId: {assetId}, PeriodSchemeId: {periodSchemeId}, PeriodId: {periodId}, Policy: {periodUsable}",
     "EasyAbp.BookingService:AssetDisabled": "Asset has been disabled: {assetId}",
-    "EasyAbp.BookingService:DefaultPeriodSchemeAlreadyExists": "The default period scheme already exists. Please unset the existing one first."
+    "EasyAbp.BookingService:DefaultPeriodSchemeAlreadyExists": "The default period scheme already exists. Please unset the existing one first.",
+    "EasyAbp.BookingService:InsufficientAssetVolume": "Occupancy failed due to insufficient asset volume.",
+    "EasyAbp.BookingService:DisabledAssetOrCategory": "Disabled asset or category."
   }
 }

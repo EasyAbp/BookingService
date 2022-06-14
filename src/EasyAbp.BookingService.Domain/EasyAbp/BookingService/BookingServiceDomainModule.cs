@@ -4,6 +4,7 @@ using Volo.Abp.Caching;
 using Volo.Abp.DistributedLocking;
 using Volo.Abp.Domain;
 using Volo.Abp.Modularity;
+using Volo.Abp.Users;
 
 namespace EasyAbp.BookingService;
 
@@ -12,6 +13,7 @@ namespace EasyAbp.BookingService;
     typeof(AbpTreesDomainModule),
     typeof(AbpDistributedLockingAbstractionsModule),
     typeof(AbpCachingModule),
+    typeof(AbpUsersAbstractionModule),
     typeof(BookingServiceDomainSharedModule)
 )]
 public class BookingServiceDomainModule : AbpModule

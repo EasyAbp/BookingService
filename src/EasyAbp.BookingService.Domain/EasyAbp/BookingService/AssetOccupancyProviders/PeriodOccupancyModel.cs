@@ -1,6 +1,6 @@
 using System;
 
-namespace EasyAbp.BookingService.AssetOccupancies;
+namespace EasyAbp.BookingService.AssetOccupancyProviders;
 
 public class PeriodOccupancyModel
 {

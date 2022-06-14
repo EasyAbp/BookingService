@@ -10,4 +10,6 @@ public static class BookingServiceErrorCodes
     public const string AssetScheduleExists = "EasyAbp.BookingService:AssetScheduleExists";
     public const string AssetDisabled = "EasyAbp.BookingService:AssetDisabled";
     public const string DefaultPeriodSchemeAlreadyExists = "EasyAbp.BookingService:DefaultPeriodSchemeAlreadyExists";
+    public const string InsufficientAssetVolume = "EasyAbp.BookingService:InsufficientAssetVolume";
+    public const string DisabledAssetOrCategory = "EasyAbp.BookingService:DisabledAssetOrCategory";
 }

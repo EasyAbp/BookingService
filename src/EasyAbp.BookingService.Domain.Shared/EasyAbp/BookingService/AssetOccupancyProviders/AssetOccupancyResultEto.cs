@@ -2,7 +2,7 @@
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.ObjectExtending;
 
-namespace EasyAbp.BookingService.AssetOccupancies;
+namespace EasyAbp.BookingService.AssetOccupancyProviders;
 
 public class AssetOccupancyResultEto : ExtensibleObject, IMultiTenant
 {

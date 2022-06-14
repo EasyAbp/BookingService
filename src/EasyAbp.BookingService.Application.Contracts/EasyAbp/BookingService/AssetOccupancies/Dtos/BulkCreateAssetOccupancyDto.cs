@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using EasyAbp.BookingService.AssetOccupancyProviders;
 using Volo.Abp.ObjectExtending;
 
 namespace EasyAbp.BookingService.AssetOccupancies.Dtos;

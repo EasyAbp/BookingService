@@ -13,8 +13,4 @@
     <ProjectReference Include="..\EasyAbp.BookingService.Domain\EasyAbp.BookingService.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="EasyAbp\BookingService" />
-  </ItemGroup>
-
 </Project>

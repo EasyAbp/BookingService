@@ -15,18 +15,18 @@ public interface IAssetOccupancyAppService :
     Task<AssetOccupancyDto> CreateByCategoryIdAsync(CreateAssetOccupancyByCategoryIdDto input);
 
     /// <summary>
-    /// Search for asset's bookable periods on specific date
+    /// Search for asset's booking periods on specific date
     /// </summary>
-    Task<SearchBookablePeriodResultDto> SearchAssetBookablePeriodsAsync(SearchAssetBookablePeriodsRequestDto input);
+    Task<SearchBookingPeriodsResultDto> SearchBookingPeriodsAsync(SearchBookingPeriodsInputDto input);
 
     /// <summary>
-    /// Search for category's bookable periods on specific date
+    /// Search for category's booking periods on specific date
     /// </summary>
-    Task<SearchBookablePeriodResultDto> SearchCategoryBookablePeriodsAsync(SearchCategoryBookablePeriodsRequestDto input);
+    Task<SearchBookingPeriodsResultDto> SearchCategoryBookingPeriodsAsync(SearchCategoryBookingPeriodsInputDto input);
 
     Task CheckCreateAsync(CreateAssetOccupancyDto input);
 
     Task CheckCreateByCategoryIdAsync(CreateAssetOccupancyByCategoryIdDto input);
-    
+
     Task CheckBulkCreateAsync(BulkCreateAssetOccupancyDto input);
 }

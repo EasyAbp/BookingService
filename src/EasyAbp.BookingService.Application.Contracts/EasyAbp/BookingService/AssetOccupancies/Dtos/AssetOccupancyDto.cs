@@ -4,7 +4,7 @@ using Volo.Abp.Application.Dtos;
 namespace EasyAbp.BookingService.AssetOccupancies.Dtos;
 
 [Serializable]
-public class AssetOccupancyDto : ExtensibleCreationAuditedEntityDto<Guid>, IHasPeriodInfo
+public class AssetOccupancyDto : ExtensibleCreationAuditedEntityDto<Guid>, IPeriodInfo
 {
     public Guid AssetId { get; set; }
 

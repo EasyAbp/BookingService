@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using EasyAbp.BookingService.AssetOccupancyProviders;
 using Volo.Abp.ObjectExtending;
 
 namespace EasyAbp.BookingService.AssetOccupancies.Dtos;
 
 [Serializable]
-public class CreateAssetOccupancyByCategoryIdDto : ExtensibleObject
+public class CreateAssetOccupancyByCategoryIdDto : ExtensibleObject, IOccupyingBaseInfo
 {
     public Guid AssetCategoryId { get; set; }
-    
+
+    public int Volume { get; set; }
+
     public DateTime Date { get; set; }
 
     public TimeSpan StartingTime { get; set; }

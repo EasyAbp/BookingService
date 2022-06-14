@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.ObjectExtending;
 
-namespace EasyAbp.BookingService.AssetOccupancies;
+namespace EasyAbp.BookingService.AssetOccupancyProviders;
 
 /// <summary>
 /// Extra properties will fully map to <see cref="BulkAssetOccupancyResultEto"/> by default.

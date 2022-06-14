@@ -3,7 +3,7 @@ using Volo.Abp.Domain.Entities;
 
 namespace EasyAbp.BookingService.PeriodSchemes;
 
-public class Period : Entity<Guid>, IHasPeriodInfo
+public class Period : Entity<Guid>, IPeriodInfo
 {
     public virtual TimeSpan StartingTime { get; protected set; }
 
@@ -23,10 +23,5 @@ public class Period : Entity<Guid>, IHasPeriodInfo
     {
         StartingTime = startingTime;
         Duration = duration;
-    }
-
-    public TimeSpan GetEndingTime()
-    {
-        return StartingTime + Duration;
     }
 }

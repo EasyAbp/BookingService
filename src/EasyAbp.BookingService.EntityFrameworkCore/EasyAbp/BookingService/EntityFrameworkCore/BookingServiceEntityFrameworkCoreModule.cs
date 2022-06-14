@@ -5,6 +5,7 @@ using EasyAbp.BookingService.Assets;
 using EasyAbp.BookingService.AssetPeriodSchemes;
 using EasyAbp.BookingService.AssetOccupancies;
 using EasyAbp.BookingService.AssetCategories;
+using EasyAbp.BookingService.AssetOccupancyCounts;
 using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Modularity;
@@ -27,6 +28,7 @@ public class BookingServiceEntityFrameworkCoreModule : AbpModule
              */
             options.AddRepository<AssetCategory, AssetCategoryRepository>();
             options.AddRepository<AssetOccupancy, AssetOccupancyRepository>();
+            options.AddRepository<AssetOccupancyCount, AssetOccupancyCountRepository>();
             options.AddRepository<AssetPeriodScheme, AssetPeriodSchemeRepository>();
             options.AddRepository<Asset, AssetRepository>();
             options.AddRepository<AssetSchedule, AssetScheduleRepository>();

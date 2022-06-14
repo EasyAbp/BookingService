@@ -6,7 +6,7 @@ using Volo.Abp.ObjectExtending;
 namespace EasyAbp.BookingService.PeriodSchemes.Dtos;
 
 [Serializable]
-public class CreateUpdatePeriodDto : ExtensibleObject, IHasPeriodInfo
+public class CreateUpdatePeriodDto : ExtensibleObject, IPeriodInfo
 {
     [Range(typeof(TimeSpan), "00:00:00", "23:59:59.999")]
     public TimeSpan StartingTime { get; set; }

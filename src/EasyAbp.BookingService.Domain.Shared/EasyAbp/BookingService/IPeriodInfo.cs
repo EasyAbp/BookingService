@@ -2,7 +2,7 @@
 
 namespace EasyAbp.BookingService;
 
-public interface IHasPeriodInfo
+public interface IPeriodInfo
 {
     TimeSpan StartingTime { get; }
     

@@ -12,6 +12,7 @@
     <PackageReference Include="Volo.Abp.Ddd.Domain" Version="$(AbpVersion)" />
     <PackageReference Include="Volo.Abp.Caching" Version="$(AbpVersion)" />
     <PackageReference Include="Volo.Abp.DistributedLocking.Abstractions" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Users.Abstractions" Version="$(AbpVersion)" />
     <ProjectReference Include="..\EasyAbp.BookingService.Domain.Shared\EasyAbp.BookingService.Domain.Shared.csproj" />
   </ItemGroup>
 

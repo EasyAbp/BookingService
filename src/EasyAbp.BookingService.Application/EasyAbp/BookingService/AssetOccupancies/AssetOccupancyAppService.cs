@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using EasyAbp.BookingService.AssetCategories;
 using EasyAbp.BookingService.AssetOccupancies.Dtos;
+using EasyAbp.BookingService.AssetOccupancyProviders;
 using EasyAbp.BookingService.Assets;
-using EasyAbp.BookingService.PeriodSchemes;
 using EasyAbp.BookingService.Permissions;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
@@ -27,17 +27,17 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
     private readonly IAssetOccupancyRepository _repository;
     private readonly IAssetRepository _assetRepository;
     private readonly IAssetCategoryRepository _assetCategoryRepository;
-    private readonly AssetOccupancyManager _assetOccupancyManager;
+    private readonly IAssetOccupancyProvider _assetOccupancyProvider;
 
     public AssetOccupancyAppService(IAssetOccupancyRepository repository,
         IAssetRepository assetRepository,
         IAssetCategoryRepository assetCategoryRepository,
-        AssetOccupancyManager assetOccupancyManager) : base(repository)
+        IAssetOccupancyProvider assetOccupancyProvider) : base(repository)
     {
         _repository = repository;
         _assetRepository = assetRepository;
         _assetCategoryRepository = assetCategoryRepository;
-        _assetOccupancyManager = assetOccupancyManager;
+        _assetOccupancyProvider = assetOccupancyProvider;
     }
 
     protected override async Task<IQueryable<AssetOccupancy>> CreateFilteredQueryAsync(
@@ -60,15 +60,14 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
     {
         await CheckCreatePolicyAsync();
 
-        var entity = await _assetOccupancyManager.CreateAsync(
+        var (_, entity) = await _assetOccupancyProvider.OccupyAsync(
             new OccupyAssetInfoModel(
                 input.AssetId,
+                input.Volume,
                 input.Date,
                 input.StartingTime,
                 input.Duration),
             input.OccupierUserId); // Todo: create a permission for occupying assets with a specified OccupierUserId.
-
-        await _repository.InsertAsync(entity, true);
 
         return await MapToGetOutputDtoAsync(entity);
     }
@@ -77,15 +76,14 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
     {
         await CheckCreatePolicyAsync();
 
-        var entity = await _assetOccupancyManager.CreateByCategoryIdAsync(
+        var (_, entity) = await _assetOccupancyProvider.OccupyByCategoryAsync(
             new OccupyAssetByCategoryInfoModel(
                 input.AssetCategoryId,
+                input.Volume,
                 input.Date,
                 input.StartingTime,
                 input.Duration),
             input.OccupierUserId); // Todo: create a permission for occupying assets with a specified OccupierUserId.
-
-        await _repository.InsertAsync(entity, true);
 
         return await MapToGetOutputDtoAsync(entity);
     }
@@ -100,52 +98,45 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         await CheckPolicyAsync(CheckPolicyName);
     }
 
-    public virtual async Task<SearchBookablePeriodResultDto> SearchAssetBookablePeriodsAsync(
-        SearchAssetBookablePeriodsRequestDto input)
+    public virtual async Task<SearchBookingPeriodsResultDto> SearchBookingPeriodsAsync(
+        SearchBookingPeriodsInputDto input)
     {
         await CheckSearchPolicyAsync();
 
         var asset = await _assetRepository.GetAsync(input.AssetId);
-        if (asset.Disabled)
-        {
-            return new SearchBookablePeriodResultDto();
-        }
-
         var category = await _assetCategoryRepository.GetAsync(asset.AssetCategoryId);
-        if (category.Disabled)
-        {
-            return new SearchBookablePeriodResultDto();
-        }
 
-        var periods = await _assetOccupancyManager.SearchAssetBookablePeriodsAsync(
+        var periods = await _assetOccupancyProvider.GetPeriodsAsync(
             asset, category, input.CurrentDateTime, input.TargetDate);
 
-        return new SearchBookablePeriodResultDto(
-            ObjectMapper.Map<List<PeriodOccupancyModel>, List<BookablePeriodDto>>(periods));
+        return new SearchBookingPeriodsResultDto(
+            ObjectMapper.Map<List<PeriodOccupancyModel>, List<BookingPeriodDto>>(periods));
     }
 
-    public virtual async Task<SearchBookablePeriodResultDto> SearchCategoryBookablePeriodsAsync(
-        SearchCategoryBookablePeriodsRequestDto input)
+    public virtual async Task<SearchBookingPeriodsResultDto> SearchCategoryBookingPeriodsAsync(
+        SearchCategoryBookingPeriodsInputDto input)
     {
         await CheckSearchPolicyAsync();
-        var periods = await _assetOccupancyManager.SearchCategoryBookablePeriodsAsync(
-            input.CategoryId, input.CurrentDateTime, input.TargetDate);
 
-        return new SearchBookablePeriodResultDto(
-            ObjectMapper.Map<List<PeriodOccupancyModel>, List<BookablePeriodDto>>(periods));
+        var category = await _assetCategoryRepository.GetAsync(input.CategoryId);
+
+        var periods = await _assetOccupancyProvider.GetPeriodsAsync(
+            category, input.CurrentDateTime, input.TargetDate);
+
+        return new SearchBookingPeriodsResultDto(
+            ObjectMapper.Map<List<PeriodOccupancyModel>, List<BookingPeriodDto>>(periods));
     }
 
     public virtual async Task CheckCreateAsync(CreateAssetOccupancyDto input)
     {
         await CheckCreationCheckPolicyAsync();
 
-        await _assetOccupancyManager.CreateAsync(
-            new OccupyAssetInfoModel(
-                input.AssetId,
-                input.Date,
-                input.StartingTime,
-                input.Duration),
-            input.OccupierUserId); // Todo: create a permission for occupying assets with a specified OccupierUserId.
+        await _assetOccupancyProvider.CanOccupyAsync(new OccupyAssetInfoModel(
+            input.AssetId,
+            input.Volume,
+            input.Date,
+            input.StartingTime,
+            input.Duration)); // Todo: create a permission for occupying assets with a specified OccupierUserId.
 
         await UnitOfWorkManager.Current.RollbackAsync();
     }
@@ -155,13 +146,12 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
     {
         await CheckCreationCheckPolicyAsync();
 
-        await _assetOccupancyManager.CreateByCategoryIdAsync(
-            new OccupyAssetByCategoryInfoModel(
-                input.AssetCategoryId,
-                input.Date,
-                input.StartingTime,
-                input.Duration),
-            input.OccupierUserId); // Todo: create a permission for occupying assets with a specified OccupierUserId.
+        await _assetOccupancyProvider.CanOccupyByCategoryAsync(new OccupyAssetByCategoryInfoModel(
+            input.AssetCategoryId,
+            input.Volume,
+            input.Date,
+            input.StartingTime,
+            input.Duration)); // Todo: create a permission for occupying assets with a specified OccupierUserId.
 
         await UnitOfWorkManager.Current.RollbackAsync();
     }
@@ -170,10 +160,9 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
     {
         await CheckCreationCheckPolicyAsync();
 
-        await _assetOccupancyManager.BulkCreateAsync(
+        await _assetOccupancyProvider.CanBulkOccupyAsync(
             input.Models,
-            input.ByCategoryModels,
-            input.OccupierUserId); // Todo: create a permission for occupying assets with a specified OccupierUserId.
+            input.ByCategoryModels); // Todo: create a permission for occupying assets with a specified OccupierUserId.
 
         await UnitOfWorkManager.Current.RollbackAsync();
     }
