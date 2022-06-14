@@ -104,16 +104,7 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         await CheckSearchPolicyAsync();
 
         var asset = await _assetRepository.GetAsync(input.AssetId);
-        if (asset.Disabled)
-        {
-            return new SearchBookingPeriodsResultDto();
-        }
-
         var category = await _assetCategoryRepository.GetAsync(asset.AssetCategoryId);
-        if (category.Disabled)
-        {
-            return new SearchBookingPeriodsResultDto();
-        }
 
         var periods = await _assetOccupancyProvider.GetPeriodsAsync(
             asset, category, input.CurrentDateTime, input.TargetDate);

@@ -62,8 +62,12 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         DateTime currentDateTime, DateTime targetDate)
     {
         var periodScheme = await GetEffectivePeriodSchemeAsync(targetDate, asset, categoryOfAsset);
-        var defaultAvailable = await GetEffectivePeriodUsableAsync(asset, categoryOfAsset) is PeriodUsable.Accept;
+
+        var defaultAvailable = !asset.Disabled && !categoryOfAsset.Disabled &&
+                               await GetEffectivePeriodUsableAsync(asset, categoryOfAsset) is PeriodUsable.Accept;
+
         var defaultAvailableVolume = defaultAvailable ? asset.Volume : 0;
+
         var timeInAdvance = await GetEffectiveTimeInAdvanceAsync(asset, categoryOfAsset);
 
         var models = periodScheme.Periods.Select(x => new PeriodOccupancyModel(targetDate, x.StartingTime,
@@ -89,17 +93,21 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     public virtual async Task<bool> CanOccupyAsync(OccupyAssetInfoModel model)
     {
         var asset = await AssetRepository.GetAsync(model.AssetId);
-
         var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
 
         var periods = await GetPeriodsAsync(asset, category, Clock.Now, model.Date);
 
-        return await CanOccupyAsync(model, periods);
+        return await IsVolumeSufficientAsync(model, periods);
     }
 
     public virtual async Task<bool> CanOccupyByCategoryAsync(OccupyAssetByCategoryInfoModel model)
     {
         var category = await AssetCategoryRepository.GetAsync(model.AssetCategoryId);
+
+        if (category.Disabled)
+        {
+            return false;
+        }
 
         return await PickAssetOrNullAsync(category, model) is not null;
     }
@@ -112,15 +120,21 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         foreach (var assetIdGroup in models.GroupBy(x => x.AssetId))
         {
             var asset = await AssetRepository.GetAsync(assetIdGroup.Key);
-            var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
+            var categoryOfAsset = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
+
+            if (asset.Disabled || categoryOfAsset.Disabled)
+            {
+                return false;
+            }
 
             foreach (var dateGroup in assetIdGroup.GroupBy(x => x.Date))
             {
-                var periods = await GetCachedAssetDayPeriodsAsync(asset, category, dateGroup.Key, assetDayPeriods);
+                var periods =
+                    await GetCachedAssetDayPeriodsAsync(asset, categoryOfAsset, dateGroup.Key, assetDayPeriods);
 
                 foreach (var model in dateGroup)
                 {
-                    if (!await CanOccupyAsync(model, periods))
+                    if (!await IsVolumeSufficientAsync(model, periods))
                     {
                         return false;
                     }
@@ -138,18 +152,24 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         {
             var category = await AssetCategoryRepository.GetAsync(categoryIdGroup.Key);
 
+            if (category.Disabled)
+            {
+                return false;
+            }
+
             foreach (var dateGroup in categoryIdGroup.GroupBy(x => x.Date))
             {
                 foreach (var model in dateGroup)
                 {
-                    var assets = await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id);
+                    var assets =
+                        await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
 
                     foreach (var asset in assets)
                     {
                         var periods =
                             await GetCachedAssetDayPeriodsAsync(asset, category, dateGroup.Key, assetDayPeriods);
 
-                        if (!await CanOccupyAsync(model, periods))
+                        if (!await IsVolumeSufficientAsync(model, periods))
                         {
                             return false;
                         }
@@ -197,6 +217,11 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     {
         // Todo: lock the day?
         var category = await AssetCategoryRepository.GetAsync(model.AssetCategoryId);
+
+        if (category.Disabled)
+        {
+            throw new BusinessException(BookingServiceErrorCodes.DisabledAssetOrCategory);
+        }
 
         var asset = await PickAssetOrNullAsync(category, model);
 
@@ -250,17 +275,23 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
     protected virtual async Task CheckOccupancyAsync(Asset asset, OccupyAssetInfoModel model)
     {
-        var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
+        var categoryOfAsset = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
 
-        var periods = await GetPeriodsAsync(asset, category, Clock.Now, model.Date);
+        if (asset.Disabled || categoryOfAsset.Disabled)
+        {
+            throw new BusinessException(BookingServiceErrorCodes.DisabledAssetOrCategory);
+        }
 
-        if (!await CanOccupyAsync(model, periods))
+        var periods = await GetPeriodsAsync(asset, categoryOfAsset, Clock.Now, model.Date);
+
+        if (!await IsVolumeSufficientAsync(model, periods))
         {
             throw new BusinessException(BookingServiceErrorCodes.InsufficientAssetVolume);
         }
     }
 
-    protected virtual Task<bool> CanOccupyAsync(IOccupyingBaseInfo model, IEnumerable<PeriodOccupancyModel> periods)
+    protected virtual Task<bool> IsVolumeSufficientAsync(IOccupyingBaseInfo model,
+        IEnumerable<PeriodOccupancyModel> periods)
     {
         var period = periods.First(x =>
             x.Date == model.Date && x.StartingTime == model.StartingTime && x.EndingTime == model.GetEndingTime());
@@ -271,13 +302,13 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     protected virtual async Task<Asset> PickAssetOrNullAsync(AssetCategory category,
         OccupyAssetByCategoryInfoModel model)
     {
-        var assets = await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id);
+        var assets = await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
 
         foreach (var asset in assets)
         {
             var periods = await GetPeriodsAsync(asset, category, Clock.Now, model.Date);
 
-            if (await CanOccupyAsync(model, periods))
+            if (await IsVolumeSufficientAsync(model, periods))
             {
                 return asset;
             }
