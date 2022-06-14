@@ -59,19 +59,26 @@ public class DefaultAssetOccupancyProvider : AssetOccupancyProviderBase, ITransi
     [UnitOfWork]
     protected override async Task<bool> ProviderTryRollBackOccupancyAsync(ProviderAssetOccupancyModel model)
     {
-        var occupancyCount =
-            await _assetOccupancyCountRepository.FindAsync(new AssetOccupancyCountKey(model.Date, model.AssetId,
-                model.StartingTime, model.Duration));
+        try
+        {
+            var occupancyCount =
+                await _assetOccupancyCountRepository.FindAsync(new AssetOccupancyCountKey(model.Date, model.AssetId,
+                    model.StartingTime, model.Duration));
 
-        if (occupancyCount is null)
+            if (occupancyCount is null)
+            {
+                return false;
+            }
+        
+            occupancyCount.ChangeVolume(-1 * model.Volume);
+        
+            await _assetOccupancyCountRepository.UpdateAsync(occupancyCount, true);
+
+            return true;
+        }
+        catch
         {
             return false;
         }
-        
-        occupancyCount.ChangeVolume(-1 * model.Volume);
-        
-        await _assetOccupancyCountRepository.UpdateAsync(occupancyCount, true);
-
-        return true;
     }
 }
