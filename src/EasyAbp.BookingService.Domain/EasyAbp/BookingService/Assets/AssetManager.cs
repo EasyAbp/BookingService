@@ -8,23 +8,19 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
-using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.Assets;
 
 public class AssetManager : DomainService
 {
-    private readonly IAssetCategoryRepository _assetCategoryRepository;
     private readonly BookingServiceOptions _options;
 
-    public AssetManager(IAssetCategoryRepository assetCategoryRepository,
-        IOptions<BookingServiceOptions> options)
+    public AssetManager(IOptions<BookingServiceOptions> options)
     {
-        _assetCategoryRepository = assetCategoryRepository;
         _options = options.Value;
     }
 
-    public virtual async Task<Asset> CreateAsync(string name, [NotNull] string assetDefinitionName,
+    public virtual Task<Asset> CreateAsync(string name, [NotNull] string assetDefinitionName,
         AssetCategory assetCategory, Guid? periodSchemeId, PeriodUsable? defaultPeriodUsable, int volume, int priority,
         TimeInAdvance timeInAdvance, bool disabled)
     {
@@ -41,7 +37,7 @@ public class AssetManager : DomainService
             throw new AssetDefinitionNameNotMatchException(assetDefinitionName, assetCategory.AssetDefinitionName);
         }
 
-        return new Asset(GuidGenerator.Create(),
+        return Task.FromResult(new Asset(GuidGenerator.Create(),
             CurrentTenant.Id,
             name,
             assetDefinitionName,
@@ -51,10 +47,10 @@ public class AssetManager : DomainService
             volume,
             priority,
             timeInAdvance,
-            disabled);
+            disabled));
     }
 
-    public async Task UpdateAsync(Asset asset, string name, string assetDefinitionName, AssetCategory assetCategory,
+    public Task UpdateAsync(Asset asset, string name, [NotNull] string assetDefinitionName, AssetCategory assetCategory,
         Guid? periodSchemeId, PeriodUsable? defaultPeriodUsable, int volume, int priority, TimeInAdvance timeInAdvance,
         bool disabled)
     {
@@ -80,5 +76,6 @@ public class AssetManager : DomainService
             priority,
             timeInAdvance,
             disabled);
+        return Task.CompletedTask;
     }
 }

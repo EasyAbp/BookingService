@@ -2,12 +2,13 @@ using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
 
-namespace EasyAbp.BookingService.Assets
+namespace EasyAbp.BookingService.AssetOccupancies
 {
-    public class AssetDomainTests : BookingServiceDomainTestBase
+    public class AssetOccupancyEventsHandlerTests : BookingServiceDomainTestBase
     {
-        public AssetDomainTests()
+        public AssetOccupancyEventsHandlerTests()
         {
+            //TODO
         }
 
         /*

@@ -8,6 +8,7 @@
     "EasyAbp.BookingService:AssetDisabled": "Asset has been disabled: {assetId}",
     "EasyAbp.BookingService:DefaultPeriodSchemeAlreadyExists": "The default period scheme already exists. Please unset the existing one first.",
     "EasyAbp.BookingService:InsufficientAssetVolume": "Occupancy failed due to insufficient asset volume.",
-    "EasyAbp.BookingService:DisabledAssetOrCategory": "Disabled asset or category."
+    "EasyAbp.BookingService:DisabledAssetOrCategory": "Disabled asset or category.",
+    "EasyAbp.BookingService:DefaultPeriodSchemeNotFound": "The default period scheme is not found."
   }
 }

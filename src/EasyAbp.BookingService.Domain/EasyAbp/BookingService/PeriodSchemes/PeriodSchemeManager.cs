@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
-using Volo.Abp;
 using Volo.Abp.Domain.Services;
 
 namespace EasyAbp.BookingService.PeriodSchemes;
@@ -41,14 +39,15 @@ public class PeriodSchemeManager : DomainService
         return Task.FromResult(period);
     }
 
-    public virtual async Task UnsetDefaultAsync(PeriodScheme entity)
+    public virtual Task UnsetDefaultAsync(PeriodScheme entity)
     {
         if (!entity.IsDefault)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         entity.UpdateIsDefault(false);
+        return Task.CompletedTask;
     }
 
     public virtual async Task SetAsDefaultAsync(PeriodScheme entity)
@@ -61,7 +60,7 @@ public class PeriodSchemeManager : DomainService
         var defaultPeriodScheme = await Repository.FindDefaultSchemeAsync();
         if (defaultPeriodScheme is not null)
         {
-            throw new BusinessException(BookingServiceErrorCodes.DefaultPeriodSchemeAlreadyExists);
+            throw new DefaultPeriodSchemeAlreadyExistsException();
         }
 
         entity.UpdateIsDefault(true);
