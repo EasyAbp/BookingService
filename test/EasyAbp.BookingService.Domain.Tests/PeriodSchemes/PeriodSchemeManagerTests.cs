@@ -89,7 +89,7 @@ public class PeriodSchemeManagerTests : BookingServiceDomainTestBase
         var anotherPeriodScheme = await _periodSchemeManager.CreateAsync(anotherPeriodSchemeName, new List<Period>());
 
         //Act & Assert
-        await Should.ThrowAsync<DefaultPeriodSchemeNotFoundException>(async () =>
+        await Should.ThrowAsync<DefaultPeriodSchemeAlreadyExistsException>(async () =>
         {
             await _periodSchemeManager.SetAsDefaultAsync(anotherPeriodScheme);
         });

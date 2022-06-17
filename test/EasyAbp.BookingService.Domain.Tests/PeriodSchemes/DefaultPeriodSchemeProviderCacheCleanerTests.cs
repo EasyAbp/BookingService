@@ -24,7 +24,7 @@ public class DefaultPeriodSchemeProviderCacheCleanerTests : BookingServiceDomain
         var cleaner = GetRequiredService<DefaultPeriodSchemeProviderCacheCleaner>();
 
         //Act
-        await cleaner.HandleEventAsync(Substitute.For<EntityChangedEventData<PeriodScheme>>());
+        await cleaner.HandleEventAsync(new EntityChangedEventData<PeriodScheme>(default));
 
         //Assert
         await _defaultPeriodSchemeProvider.Received(1).ClearCacheAsync();

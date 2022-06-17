@@ -9,6 +9,7 @@ using EasyAbp.BookingService.AssetPeriodSchemes;
 using EasyAbp.BookingService.Assets;
 using EasyAbp.BookingService.AssetSchedules;
 using EasyAbp.BookingService.PeriodSchemes;
+using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -59,7 +60,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
     [UnitOfWork]
     public virtual async Task<List<PeriodOccupancyModel>> GetPeriodsAsync(Asset asset, AssetCategory categoryOfAsset,
-        DateTime currentDateTime, DateTime targetDate)
+        DateTime targetDate)
     {
         var periodScheme = await GetEffectivePeriodSchemeAsync(targetDate, asset, categoryOfAsset);
 
@@ -76,16 +77,16 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         var schedules = await AssetScheduleRepository.GetListAsync(targetDate, asset.Id, periodScheme.Id);
         var occupancies = await ProviderGetAssetOccupanciesAsync(targetDate, asset.Id);
 
-        UpdatePeriodsUsableBySchedules(models, schedules);
-        UpdatePeriodsUsableByTimeInAdvances(models, timeInAdvance, currentDateTime);
+        var periodIdScheduleMapping = schedules.ToDictionary(x => x.PeriodId);
+        UpdatePeriodsUsableBySchedules(models, periodIdScheduleMapping);
+        UpdatePeriodsUsableByTimeInAdvances(models, periodIdScheduleMapping, timeInAdvance, Clock.Now);
         UpdatePeriodsUsableByOccupancies(models, occupancies);
 
         return models;
     }
 
     [UnitOfWork]
-    public virtual Task<List<PeriodOccupancyModel>> GetPeriodsAsync(AssetCategory category, DateTime currentDateTime,
-        DateTime targetDate)
+    public virtual Task<List<PeriodOccupancyModel>> GetPeriodsAsync(AssetCategory category, DateTime targetDate)
     {
         throw new NotImplementedException();
     }
@@ -93,9 +94,13 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     public virtual async Task<bool> CanOccupyAsync(OccupyAssetInfoModel model)
     {
         var asset = await AssetRepository.GetAsync(model.AssetId);
-        var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
+        var categoryOfAsset = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
+        if (asset.Disabled || categoryOfAsset.Disabled)
+        {
+            return false;
+        }
 
-        var periods = await GetPeriodsAsync(asset, category, Clock.Now, model.Date);
+        var periods = await GetPeriodsAsync(asset, categoryOfAsset, model.Date);
 
         return await IsVolumeSufficientAsync(model, periods);
     }
@@ -193,7 +198,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         if (!cachedPeriods.ContainsKey((asset.Id, date)))
         {
             cachedPeriods[(asset.Id, date)] =
-                await GetPeriodsAsync(asset, category, Clock.Now, date);
+                await GetPeriodsAsync(asset, category, date);
         }
 
         return cachedPeriods[(asset.Id, date)];
@@ -205,10 +210,11 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     {
         // Todo: lock the day?
         var asset = await AssetRepository.GetAsync(model.AssetId);
+        var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
 
-        await CheckOccupancyAsync(asset, model);
+        await CheckOccupancyAsync(asset, category, model);
 
-        return await InternalOccupyAsync(asset, model, occupierUserId);
+        return await InternalOccupyAsync(asset, category, model, occupierUserId);
     }
 
     [UnitOfWork(true)]
@@ -220,17 +226,17 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
         if (category.Disabled)
         {
-            throw new BusinessException(BookingServiceErrorCodes.DisabledAssetOrCategory);
+            throw new DisabledAssetOrCategoryException();
         }
 
         var asset = await PickAssetOrNullAsync(category, model);
 
         if (asset is null)
         {
-            throw new BusinessException(BookingServiceErrorCodes.InsufficientAssetVolume);
+            throw new InsufficientAssetVolumeException();
         }
 
-        return await InternalOccupyAsync(asset, model.ToOccupyAssetInfoModel(asset.Id), occupierUserId);
+        return await InternalOccupyAsync(asset, category, model.ToOccupyAssetInfoModel(asset.Id), occupierUserId);
     }
 
     [UnitOfWork(true)]
@@ -263,7 +269,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
             {
                 if (!await ProviderTryRollBackOccupancyAsync(model))
                 {
-                    _logger.LogWarning("Occupancy provider occupancy rollback failed! {model}", model);
+                    _logger.LogWarning("Occupancy provider occupancy rollback failed! {Model}", model);
                 }
             }
 
@@ -273,20 +279,19 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         return assetOccupancies;
     }
 
-    protected virtual async Task CheckOccupancyAsync(Asset asset, OccupyAssetInfoModel model)
+    protected virtual async Task CheckOccupancyAsync(Asset asset, AssetCategory assetCategory,
+        OccupyAssetInfoModel model)
     {
-        var categoryOfAsset = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
-
-        if (asset.Disabled || categoryOfAsset.Disabled)
+        if (asset.Disabled || assetCategory.Disabled)
         {
-            throw new BusinessException(BookingServiceErrorCodes.DisabledAssetOrCategory);
+            throw new DisabledAssetOrCategoryException();
         }
 
-        var periods = await GetPeriodsAsync(asset, categoryOfAsset, Clock.Now, model.Date);
+        var periods = await GetPeriodsAsync(asset, assetCategory, model.Date);
 
         if (!await IsVolumeSufficientAsync(model, periods))
         {
-            throw new BusinessException(BookingServiceErrorCodes.InsufficientAssetVolume);
+            throw new InsufficientAssetVolumeException();
         }
     }
 
@@ -304,13 +309,18 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     {
         var assets = await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
 
-        foreach (var asset in assets)
+        foreach (var assetGroup in assets
+                     .GroupBy(x => x.Priority)
+                     .OrderByDescending(x => x.Key))
         {
-            var periods = await GetPeriodsAsync(asset, category, Clock.Now, model.Date);
-
-            if (await IsVolumeSufficientAsync(model, periods))
+            foreach (var asset in assetGroup)
             {
-                return asset;
+                var periods = await GetPeriodsAsync(asset, category, model.Date);
+
+                if (await IsVolumeSufficientAsync(model, periods))
+                {
+                    return asset;
+                }
             }
         }
 
@@ -318,21 +328,23 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     }
 
     protected virtual async Task<(ProviderAssetOccupancyModel, AssetOccupancy)> InternalOccupyAsync(Asset asset,
+        AssetCategory category,
         OccupyAssetInfoModel model, Guid? occupierUserId)
     {
-        var result = await ProviderOccupyAsync(model);
+        var result = await ProviderOccupyAsync(asset, category, model);
 
         try
         {
-            return (result, await CreateInsertAssetOccupancyEntityAsync(asset, model, model.Volume, occupierUserId));
+            return (result,
+                await CreateInsertAssetOccupancyEntityAsync(asset, category, model, model.Volume, occupierUserId));
         }
         catch (Exception e)
         {
-            _logger.LogError("Occupancy provider threw: {e}", e);
+            _logger.LogError(e, "Occupancy provider threw: {Message}", e.Message);
 
             if (!await ProviderTryRollBackOccupancyAsync(result))
             {
-                _logger.LogWarning("Occupancy provider occupancy rollback failed! {result}", result);
+                _logger.LogWarning("Occupancy provider occupancy rollback failed! {Result}", result);
             }
 
             await UnitOfWorkManager.Current.RollbackAsync();
@@ -344,7 +356,8 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     protected abstract Task<List<ProviderAssetOccupancyModel>> ProviderGetAssetOccupanciesAsync(
         DateTime targetDate, Guid assetId);
 
-    protected abstract Task<ProviderAssetOccupancyModel> ProviderOccupyAsync(OccupyAssetInfoModel model);
+    protected abstract Task<ProviderAssetOccupancyModel> ProviderOccupyAsync(Asset asset,
+        AssetCategory category, OccupyAssetInfoModel model);
 
     protected abstract Task<bool> ProviderTryRollBackOccupancyAsync(ProviderAssetOccupancyModel model);
 
@@ -356,6 +369,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     }
 
     protected virtual async Task<AssetOccupancy> CreateInsertAssetOccupancyEntityAsync(Asset asset,
+        AssetCategory category,
         IOccupyingTimeInfo timeInfo,
         int volume, Guid? occupierUserId)
     {
@@ -365,7 +379,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
             GuidGenerator.Create(),
             CurrentTenant.Id,
             asset.Id,
-            asset.Name,
+            $"{category.DisplayName}-{asset.Name}",
             asset.AssetDefinitionName,
             volume,
             timeInfo.Date,
@@ -427,6 +441,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         }
     }
 
+    [ItemNotNull]
     protected virtual Task<TimeInAdvance> GetEffectiveTimeInAdvanceAsync(Asset asset, AssetCategory category)
     {
         // Fallback chain when no schedule: Asset -> Category -> AssetDefinition
@@ -452,12 +467,11 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
     protected virtual void UpdatePeriodsUsableBySchedules(
         List<PeriodOccupancyModel> models,
-        List<AssetSchedule> schedules)
+        IDictionary<Guid, AssetSchedule> periodIdScheduleMapping)
     {
         foreach (var model in models)
         {
-            foreach (var schedule in schedules.Where(x =>
-                         x.PeriodSchemeId == model.PeriodSchemeId && x.PeriodId == model.PeriodId))
+            if (periodIdScheduleMapping.TryGetValue(model.PeriodId, out var schedule))
             {
                 model.AvailableVolume = schedule.PeriodUsable is PeriodUsable.Accept ? model.TotalVolume : 0;
             }
@@ -489,12 +503,18 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
     protected virtual void UpdatePeriodsUsableByTimeInAdvances(
         IEnumerable<PeriodOccupancyModel> models,
-        TimeInAdvance timeInAdvance,
+        IDictionary<Guid, AssetSchedule> periodIdScheduleMapping,
+        [NotNull] TimeInAdvance timeInAdvance,
         DateTime currentDateTime)
     {
-        foreach (var model in models.Where(x =>
-                     x.AvailableVolume > 0 && !timeInAdvance.CanOccupy(x.GetStartingDateTime(), currentDateTime)))
+        foreach (var model in models.Where(x => x.AvailableVolume > 0))
         {
+            periodIdScheduleMapping.TryGetValue(model.PeriodId, out var schedule);
+            if ((schedule?.TimeInAdvance ?? timeInAdvance).CanOccupy(model.GetStartingDateTime(), currentDateTime))
+            {
+                continue;
+            }
+
             model.AvailableVolume = 0;
         }
     }

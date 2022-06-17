@@ -13,12 +13,6 @@ public class SearchCategoryBookingPeriodsInputDto
     public Guid CategoryId { get; set; }
 
     /// <summary>
-    /// The moment of a user is going to book
-    /// </summary>
-    [Required]
-    public DateTime CurrentDateTime { get; set; }
-
-    /// <summary>
     /// Search for the asset's bookable period on this date
     /// </summary>
     [Required]

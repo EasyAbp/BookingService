@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using EasyAbp.BookingService.AssetDefinitions;
 using EasyAbp.BookingService.AssetSchedules;
@@ -14,18 +13,18 @@ public class AssetCategoryManagerTests : BookingServiceDomainTestBase
 {
     private readonly AssetCategoryManager _assetCategoryManager;
     private readonly IGuidGenerator _guid;
-    private readonly AssetDefinition _assetDefinition;
+
+    private static readonly AssetDefinition AssetDefinition = new(nameof(AssetDefinition),
+        default,
+        new TimeInAdvance
+        {
+            MaxDaysInAdvance = 5
+        });
 
     public AssetCategoryManagerTests()
     {
         _assetCategoryManager = GetRequiredService<AssetCategoryManager>();
         _guid = GetRequiredService<IGuidGenerator>();
-        _assetDefinition = new AssetDefinition(nameof(AssetDefinition),
-            default,
-            new TimeInAdvance
-            {
-                MaxDaysInAdvance = 5
-            });
     }
 
     protected override void AfterAddApplication(IServiceCollection services)
@@ -34,7 +33,7 @@ public class AssetCategoryManagerTests : BookingServiceDomainTestBase
         {
             options.AssetDefinitionConfigurations = new List<AssetDefinition>
             {
-                _assetDefinition
+                AssetDefinition
             };
         });
     }
@@ -45,7 +44,7 @@ public class AssetCategoryManagerTests : BookingServiceDomainTestBase
         // Arrange
         var parentId = _guid.Create();
         const string displayName = nameof(Create_Test);
-        var assetDefinitionName = _assetDefinition.Name;
+        var assetDefinitionName = AssetDefinition.Name;
         var periodSchemeId = _guid.Create();
         const PeriodUsable defaultPeriodUsable = PeriodUsable.Accept;
         var timeInAdvance = new TimeInAdvance
