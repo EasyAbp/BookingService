@@ -40,7 +40,7 @@ public class AssetCategory : FullAuditedAggregateRoot<Guid>, ITree<AssetCategory
     /// <summary>
     /// This value object describes the time range for assets that can occupy.
     /// The property value from <see cref="Asset"/> is preferred.
-    /// Will fall back to <see cref="AssetCategory"/> if the value here is <c>null</c>.
+    /// Will fall back to <see cref="AssetDefinition"/> if the value here is <c>null</c>.
     /// </summary>
     [CanBeNull]
     public virtual TimeInAdvance TimeInAdvance { get; protected set; }
