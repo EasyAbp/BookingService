@@ -20,20 +20,17 @@ public class AssetOccupancyEventsHandler :
     private readonly IUnitOfWorkManager _unitOfWorkManager;
     private readonly IDistributedEventBus _distributedEventBus;
     private readonly IAssetOccupancyProvider _assetOccupancyProvider;
-    private readonly IAssetOccupancyRepository _assetOccupancyRepository;
 
     public AssetOccupancyEventsHandler(
         ICurrentTenant currentTenant,
         IUnitOfWorkManager unitOfWorkManager,
         IDistributedEventBus distributedEventBus,
-        IAssetOccupancyProvider assetOccupancyProvider,
-        IAssetOccupancyRepository assetOccupancyRepository)
+        IAssetOccupancyProvider assetOccupancyProvider)
     {
         _currentTenant = currentTenant;
         _unitOfWorkManager = unitOfWorkManager;
         _distributedEventBus = distributedEventBus;
         _assetOccupancyProvider = assetOccupancyProvider;
-        _assetOccupancyRepository = assetOccupancyRepository;
     }
 
     public virtual async Task HandleEventAsync(OccupyAssetEto eventData)
@@ -67,8 +64,6 @@ public class AssetOccupancyEventsHandler :
 
             var (_, occupancy) =
                 await _assetOccupancyProvider.OccupyByCategoryAsync(eventData.Model, eventData.OccupierUserId);
-
-            await _assetOccupancyRepository.InsertAsync(occupancy, true);
 
             await CreatePublishSuccessResultEventAsync(occupancy, eventData);
 

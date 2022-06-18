@@ -43,12 +43,17 @@ public class AssetOccupancyCount : AggregateRoot, IMultiTenant
 
     public void ChangeVolume(int changedVolume)
     {
+        if (Volume + changedVolume < 0)
+        {
+            throw new AssetOccupancyCountVolumeCannotLessThanZeroException(AssetId, Date, StartingTime, Duration,
+                Volume,
+                changedVolume);
+        }
+
         checked
         {
             Volume += changedVolume;
         }
-
-        Volume = Math.Max(0, Volume);
     }
 
     public override object[] GetKeys()
