@@ -21,7 +21,7 @@ public interface IAssetOccupancyProvider
 
     Task<CanOccupyResult> CanOccupyByCategoryAsync(OccupyAssetByCategoryInfoModel model);
 
-    Task<BulkCanOccupyResult> CanBulkOccupyAsync(IEnumerable<OccupyAssetInfoModel> models,
+    Task<CanBulkOccupyResult> CanBulkOccupyAsync(IEnumerable<OccupyAssetInfoModel> models,
         IEnumerable<OccupyAssetByCategoryInfoModel> byCategoryModels);
 
     Task HandleCanOccupyResultAsync(ICanOccupyResult result);

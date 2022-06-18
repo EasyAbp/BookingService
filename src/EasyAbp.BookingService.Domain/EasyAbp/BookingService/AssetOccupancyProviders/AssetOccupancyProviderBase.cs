@@ -120,7 +120,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         return CanOccupyResult.Success;
     }
 
-    public virtual async Task<BulkCanOccupyResult> CanBulkOccupyAsync(IEnumerable<OccupyAssetInfoModel> models,
+    public virtual async Task<CanBulkOccupyResult> CanBulkOccupyAsync(IEnumerable<OccupyAssetInfoModel> models,
         IEnumerable<OccupyAssetByCategoryInfoModel> byCategoryModels)
     {
         var assetDayPeriods = new Dictionary<(Guid, DateTime), List<PeriodOccupancyModel>>();
@@ -132,7 +132,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
             if (asset.Disabled || categoryOfAsset.Disabled)
             {
-                return new BulkCanOccupyResult(false, BookingServiceErrorCodes.DisabledAssetOrCategory,
+                return new CanBulkOccupyResult(false, BookingServiceErrorCodes.DisabledAssetOrCategory,
                     asset, categoryOfAsset);
             }
 
@@ -145,7 +145,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
                 {
                     if (!await IsVolumeSufficientAsync(model, periods))
                     {
-                        return new BulkCanOccupyResult(false, BookingServiceErrorCodes.InsufficientAssetVolume,
+                        return new CanBulkOccupyResult(false, BookingServiceErrorCodes.InsufficientAssetVolume,
                             asset, categoryOfAsset, model);
                     }
 
@@ -164,7 +164,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
             if (category.Disabled)
             {
-                return new BulkCanOccupyResult(false, BookingServiceErrorCodes.DisabledAssetOrCategory,
+                return new CanBulkOccupyResult(false, BookingServiceErrorCodes.DisabledAssetOrCategory,
                     category: category);
             }
 
@@ -190,7 +190,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
                     if (periodOccupancyModels.IsNullOrEmpty())
                     {
-                        return new BulkCanOccupyResult(false, BookingServiceErrorCodes.InsufficientAssetVolume,
+                        return new CanBulkOccupyResult(false, BookingServiceErrorCodes.InsufficientAssetVolume,
                             category: category,
                             occupyingBaseInfo: model);
                     }
@@ -204,7 +204,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
             }
         }
 
-        return BulkCanOccupyResult.Success;
+        return CanBulkOccupyResult.Success;
     }
 
     protected virtual async Task<List<PeriodOccupancyModel>> GetCachedAssetDayPeriodsAsync(Asset asset,
@@ -262,7 +262,8 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         List<OccupyAssetInfoModel> models, List<OccupyAssetByCategoryInfoModel> byCategoryModels, Guid? occupierUserId)
     {
         // Todo: lock the days?
-        await CanBulkOccupyAsync(models, byCategoryModels);
+        var result = await CanBulkOccupyAsync(models, byCategoryModels);
+        await HandleCanOccupyResultAsync(result);
 
         var assetOccupancies = new List<(ProviderAssetOccupancyModel, AssetOccupancy)>();
 
