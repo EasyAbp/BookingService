@@ -47,6 +47,8 @@ public class AssetOccupancyCount : AggregateRoot, IMultiTenant
         {
             Volume += changedVolume;
         }
+
+        Volume = Math.Max(0, Volume);
     }
 
     public override object[] GetKeys()

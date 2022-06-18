@@ -104,9 +104,8 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
             return false;
         }
 
-        var periods = await GetPeriodsAsync(asset, categoryOfAsset, model.Date);
-
-        return await IsVolumeSufficientAsync(model, periods);
+        return await InternalCanOccupyAsync(new ProviderOccupyingInfoModel(asset, categoryOfAsset,
+            model.StartingTime, model.Duration, model.Date, model.Volume));
     }
 
     public virtual async Task<bool> CanOccupyByCategoryAsync(OccupyAssetByCategoryInfoModel model)
@@ -173,22 +172,29 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
                     var assets =
                         await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
 
+                    var periodOccupancyModels = new List<PeriodOccupancyModel>();
                     foreach (var asset in assets)
                     {
                         var periods =
                             await GetCachedAssetDayPeriodsAsync(asset, category, dateGroup.Key, assetDayPeriods);
 
-                        if (!await IsVolumeSufficientAsync(model, periods))
+                        if (await IsVolumeSufficientAsync(model, periods))
                         {
-                            return false;
+                            periodOccupancyModels.AddRange(periods);
+                            break;
                         }
-
-                        var period = periods.First(x =>
-                            x.Date == model.Date && x.StartingTime == model.StartingTime &&
-                            x.EndingTime == model.GetEndingTime());
-
-                        period.AvailableVolume -= model.Volume;
                     }
+
+                    if (periodOccupancyModels.IsNullOrEmpty())
+                    {
+                        return false;
+                    }
+
+                    var period = periodOccupancyModels.First(x =>
+                        x.Date == model.Date && x.StartingTime == model.StartingTime &&
+                        x.EndingTime == model.GetEndingTime());
+
+                    period.AvailableVolume -= model.Volume;
                 }
             }
         }
@@ -215,10 +221,17 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         // Todo: lock the day?
         var asset = await AssetRepository.GetAsync(model.AssetId);
         var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
+        if (asset.Disabled || category.Disabled)
+        {
+            throw new DisabledAssetOrCategoryException();
+        }
 
         var occupyingModel = new ProviderOccupyingInfoModel(asset, category, model.StartingTime, model.Duration,
             model.Date, model.Volume);
-        await CheckOccupancyAsync(occupyingModel);
+        if (!await InternalCanOccupyAsync(occupyingModel))
+        {
+            throw new InsufficientAssetVolumeException();
+        }
 
         return await InternalOccupyAsync(occupyingModel, occupierUserId);
     }
@@ -254,7 +267,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         // Todo: lock the days?
         if (!await CanBulkOccupyAsync(models, byCategoryModels))
         {
-            throw new BusinessException(BookingServiceErrorCodes.InsufficientAssetVolume);
+            throw new InsufficientAssetVolumeException();
         }
 
         var assetOccupancies = new List<(ProviderAssetOccupancyModel, AssetOccupancy)>();
@@ -287,19 +300,11 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         return assetOccupancies;
     }
 
-    protected virtual async Task CheckOccupancyAsync(ProviderOccupyingInfoModel model)
+    protected virtual async Task<bool> InternalCanOccupyAsync(ProviderOccupyingInfoModel model)
     {
-        if (model.Asset.Disabled || model.CategoryOfAsset.Disabled)
-        {
-            throw new DisabledAssetOrCategoryException();
-        }
-
         var periods = await GetPeriodsAsync(model.Asset, model.CategoryOfAsset, model.Date);
 
-        if (!await IsVolumeSufficientAsync(model, periods))
-        {
-            throw new InsufficientAssetVolumeException();
-        }
+        return await IsVolumeSufficientAsync(model, periods);
     }
 
     protected virtual Task<bool> IsVolumeSufficientAsync(IOccupyingBaseInfo model,
@@ -353,7 +358,10 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
                 _logger.LogWarning("Occupancy provider occupancy rollback failed! {Result}", result);
             }
 
-            await UnitOfWorkManager.Current.RollbackAsync();
+            if (UnitOfWorkManager.Current is not null)
+            {
+                await UnitOfWorkManager.Current.RollbackAsync();
+            }
 
             throw;
         }
