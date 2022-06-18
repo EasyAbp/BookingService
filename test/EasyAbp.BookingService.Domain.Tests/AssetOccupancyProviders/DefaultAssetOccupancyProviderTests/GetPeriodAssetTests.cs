@@ -27,11 +27,10 @@ public class GetPeriodAssetTests : DefaultAssetOccupancyProviderTestBase
         await PeriodSchemeManager.SetAsDefaultAsync(periodScheme);
         await WithUnitOfWorkAsync(() => PeriodSchemeRepository.InsertAsync(periodScheme));
         var currentDateTime = new DateTime(2022, 6, 17);
-        Clock.Now.Returns(currentDateTime);
         var targetDate = new DateTime(2022, 6, 18);
 
         // Act
-        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate);
+        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate, currentDateTime);
 
         // Assert
         actualPeriods.ShouldNotBeEmpty();
@@ -94,7 +93,7 @@ public class GetPeriodAssetTests : DefaultAssetOccupancyProviderTestBase
         }
 
         // Act
-        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate);
+        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate, currentDateTime);
 
         // Assert
         actualPeriods.ShouldNotBeEmpty();
@@ -142,7 +141,7 @@ public class GetPeriodAssetTests : DefaultAssetOccupancyProviderTestBase
         }
 
         // Act
-        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate);
+        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate, currentDateTime);
 
         // Assert
         actualPeriods.ShouldNotBeEmpty();
@@ -175,7 +174,7 @@ public class GetPeriodAssetTests : DefaultAssetOccupancyProviderTestBase
 
         // Act & Assert
         await Should.ThrowAsync<AssetDefinitionNotExistsException>(() =>
-            AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate));
+            AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate, currentDateTime));
     }
 
     [Theory]
@@ -214,7 +213,7 @@ public class GetPeriodAssetTests : DefaultAssetOccupancyProviderTestBase
         }
 
         // Act
-        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate);
+        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate, currentDateTime);
 
         // Assert
         actualPeriods.ShouldNotBeEmpty();
@@ -250,7 +249,7 @@ public class GetPeriodAssetTests : DefaultAssetOccupancyProviderTestBase
 
         // Act & Assert
         await Should.ThrowAsync<AssetDefinitionNotExistsException>(() =>
-            AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate));
+            AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate, currentDateTime));
     }
 
     [Theory]
@@ -286,7 +285,7 @@ public class GetPeriodAssetTests : DefaultAssetOccupancyProviderTestBase
         }
 
         // Act
-        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate);
+        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate, currentDateTime);
 
         // Assert
         actualPeriods.ShouldNotBeEmpty();
@@ -325,7 +324,7 @@ public class GetPeriodAssetTests : DefaultAssetOccupancyProviderTestBase
         await WithUnitOfWorkAsync(() => AssetScheduleRepository.InsertAsync(assetSchedule));
 
         // Act
-        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate);
+        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate, currentDateTime);
 
         // Assert
         actualPeriods.ShouldNotBeEmpty();
@@ -378,7 +377,7 @@ public class GetPeriodAssetTests : DefaultAssetOccupancyProviderTestBase
         await WithUnitOfWorkAsync(() => AssetScheduleRepository.InsertAsync(assetSchedule));
 
         // Act
-        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate);
+        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate, currentDateTime);
 
         // Assert
         actualPeriods.ShouldNotBeEmpty();
@@ -428,7 +427,7 @@ public class GetPeriodAssetTests : DefaultAssetOccupancyProviderTestBase
                 period.Duration, occupancyVolume)));
 
         // Act
-        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate);
+        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate, currentDateTime);
 
         // Assert
         actualPeriods.ShouldNotBeEmpty();
@@ -464,7 +463,7 @@ public class GetPeriodAssetTests : DefaultAssetOccupancyProviderTestBase
                 anotherPeriod.Duration, asset.Volume)));
 
         // Act
-        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate);
+        var actualPeriods = await AssetOccupancyProvider.GetPeriodsAsync(asset, category, targetDate, currentDateTime);
 
         // Assert
         actualPeriods.ShouldNotBeEmpty();

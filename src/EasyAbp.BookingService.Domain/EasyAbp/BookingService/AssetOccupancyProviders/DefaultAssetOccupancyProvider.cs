@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using EasyAbp.BookingService.AssetCategories;
 using EasyAbp.BookingService.AssetOccupancyCounts;
-using EasyAbp.BookingService.Assets;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Uow;
 
@@ -33,18 +31,17 @@ public class DefaultAssetOccupancyProvider : AssetOccupancyProviderBase, ITransi
     }
 
     [UnitOfWork]
-    protected override async Task<ProviderAssetOccupancyModel> ProviderOccupyAsync(Asset asset,
-        AssetCategory category, OccupyAssetInfoModel model)
+    protected override async Task<ProviderAssetOccupancyModel> ProviderOccupyAsync(ProviderOccupyingInfoModel model)
     {
         var occupancyCount =
-            await _assetOccupancyCountRepository.FindAsync(new AssetOccupancyCountKey(model.Date, model.AssetId,
+            await _assetOccupancyCountRepository.FindAsync(new AssetOccupancyCountKey(model.Date, model.Asset.Id,
                 model.StartingTime, model.Duration));
 
         if (occupancyCount is null)
         {
             occupancyCount = await _assetOccupancyCountRepository.InsertAsync(
-                new AssetOccupancyCount(CurrentTenant.Id, asset.Id,
-                    $"{category.DisplayName}-{asset.Name}", model.Date, model.StartingTime,
+                new AssetOccupancyCount(CurrentTenant.Id, model.Asset.Id,
+                    $"{model.CategoryOfAsset.DisplayName}-{model.Asset.Name}", model.Date, model.StartingTime,
                     model.Duration, model.Volume), true);
         }
         else

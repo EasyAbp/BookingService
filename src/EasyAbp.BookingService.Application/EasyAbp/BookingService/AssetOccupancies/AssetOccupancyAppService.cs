@@ -107,7 +107,7 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         var category = await _assetCategoryRepository.GetAsync(asset.AssetCategoryId);
 
         var periods = await _assetOccupancyProvider.GetPeriodsAsync(
-            asset, category, input.TargetDate);
+            asset, category, input.TargetDate, input.CurrentDateTime);
 
         return new SearchBookingPeriodsResultDto(
             ObjectMapper.Map<List<PeriodOccupancyModel>, List<BookingPeriodDto>>(periods));
@@ -121,7 +121,7 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         var category = await _assetCategoryRepository.GetAsync(input.CategoryId);
 
         var periods = await _assetOccupancyProvider.GetPeriodsAsync(
-            category, input.TargetDate);
+            category, input.TargetDate, input.CurrentDateTime);
 
         return new SearchBookingPeriodsResultDto(
             ObjectMapper.Map<List<PeriodOccupancyModel>, List<BookingPeriodDto>>(periods));
