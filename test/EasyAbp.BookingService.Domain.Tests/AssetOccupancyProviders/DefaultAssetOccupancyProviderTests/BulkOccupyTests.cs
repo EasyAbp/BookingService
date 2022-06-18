@@ -387,8 +387,6 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
     public static IEnumerable<object[]> CanBulkOccupyTestData => new List<object[]>
     {
         CanBulkOccupy_OccupyingAsset_Baseline(),
-        CanBulkOccupy_OccupyingAsset_Category_Disabled(),
-        CanBulkOccupy_OccupyingAsset_Asset_Disabled(),
         CanBulkOccupy_OccupyingAsset_MultiAssets(true),
         CanBulkOccupy_OccupyingAsset_MultiAssets(false),
         CanBulkOccupy_OccupyingAsset_MultiDates(true),
@@ -399,8 +397,6 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
         CanBulkOccupy_OccupyingAssets_MultiAssetsAndMultiDates(false),
 
         CanBulkOccupy_OccupyingCategory_Baseline(),
-        CanBulkOccupy_OccupyingCategory_Category_Disabled(),
-        CanBulkOccupy_OccupyingCategory_Asset_Disabled(),
         CanBulkOccupy_OccupyingCategory_MultiAssets(true),
         CanBulkOccupy_OccupyingCategory_MultiAssets(false),
         CanBulkOccupy_OccupyingCategory_MultiDates(true),
@@ -411,6 +407,15 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
         CanBulkOccupy_OccupyingCategories_MultiAssetsAndMultiDates(false),
 
         CanBulkOccupy_OccupyingAssetAndCategory_Baseline(),
+
+        CanBulkOccupy_OccupyingCategory_Asset_Disabled(),
+    };
+
+    public static IEnumerable<object[]> CanBulkOccupyDisabledTestData => new List<object[]>
+    {
+        CanBulkOccupy_OccupyingAsset_Category_Disabled(),
+        CanBulkOccupy_OccupyingAsset_Asset_Disabled(),
+        CanBulkOccupy_OccupyingCategory_Category_Disabled(),
     };
 
     [Theory]
@@ -429,10 +434,37 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
 
         var (assets, categories) = await CreateEntitiesAsync(testModel.Categories, targetDate);
 
-        // Act
-        var actualCanOccupy = await AssetOccupancyProvider.CanBulkOccupyAsync(assets, categories);
+        // Act & Assert
+        if (testModel.CanOccupy)
+        {
+            await AssetOccupancyProvider.CanBulkOccupyAsync(assets, categories);
+        }
+        else
+        {
+            await Should.ThrowAsync<InsufficientAssetVolumeException>(() =>
+                AssetOccupancyProvider.CanBulkOccupyAsync(assets, categories));
+        }
+    }
 
-        actualCanOccupy.ShouldBe(testModel.CanOccupy);
+    [Theory]
+    [MemberData(nameof(CanBulkOccupyDisabledTestData))]
+    public async Task CanBulkOccupy_ShouldThrow_DisabledAssetOrCategoryException_Test(object obj)
+    {
+        // Arrange
+        if (obj is not BulkOccupyTestModel testModel)
+        {
+            throw new XunitException();
+        }
+
+        var currentDateTime = new DateTime(2022, 6, 17);
+        Clock.Now.Returns(currentDateTime);
+        var targetDate = new DateTime(2022, 6, 18);
+
+        var (assets, categories) = await CreateEntitiesAsync(testModel.Categories, targetDate);
+
+        // Act & Assert
+        await Should.ThrowAsync<DisabledAssetOrCategoryException>(() =>
+            AssetOccupancyProvider.CanBulkOccupyAsync(assets, categories));
     }
 
     #endregion
@@ -478,18 +510,23 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
 
     public static IEnumerable<object[]> BulkOccupyShouldThrowInsufficientAssetVolumeExceptionData => new List<object[]>
     {
-        CanBulkOccupy_OccupyingAsset_Category_Disabled(),
-        CanBulkOccupy_OccupyingAsset_Asset_Disabled(),
         CanBulkOccupy_OccupyingAsset_MultiAssets(false),
         CanBulkOccupy_OccupyingAsset_MultiDates(false),
         CanBulkOccupy_OccupyingAssets_MultiAssets(false),
         CanBulkOccupy_OccupyingAssets_MultiAssetsAndMultiDates(false),
-        CanBulkOccupy_OccupyingCategory_Category_Disabled(),
-        CanBulkOccupy_OccupyingCategory_Asset_Disabled(),
         CanBulkOccupy_OccupyingCategory_MultiAssets(false),
         CanBulkOccupy_OccupyingCategory_MultiDates(false),
         CanBulkOccupy_OccupyingCategories_MultiAssets(false),
         CanBulkOccupy_OccupyingCategories_MultiAssetsAndMultiDates(false),
+
+        CanBulkOccupy_OccupyingCategory_Asset_Disabled(),
+    };
+
+    public static IEnumerable<object[]> BulkOccupyShouldThrowDisabledAssetOrCategoryExceptionData => new List<object[]>
+    {
+        CanBulkOccupy_OccupyingCategory_Category_Disabled(),
+        CanBulkOccupy_OccupyingAsset_Category_Disabled(),
+        CanBulkOccupy_OccupyingAsset_Asset_Disabled(),
     };
 
     public static IEnumerable<object[]> BulkOccupyData => new List<object[]>
@@ -520,6 +557,27 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Act & Assert
         await Should.ThrowAsync<InsufficientAssetVolumeException>(() =>
+            AssetOccupancyProvider.BulkOccupyAsync(assets, categories, default));
+    }
+    
+    [Theory]
+    [MemberData(nameof(BulkOccupyShouldThrowDisabledAssetOrCategoryExceptionData))]
+    public async Task BulkOccupy_ShouldThrow_DisabledAssetOrCategoryException_Test(object obj)
+    {
+        // Arrange
+        if (obj is not BulkOccupyTestModel testModel)
+        {
+            throw new XunitException();
+        }
+
+        var currentDateTime = new DateTime(2022, 6, 17);
+        Clock.Now.Returns(currentDateTime);
+        var targetDate = new DateTime(2022, 6, 18);
+
+        var (assets, categories) = await CreateEntitiesAsync(testModel.Categories, targetDate);
+
+        // Act & Assert
+        await Should.ThrowAsync<DisabledAssetOrCategoryException>(() =>
             AssetOccupancyProvider.BulkOccupyAsync(assets, categories, default));
     }
 
