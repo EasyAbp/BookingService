@@ -11,6 +11,7 @@ public class CreateAssetOccupancyByCategoryIdDto : ExtensibleObject, IOccupyingB
 {
     public Guid AssetCategoryId { get; set; }
 
+    [Range(1, int.MaxValue)]
     public int Volume { get; set; }
 
     public DateTime Date { get; set; }
