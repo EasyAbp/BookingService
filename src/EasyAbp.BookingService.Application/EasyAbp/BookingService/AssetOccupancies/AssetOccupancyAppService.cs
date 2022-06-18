@@ -137,11 +137,6 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
             input.Date,
             input.StartingTime,
             input.Duration)); // Todo: create a permission for occupying assets with a specified OccupierUserId.
-
-        if (UnitOfWorkManager.Current is not null)
-        {
-            await UnitOfWorkManager.Current.RollbackAsync();
-        }
     }
 
     public virtual async Task CheckCreateByCategoryIdAsync(
@@ -149,17 +144,13 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
     {
         await CheckCreationCheckPolicyAsync();
 
+        // Todo: create a permission for occupying assets with a specified OccupierUserId.
         await _assetOccupancyProvider.CanOccupyByCategoryAsync(new OccupyAssetByCategoryInfoModel(
             input.AssetCategoryId,
             input.Volume,
             input.Date,
             input.StartingTime,
-            input.Duration)); // Todo: create a permission for occupying assets with a specified OccupierUserId.
-
-        if (UnitOfWorkManager.Current is not null)
-        {
-            await UnitOfWorkManager.Current.RollbackAsync();
-        }
+            input.Duration));
     }
 
     public virtual async Task CheckBulkCreateAsync(BulkCreateAssetOccupancyDto input)
@@ -169,10 +160,5 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         await _assetOccupancyProvider.CanBulkOccupyAsync(
             input.Models,
             input.ByCategoryModels); // Todo: create a permission for occupying assets with a specified OccupierUserId.
-
-        if (UnitOfWorkManager.Current is not null)
-        {
-            await UnitOfWorkManager.Current.RollbackAsync();
-        }
     }
 }
