@@ -4,11 +4,11 @@ using JetBrains.Annotations;
 
 namespace EasyAbp.BookingService.AssetOccupancyProviders;
 
-public class BulkCanOccupyResult : ICanOccupyResult
+public class CanBulkOccupyResult : ICanOccupyResult
 {
-    public static BulkCanOccupyResult Success { get; } = new(true, default);
+    public static CanBulkOccupyResult Success { get; } = new(true, default);
 
-    public BulkCanOccupyResult(bool canOccupy, string errorCode,
+    public CanBulkOccupyResult(bool canOccupy, string errorCode,
         [CanBeNull] Asset asset = default,
         [CanBeNull] AssetCategory category = default,
         [CanBeNull] IOccupyingBaseInfo occupyingBaseInfo = default)
