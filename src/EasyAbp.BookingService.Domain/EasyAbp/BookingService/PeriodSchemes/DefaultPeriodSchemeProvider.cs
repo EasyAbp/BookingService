@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Volo.Abp;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 
@@ -29,8 +28,7 @@ public class DefaultPeriodSchemeProvider : IDefaultPeriodSchemeProvider, ITransi
 
         if (defaultPeriodScheme is null)
         {
-            // Todo: use a custom exception.
-            throw new BusinessException();
+            throw new DefaultPeriodSchemeNotFoundException();
         }
 
         await _distributedCache.SetAsync(DefaultPeriodSchemeCacheItem.Key, new DefaultPeriodSchemeCacheItem
@@ -39,7 +37,6 @@ public class DefaultPeriodSchemeProvider : IDefaultPeriodSchemeProvider, ITransi
         });
 
         return defaultPeriodScheme;
-
     }
 
     public virtual async Task ClearCacheAsync()

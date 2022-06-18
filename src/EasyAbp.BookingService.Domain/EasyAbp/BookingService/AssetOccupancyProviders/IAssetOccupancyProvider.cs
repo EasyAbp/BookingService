@@ -10,10 +10,12 @@ namespace EasyAbp.BookingService.AssetOccupancyProviders;
 public interface IAssetOccupancyProvider
 {
     Task<List<PeriodOccupancyModel>> GetPeriodsAsync(Asset asset, AssetCategory categoryOfAsset,
-        DateTime currentDateTime, DateTime targetDate);
+        DateTime targetDate,
+        DateTime? currentDateTime = default);
 
-    Task<List<PeriodOccupancyModel>> GetPeriodsAsync(AssetCategory category, DateTime currentDateTime,
-        DateTime targetDate);
+    Task<List<PeriodOccupancyModel>> GetPeriodsAsync(AssetCategory category,
+        DateTime targetDate,
+        DateTime? currentDateTime = default);
 
     Task<bool> CanOccupyAsync(OccupyAssetInfoModel model);
 

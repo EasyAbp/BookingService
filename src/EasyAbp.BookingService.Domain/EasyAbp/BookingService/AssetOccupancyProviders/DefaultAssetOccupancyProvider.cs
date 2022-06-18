@@ -31,18 +31,17 @@ public class DefaultAssetOccupancyProvider : AssetOccupancyProviderBase, ITransi
     }
 
     [UnitOfWork]
-    protected override async Task<ProviderAssetOccupancyModel> ProviderOccupyAsync(OccupyAssetInfoModel model)
+    protected override async Task<ProviderAssetOccupancyModel> ProviderOccupyAsync(ProviderOccupyingInfoModel model)
     {
         var occupancyCount =
-            await _assetOccupancyCountRepository.FindAsync(new AssetOccupancyCountKey(model.Date, model.AssetId,
+            await _assetOccupancyCountRepository.FindAsync(new AssetOccupancyCountKey(model.Date, model.Asset.Id,
                 model.StartingTime, model.Duration));
 
         if (occupancyCount is null)
         {
-            var asset = await AssetRepository.GetAsync(model.AssetId);
-
             occupancyCount = await _assetOccupancyCountRepository.InsertAsync(
-                new AssetOccupancyCount(CurrentTenant.Id, asset.Id, asset.Name, model.Date, model.StartingTime,
+                new AssetOccupancyCount(CurrentTenant.Id, model.Asset.Id,
+                    $"{model.CategoryOfAsset.DisplayName}-{model.Asset.Name}", model.Date, model.StartingTime,
                     model.Duration, model.Volume), true);
         }
         else
@@ -69,9 +68,9 @@ public class DefaultAssetOccupancyProvider : AssetOccupancyProviderBase, ITransi
             {
                 return false;
             }
-        
+
             occupancyCount.ChangeVolume(-1 * model.Volume);
-        
+
             await _assetOccupancyCountRepository.UpdateAsync(occupancyCount, true);
 
             return true;

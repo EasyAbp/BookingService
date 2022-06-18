@@ -8,6 +8,7 @@
     "EasyAbp.BookingService:AssetDisabled": "资产已被禁用： {assetId}",
     "EasyAbp.BookingService:DefaultPeriodSchemeAlreadyExists": "已存在默认时段方案，请先将其设为非默认，再重新操作",
     "EasyAbp.BookingService:InsufficientAssetVolume": "由于资产剩余容量不足而占用失败",
-    "EasyAbp.BookingService:DisabledAssetOrCategory": "禁用的资产或资产目录"
+    "EasyAbp.BookingService:DisabledAssetOrCategory": "禁用的资产或资产目录",
+    "EasyAbp.BookingService:DefaultPeriodSchemeNotFound": "默认时段方案不存在."
   }
 }
