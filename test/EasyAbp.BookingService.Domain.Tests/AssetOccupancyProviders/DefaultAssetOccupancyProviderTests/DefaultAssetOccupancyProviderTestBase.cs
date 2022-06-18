@@ -83,17 +83,17 @@ public abstract class DefaultAssetOccupancyProviderTestBase : BookingServiceDoma
         services.Replace(ServiceDescriptor.Transient(_ => Clock));
     }
 
-    protected virtual Task<AssetCategory> CreateAssetCategoryAsync()
+    protected virtual Task<AssetCategory> CreateAssetCategoryAsync(bool disabled = default)
     {
         return AssetCategoryManager.CreateAsync(default, nameof(AssetCategory),
             AssetDefinition.Name,
             default,
             default,
             default,
-            default);
+            disabled);
     }
 
-    protected virtual Task<Asset> CreateAssetAsync(AssetCategory assetCategory)
+    protected virtual Task<Asset> CreateAssetAsync(AssetCategory assetCategory, bool disabled = default)
     {
         return AssetManager.CreateAsync(nameof(Asset),
             AssetDefinition.Name,
@@ -103,7 +103,7 @@ public abstract class DefaultAssetOccupancyProviderTestBase : BookingServiceDoma
             1,
             default,
             default,
-            default);
+            disabled);
     }
 
     protected virtual async Task<PeriodScheme> CreatePeriodScheme()
