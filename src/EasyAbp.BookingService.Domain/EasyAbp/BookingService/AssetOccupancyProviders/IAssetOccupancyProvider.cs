@@ -17,12 +17,14 @@ public interface IAssetOccupancyProvider
         DateTime targetDate,
         DateTime? currentDateTime = default);
 
-    Task CanOccupyAsync(OccupyAssetInfoModel model);
+    Task<CanOccupyResult> CanOccupyAsync(OccupyAssetInfoModel model);
 
-    Task CanOccupyByCategoryAsync(OccupyAssetByCategoryInfoModel model);
+    Task<CanOccupyResult> CanOccupyByCategoryAsync(OccupyAssetByCategoryInfoModel model);
 
-    Task CanBulkOccupyAsync(IEnumerable<OccupyAssetInfoModel> models,
+    Task<BulkCanOccupyResult> CanBulkOccupyAsync(IEnumerable<OccupyAssetInfoModel> models,
         IEnumerable<OccupyAssetByCategoryInfoModel> byCategoryModels);
+
+    Task HandleCanOccupyResultAsync(ICanOccupyResult result);
 
     Task<(ProviderAssetOccupancyModel, AssetOccupancy)> OccupyAsync(OccupyAssetInfoModel model, Guid? occupierUserId);
 

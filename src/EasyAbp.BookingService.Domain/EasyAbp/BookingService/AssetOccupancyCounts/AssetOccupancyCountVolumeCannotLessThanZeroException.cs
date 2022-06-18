@@ -3,11 +3,11 @@ using Volo.Abp;
 
 namespace EasyAbp.BookingService.AssetOccupancyCounts;
 
-public class AssetOccupancyCountVolumeCannotLessThanZeroException : BusinessException
+public class UnexpectedNegativeVolumeException : BusinessException
 {
-    public AssetOccupancyCountVolumeCannotLessThanZeroException(Guid assetId, DateTime date, TimeSpan startingTime,
+    public UnexpectedNegativeVolumeException(Guid assetId, DateTime date, TimeSpan startingTime,
         TimeSpan duration, int volume, int changedVolume)
-        : base(BookingServiceErrorCodes.AssetOccupancyCountVolumeCannotLessThanZero)
+        : base(BookingServiceErrorCodes.UnexpectedNegativeVolume)
     {
         WithData(nameof(assetId), assetId);
         WithData(nameof(date), date);

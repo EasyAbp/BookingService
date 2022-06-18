@@ -45,7 +45,7 @@ public class AssetOccupancyCount : AggregateRoot, IMultiTenant
     {
         if (Volume + changedVolume < 0)
         {
-            throw new AssetOccupancyCountVolumeCannotLessThanZeroException(AssetId, Date, StartingTime, Duration,
+            throw new UnexpectedNegativeVolumeException(AssetId, Date, StartingTime, Duration,
                 Volume,
                 changedVolume);
         }

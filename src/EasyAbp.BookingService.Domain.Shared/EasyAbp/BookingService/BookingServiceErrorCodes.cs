@@ -13,5 +13,5 @@ public static class BookingServiceErrorCodes
     public const string InsufficientAssetVolume = "EasyAbp.BookingService:InsufficientAssetVolume";
     public const string DisabledAssetOrCategory = "EasyAbp.BookingService:DisabledAssetOrCategory";
     public const string DefaultPeriodSchemeNotFound = "EasyAbp.BookingService:DefaultPeriodSchemeNotFound";
-    public const string AssetOccupancyCountVolumeCannotLessThanZero = "EasyAbp.BookingService:AssetOccupancyCountVolumeCannotLessThanZero";
+    public const string UnexpectedNegativeVolume = "EasyAbp.BookingService:UnexpectedNegativeVolume";
 }

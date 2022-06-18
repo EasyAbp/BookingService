@@ -131,12 +131,15 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
     {
         await CheckCreationCheckPolicyAsync();
 
-        await _assetOccupancyProvider.CanOccupyAsync(new OccupyAssetInfoModel(
+        // Todo: create a permission for occupying assets with a specified OccupierUserId.
+        var result = await _assetOccupancyProvider.CanOccupyAsync(new OccupyAssetInfoModel(
             input.AssetId,
             input.Volume,
             input.Date,
             input.StartingTime,
-            input.Duration)); // Todo: create a permission for occupying assets with a specified OccupierUserId.
+            input.Duration));
+
+        await _assetOccupancyProvider.HandleCanOccupyResultAsync(result);
     }
 
     public virtual async Task CheckCreateByCategoryIdAsync(
@@ -145,20 +148,25 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         await CheckCreationCheckPolicyAsync();
 
         // Todo: create a permission for occupying assets with a specified OccupierUserId.
-        await _assetOccupancyProvider.CanOccupyByCategoryAsync(new OccupyAssetByCategoryInfoModel(
+        var result = await _assetOccupancyProvider.CanOccupyByCategoryAsync(new OccupyAssetByCategoryInfoModel(
             input.AssetCategoryId,
             input.Volume,
             input.Date,
             input.StartingTime,
             input.Duration));
+
+        await _assetOccupancyProvider.HandleCanOccupyResultAsync(result);
     }
 
     public virtual async Task CheckBulkCreateAsync(BulkCreateAssetOccupancyDto input)
     {
         await CheckCreationCheckPolicyAsync();
 
-        await _assetOccupancyProvider.CanBulkOccupyAsync(
+        // Todo: create a permission for occupying assets with a specified OccupierUserId.
+        var result = await _assetOccupancyProvider.CanBulkOccupyAsync(
             input.Models,
-            input.ByCategoryModels); // Todo: create a permission for occupying assets with a specified OccupierUserId.
+            input.ByCategoryModels);
+
+        await _assetOccupancyProvider.HandleCanOccupyResultAsync(result);
     }
 }
