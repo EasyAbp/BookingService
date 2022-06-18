@@ -435,14 +435,11 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
         var (assets, categories) = await CreateEntitiesAsync(testModel.Categories, targetDate);
 
         // Act & Assert
-        if (testModel.CanOccupy)
+        var result = await AssetOccupancyProvider.CanBulkOccupyAsync(assets, categories);
+        result.CanOccupy.ShouldBe(testModel.CanOccupy);
+        if (!testModel.CanOccupy)
         {
-            await AssetOccupancyProvider.CanBulkOccupyAsync(assets, categories);
-        }
-        else
-        {
-            await Should.ThrowAsync<InsufficientAssetVolumeException>(() =>
-                AssetOccupancyProvider.CanBulkOccupyAsync(assets, categories));
+            result.ErrorCode.ShouldBe(BookingServiceErrorCodes.InsufficientAssetVolume);
         }
     }
 
@@ -463,8 +460,9 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
         var (assets, categories) = await CreateEntitiesAsync(testModel.Categories, targetDate);
 
         // Act & Assert
-        await Should.ThrowAsync<DisabledAssetOrCategoryException>(() =>
-            AssetOccupancyProvider.CanBulkOccupyAsync(assets, categories));
+        var result = await AssetOccupancyProvider.CanBulkOccupyAsync(assets, categories);
+        result.CanOccupy.ShouldBeFalse();
+        result.ErrorCode.ShouldBe(BookingServiceErrorCodes.DisabledAssetOrCategory);
     }
 
     #endregion
@@ -559,7 +557,7 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
         await Should.ThrowAsync<InsufficientAssetVolumeException>(() =>
             AssetOccupancyProvider.BulkOccupyAsync(assets, categories, default));
     }
-    
+
     [Theory]
     [MemberData(nameof(BulkOccupyShouldThrowDisabledAssetOrCategoryExceptionData))]
     public async Task BulkOccupy_ShouldThrow_DisabledAssetOrCategoryException_Test(object obj)

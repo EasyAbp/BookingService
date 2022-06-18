@@ -75,22 +75,21 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
         });
 
         // Act & Assert
-        if (canOccupy)
+        var result = await AssetOccupancyProvider.CanOccupyAsync(
+            new OccupyAssetInfoModel(asset.Id, occupyingVolume, targetDate, period.StartingTime, period.Duration));
+
+        result.CanOccupy.ShouldBe(canOccupy);
+
+        if (!canOccupy)
         {
-            await AssetOccupancyProvider.CanOccupyAsync(
-                new OccupyAssetInfoModel(asset.Id, occupyingVolume, targetDate, period.StartingTime, period.Duration));
-        }
-        else
-        {
-            await Should.ThrowAsync<InsufficientAssetVolumeException>(() => AssetOccupancyProvider.CanOccupyAsync(
-                new OccupyAssetInfoModel(asset.Id, occupyingVolume, targetDate, period.StartingTime, period.Duration)));
+            result.ErrorCode.ShouldBe(BookingServiceErrorCodes.InsufficientAssetVolume);
         }
     }
 
     [Theory]
     [InlineData(nameof(Asset))]
     [InlineData(nameof(AssetCategory))]
-    public async Task Asset_CanOccupy_ShouldThrow_DisabledAssetOrCategoryException_Test(string testSubject)
+    public async Task Asset_CanOccupy_DisabledAssetOrCategoryErrorCode_Test(string testSubject)
     {
         // Arrange
         var category = await CreateAssetCategoryAsync(testSubject == nameof(AssetCategory));
@@ -114,8 +113,10 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
         });
 
         // Act & Assert
-        await Should.ThrowAsync<DisabledAssetOrCategoryException>(() => AssetOccupancyProvider.CanOccupyAsync(
-            new OccupyAssetInfoModel(asset.Id, 1, targetDate, period.StartingTime, period.Duration)));
+        var result = await AssetOccupancyProvider.CanOccupyAsync(
+            new OccupyAssetInfoModel(asset.Id, 1, targetDate, period.StartingTime, period.Duration));
+        result.CanOccupy.ShouldBeFalse();
+        result.ErrorCode.ShouldBe(BookingServiceErrorCodes.DisabledAssetOrCategory);
     }
 
     [Theory]
@@ -391,23 +392,18 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
         });
 
         // Act & Assert
-        if (canOccupy)
+        var result = await AssetOccupancyProvider.CanOccupyByCategoryAsync(
+            new OccupyAssetByCategoryInfoModel(category.Id, occupyingVolume, targetDate, period.StartingTime,
+                period.Duration));
+        result.CanOccupy.ShouldBe(canOccupy);
+        if (!canOccupy)
         {
-            await AssetOccupancyProvider.CanOccupyByCategoryAsync(
-                new OccupyAssetByCategoryInfoModel(category.Id, occupyingVolume, targetDate, period.StartingTime,
-                    period.Duration));
-        }
-        else
-        {
-            await Should.ThrowAsync<InsufficientAssetVolumeException>(() =>
-                AssetOccupancyProvider.CanOccupyByCategoryAsync(
-                    new OccupyAssetByCategoryInfoModel(category.Id, occupyingVolume, targetDate, period.StartingTime,
-                        period.Duration)));
+            result.ErrorCode.ShouldBe(BookingServiceErrorCodes.InsufficientAssetVolume);
         }
     }
 
     [Fact]
-    public async Task Category_CanOccupy_ShouldThrow_DisabledAssetOrCategoryException_Test()
+    public async Task Category_CanOccupy_DisabledAssetOrCategoryErrorCode_Test()
     {
         // Arrange
         var category = await CreateAssetCategoryAsync(true);
@@ -431,8 +427,11 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
         });
 
         // Act & Assert
-        await Should.ThrowAsync<DisabledAssetOrCategoryException>(() => AssetOccupancyProvider.CanOccupyAsync(
-            new OccupyAssetInfoModel(asset.Id, 1, targetDate, period.StartingTime, period.Duration)));
+        var result = await AssetOccupancyProvider.CanOccupyAsync(
+            new OccupyAssetInfoModel(asset.Id, 1, targetDate, period.StartingTime, period.Duration));
+
+        result.CanOccupy.ShouldBeFalse();
+        result.ErrorCode.ShouldBe(BookingServiceErrorCodes.DisabledAssetOrCategory);
     }
 
     [Theory]
