@@ -11,12 +11,15 @@ namespace EasyAbp.BookingService.AssetOccupancyProviders;
 public class DefaultAssetOccupancyProvider : AssetOccupancyProviderBase, ITransientDependency
 {
     private readonly IAssetOccupancyCountRepository _assetOccupancyCountRepository;
+    private readonly IUnitOfWorkManager _unitOfWorkManager;
 
     public DefaultAssetOccupancyProvider(
         IAssetOccupancyCountRepository assetOccupancyCountRepository,
+        IUnitOfWorkManager unitOfWorkManager,
         IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _assetOccupancyCountRepository = assetOccupancyCountRepository;
+        _unitOfWorkManager = unitOfWorkManager;
     }
 
     [UnitOfWork]
@@ -58,6 +61,11 @@ public class DefaultAssetOccupancyProvider : AssetOccupancyProviderBase, ITransi
     [UnitOfWork]
     protected override async Task<bool> ProviderTryRollBackOccupancyAsync(ProviderAssetOccupancyModel model)
     {
+        if (_unitOfWorkManager.Current is not null && _unitOfWorkManager.Current.Options.IsTransactional)
+        {
+            return true;
+        }
+
         try
         {
             var occupancyCount =
