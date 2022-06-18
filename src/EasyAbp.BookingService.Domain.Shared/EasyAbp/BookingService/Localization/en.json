@@ -10,6 +10,6 @@
     "EasyAbp.BookingService:InsufficientAssetVolume": "Occupancy failed due to insufficient asset volume.",
     "EasyAbp.BookingService:DisabledAssetOrCategory": "Disabled asset or category.",
     "EasyAbp.BookingService:DefaultPeriodSchemeNotFound": "The default period scheme is not found.",
-    "EasyAbp.BookingService:AssetOccupancyCountVolumeCannotLessThanZero": "AssetOccupancyCount(Asset:{assetId}, Date:{date}, StartingTime:{startingTime}, Duration:{duration})'s volume({volume},{changedVolume}) cannot less than zero. "
+    "EasyAbp.BookingService:UnexpectedNegativeVolume": "AssetOccupancyCount(Asset:{assetId}, Date:{date}, StartingTime:{startingTime}, Duration:{duration})'s volume({volume},{changedVolume}) cannot less than zero. "
   }
 }

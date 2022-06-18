@@ -94,33 +94,33 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         throw new NotImplementedException();
     }
 
-    public virtual async Task CanOccupyAsync(OccupyAssetInfoModel model)
+    public virtual async Task<CanOccupyResult> CanOccupyAsync(OccupyAssetInfoModel model)
     {
         var asset = await AssetRepository.GetAsync(model.AssetId);
         var categoryOfAsset = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
-        if (!await InternalCanOccupyAsync(new ProviderOccupyingInfoModel(asset, categoryOfAsset,
-                model.StartingTime, model.Duration, model.Date, model.Volume)))
-        {
-            throw new InsufficientAssetVolumeException();
-        }
+
+        return await InternalCanOccupyAsync(new ProviderOccupyingInfoModel(asset, categoryOfAsset,
+            model.StartingTime, model.Duration, model.Date, model.Volume));
     }
 
-    public virtual async Task CanOccupyByCategoryAsync(OccupyAssetByCategoryInfoModel model)
+    public virtual async Task<CanOccupyResult> CanOccupyByCategoryAsync(OccupyAssetByCategoryInfoModel model)
     {
         var category = await AssetCategoryRepository.GetAsync(model.AssetCategoryId);
 
         if (category.Disabled)
         {
-            throw new DisabledAssetOrCategoryException();
+            return new CanOccupyResult(false, BookingServiceErrorCodes.DisabledAssetOrCategory);
         }
 
         if (await PickAssetOrNullAsync(category, model) is null)
         {
-            throw new InsufficientAssetVolumeException();
+            return new CanOccupyResult(false, BookingServiceErrorCodes.InsufficientAssetVolume);
         }
+
+        return CanOccupyResult.Success;
     }
 
-    public virtual async Task CanBulkOccupyAsync(IEnumerable<OccupyAssetInfoModel> models,
+    public virtual async Task<BulkCanOccupyResult> CanBulkOccupyAsync(IEnumerable<OccupyAssetInfoModel> models,
         IEnumerable<OccupyAssetByCategoryInfoModel> byCategoryModels)
     {
         var assetDayPeriods = new Dictionary<(Guid, DateTime), List<PeriodOccupancyModel>>();
@@ -132,7 +132,8 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
             if (asset.Disabled || categoryOfAsset.Disabled)
             {
-                throw new DisabledAssetOrCategoryException();
+                return new BulkCanOccupyResult(false, BookingServiceErrorCodes.DisabledAssetOrCategory,
+                    asset, categoryOfAsset);
             }
 
             foreach (var dateGroup in assetIdGroup.GroupBy(x => x.Date))
@@ -144,7 +145,8 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
                 {
                     if (!await IsVolumeSufficientAsync(model, periods))
                     {
-                        throw new InsufficientAssetVolumeException();
+                        return new BulkCanOccupyResult(false, BookingServiceErrorCodes.InsufficientAssetVolume,
+                            asset, categoryOfAsset, model);
                     }
 
                     var period = periods.First(x =>
@@ -162,7 +164,8 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
             if (category.Disabled)
             {
-                throw new DisabledAssetOrCategoryException();
+                return new BulkCanOccupyResult(false, BookingServiceErrorCodes.DisabledAssetOrCategory,
+                    category: category);
             }
 
             foreach (var dateGroup in categoryIdGroup.GroupBy(x => x.Date))
@@ -187,7 +190,9 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
                     if (periodOccupancyModels.IsNullOrEmpty())
                     {
-                        throw new InsufficientAssetVolumeException();
+                        return new BulkCanOccupyResult(false, BookingServiceErrorCodes.InsufficientAssetVolume,
+                            category: category,
+                            occupyingBaseInfo: model);
                     }
 
                     var period = periodOccupancyModels.First(x =>
@@ -198,6 +203,8 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
                 }
             }
         }
+
+        return BulkCanOccupyResult.Success;
     }
 
     protected virtual async Task<List<PeriodOccupancyModel>> GetCachedAssetDayPeriodsAsync(Asset asset,
@@ -221,11 +228,8 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
         var occupyingModel = new ProviderOccupyingInfoModel(asset, category, model.StartingTime, model.Duration,
             model.Date, model.Volume);
-        if (!await InternalCanOccupyAsync(occupyingModel))
-        {
-            throw new InsufficientAssetVolumeException();
-        }
-
+        var result = await InternalCanOccupyAsync(occupyingModel);
+        await HandleCanOccupyResultAsync(result);
         return await InternalOccupyAsync(occupyingModel, occupierUserId);
     }
 
@@ -290,16 +294,36 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         return assetOccupancies;
     }
 
-    protected virtual async Task<bool> InternalCanOccupyAsync(ProviderOccupyingInfoModel model)
+    public virtual Task HandleCanOccupyResultAsync(ICanOccupyResult result)
+    {
+        if (!result.CanOccupy)
+        {
+            throw result.ErrorCode switch
+            {
+                BookingServiceErrorCodes.DisabledAssetOrCategory => new DisabledAssetOrCategoryException(),
+                BookingServiceErrorCodes.InsufficientAssetVolume => new InsufficientAssetVolumeException(),
+                _ => new ArgumentOutOfRangeException(nameof(result.ErrorCode), result.ErrorCode, "Unknown error code.")
+            };
+        }
+
+        return Task.CompletedTask;
+    }
+
+    protected virtual async Task<CanOccupyResult> InternalCanOccupyAsync(ProviderOccupyingInfoModel model)
     {
         if (model.Asset.Disabled || model.CategoryOfAsset.Disabled)
         {
-            throw new DisabledAssetOrCategoryException();
+            return new CanOccupyResult(false, BookingServiceErrorCodes.DisabledAssetOrCategory);
         }
 
         var periods = await GetPeriodsAsync(model.Asset, model.CategoryOfAsset, model.Date);
 
-        return await IsVolumeSufficientAsync(model, periods);
+        if (!await IsVolumeSufficientAsync(model, periods))
+        {
+            return new CanOccupyResult(false, BookingServiceErrorCodes.InsufficientAssetVolume);
+        }
+
+        return CanOccupyResult.Success;
     }
 
     protected virtual Task<bool> IsVolumeSufficientAsync(IOccupyingBaseInfo model,
