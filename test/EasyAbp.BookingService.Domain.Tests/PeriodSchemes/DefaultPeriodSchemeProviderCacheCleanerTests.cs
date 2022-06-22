@@ -13,6 +13,7 @@ public class DefaultPeriodSchemeProviderCacheCleanerTests : BookingServiceDomain
 
     protected override void AfterAddApplication(IServiceCollection services)
     {
+        base.AfterAddApplication(services);
         _defaultPeriodSchemeProvider = Substitute.For<IDefaultPeriodSchemeProvider>();
         services.Replace(ServiceDescriptor.Transient(s => _defaultPeriodSchemeProvider));
     }

@@ -33,6 +33,7 @@ public abstract class BookingServiceApplicationTestBase : BookingServiceTestBase
 
     protected override void AfterAddApplication(IServiceCollection services)
     {
+        base.AfterAddApplication(services);
         services.Configure<BookingServiceOptions>(options =>
         {
             options.AssetDefinitionConfigurations = new List<AssetDefinition>

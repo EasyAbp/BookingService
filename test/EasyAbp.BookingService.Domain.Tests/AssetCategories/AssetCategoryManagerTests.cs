@@ -29,6 +29,7 @@ public class AssetCategoryManagerTests : BookingServiceDomainTestBase
 
     protected override void AfterAddApplication(IServiceCollection services)
     {
+        base.AfterAddApplication(services);
         services.Configure<BookingServiceOptions>(options =>
         {
             options.AssetDefinitionConfigurations = new List<AssetDefinition>
