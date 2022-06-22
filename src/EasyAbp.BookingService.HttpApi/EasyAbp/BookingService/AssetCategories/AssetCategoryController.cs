@@ -1,13 +1,11 @@
 using System;
 using System.Threading.Tasks;
-using EasyAbp.BookingService;
-using EasyAbp.BookingService.AssetCategories;
 using EasyAbp.BookingService.AssetCategories.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 
-namespace AssetCategories;
+namespace EasyAbp.BookingService.AssetCategories;
 
 [RemoteService(Name = BookingServiceRemoteServiceConsts.RemoteServiceName)]
 [Route("/api/booking-service/asset-category")]

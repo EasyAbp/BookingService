@@ -1,13 +1,11 @@
 using System;
 using System.Threading.Tasks;
-using EasyAbp.BookingService;
-using EasyAbp.BookingService.PeriodSchemes;
 using EasyAbp.BookingService.PeriodSchemes.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 
-namespace PeriodSchemes;
+namespace EasyAbp.BookingService.PeriodSchemes;
 
 [RemoteService(Name = BookingServiceRemoteServiceConsts.RemoteServiceName)]
 [Route("/api/booking-service/period-scheme")]

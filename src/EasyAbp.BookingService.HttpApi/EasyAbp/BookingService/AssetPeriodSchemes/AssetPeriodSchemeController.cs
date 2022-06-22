@@ -1,12 +1,10 @@
 using System.Threading.Tasks;
-using EasyAbp.BookingService;
-using EasyAbp.BookingService.AssetPeriodSchemes;
 using EasyAbp.BookingService.AssetPeriodSchemes.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 
-namespace AssetPeriodSchemes;
+namespace EasyAbp.BookingService.AssetPeriodSchemes;
 
 [RemoteService(Name = BookingServiceRemoteServiceConsts.RemoteServiceName)]
 [Route("/api/booking-service/asset-period-scheme")]
