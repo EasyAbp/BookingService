@@ -85,5 +85,13 @@ public static class BookingServiceDbContextModelCreatingExtensions
 
             /* Configure more properties here */
         });
+
+        builder.Entity<Period>(b =>
+        {
+            b.ToTable(BookingServiceDbProperties.DbTablePrefix + "Periods", BookingServiceDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            /* Configure more properties here */
+        });
     }
 }

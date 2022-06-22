@@ -22,4 +22,5 @@ public interface IBookingServiceDbContext : IEfCoreDbContext
     DbSet<Asset> Assets { get; set; }
     DbSet<AssetSchedule> AssetSchedules { get; set; }
     DbSet<PeriodScheme> PeriodSchemes { get; set; }
+    DbSet<Period> Periods { get; set; }
 }
