@@ -1,8 +1,4 @@
-using System;
-using System.Threading.Tasks;
 using EasyAbp.BookingService.AssetCategories;
-using Volo.Abp.Domain.Repositories;
-using Xunit;
 
 namespace EasyAbp.BookingService.EntityFrameworkCore.AssetCategories
 {

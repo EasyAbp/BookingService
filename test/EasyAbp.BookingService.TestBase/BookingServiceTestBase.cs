@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 using Volo.Abp;
 using Volo.Abp.Modularity;
 using Volo.Abp.Uow;
 using Volo.Abp.Testing;
+using Volo.Abp.Users;
 
 namespace EasyAbp.BookingService;
 
@@ -12,6 +14,14 @@ namespace EasyAbp.BookingService;
 public abstract class BookingServiceTestBase<TStartupModule> : AbpIntegratedTest<TStartupModule>
     where TStartupModule : IAbpModule
 {
+    protected IExternalUserLookupServiceProvider ExternalUserLookupServiceProvider;
+
+    protected override void AfterAddApplication(IServiceCollection services)
+    {
+        ExternalUserLookupServiceProvider = Substitute.For<IExternalUserLookupServiceProvider>();
+        services.AddTransient(_ => ExternalUserLookupServiceProvider);
+    }
+
     protected override void SetAbpApplicationCreationOptions(AbpApplicationCreationOptions options)
     {
         options.UseAutofac();
@@ -42,7 +52,8 @@ public abstract class BookingServiceTestBase<TStartupModule> : AbpIntegratedTest
         return WithUnitOfWorkAsync(new AbpUnitOfWorkOptions(), func);
     }
 
-    protected virtual async Task<TResult> WithUnitOfWorkAsync<TResult>(AbpUnitOfWorkOptions options, Func<Task<TResult>> func)
+    protected virtual async Task<TResult> WithUnitOfWorkAsync<TResult>(AbpUnitOfWorkOptions options,
+        Func<Task<TResult>> func)
     {
         using (var scope = ServiceProvider.CreateScope())
         {

@@ -40,7 +40,6 @@ public abstract class DefaultAssetOccupancyProviderTestBase : BookingServiceDoma
     protected readonly IAssetPeriodSchemeRepository AssetPeriodSchemeRepository;
     protected const int DefaultPeriodStartingTimeHours = 0;
     protected const int DefaultPeriodDurationHours = 1;
-    protected IExternalUserLookupServiceProvider ExternalUserLookupServiceProvider;
     protected IClock Clock;
     protected readonly AssetScheduleManager AssetScheduleManager;
     protected readonly IAssetScheduleRepository AssetScheduleRepository;
@@ -69,6 +68,7 @@ public abstract class DefaultAssetOccupancyProviderTestBase : BookingServiceDoma
 
     protected override void AfterAddApplication(IServiceCollection services)
     {
+        base.AfterAddApplication(services);
         services.Configure<BookingServiceOptions>(options =>
         {
             options.AssetDefinitionConfigurations = new List<AssetDefinition>
@@ -77,8 +77,6 @@ public abstract class DefaultAssetOccupancyProviderTestBase : BookingServiceDoma
             };
         });
 
-        ExternalUserLookupServiceProvider = Substitute.For<IExternalUserLookupServiceProvider>();
-        services.AddTransient(_ => ExternalUserLookupServiceProvider);
         Clock = Substitute.For<IClock>();
         services.Replace(ServiceDescriptor.Transient(_ => Clock));
     }
