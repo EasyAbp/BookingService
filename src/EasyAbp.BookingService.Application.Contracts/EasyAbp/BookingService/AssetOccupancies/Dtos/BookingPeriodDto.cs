@@ -18,4 +18,12 @@ public class BookingPeriodDto
     public int TotalVolume { get; set; }
 
     public int AvailableVolume { get; set; }
+
+    public TimeSpan Duration
+    {
+        get
+        {
+            return this.EndingTime.Subtract(this.StartingTime);
+        }
+    }
 }
