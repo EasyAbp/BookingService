@@ -10,6 +10,9 @@
     "EasyAbp.BookingService:InsufficientAssetVolume": "由于资产剩余容量不足而占用失败",
     "EasyAbp.BookingService:DisabledAssetOrCategory": "禁用的资产或资产目录",
     "EasyAbp.BookingService:DefaultPeriodSchemeNotFound": "默认时段方案不存在",
-    "EasyAbp.BookingService:UnexpectedNegativeVolume": "资产占用计数(资产:{assetId}, 日期:{date}, 开始时间:{startingTime}, 持续时间:{duration})的volume({volume},{changedVolume})不能小于0"
+    "EasyAbp.BookingService:UnexpectedNegativeVolume": "资产占用计数(资产:{assetId}, 日期:{date}, 开始时间:{startingTime}, 持续时间:{duration})的volume({volume},{changedVolume})不能小于0",
+    "EasyAbp.BookingService:CannotDeletePeriodInUse": "不能删除正在使用的时段。时段Id：{id}",
+    "EasyAbp.BookingService:CannotUpdatePeriodInUse": "不能更新正在使用的时段。时段Id：{id}",
+    "EasyAbp.BookingService:CannotDeletePeriodSchemeInUse": "不能删除正在使用的时段方案：{name}, Id：{id}. "
   }
 }
