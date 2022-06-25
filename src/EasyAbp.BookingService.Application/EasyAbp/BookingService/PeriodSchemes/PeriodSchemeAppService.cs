@@ -132,7 +132,7 @@ public class PeriodSchemeAppService :
             throw new CannotDeletePeriodSchemeInUseException(entity.Id, entity.Name);
         }
 
-        await DeleteByIdAsync(id);
+        await _repository.DeleteAsync(entity, true);
     }
 
     protected override async Task<PeriodSchemeDto> MapToGetOutputDtoAsync(PeriodScheme entity)

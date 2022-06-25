@@ -120,9 +120,8 @@ public class PeriodSchemeManager : DomainService
         return assetPeriodScheme is not null;
     }
 
-    protected virtual async Task<bool> IsPeriodInUseAsync(Period period)
+    protected virtual Task<bool> IsPeriodInUseAsync(Period period)
     {
-        var entities = await AssetScheduleRepository.FirstOrDefaultAsync(x => x.PeriodId == period.Id);
-        return entities is not null;
+        return AssetScheduleRepository.AnyAsync(x => x.PeriodId == period.Id);
     }
 }
