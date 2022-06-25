@@ -14,4 +14,7 @@ public static class BookingServiceErrorCodes
     public const string DisabledAssetOrCategory = "EasyAbp.BookingService:DisabledAssetOrCategory";
     public const string DefaultPeriodSchemeNotFound = "EasyAbp.BookingService:DefaultPeriodSchemeNotFound";
     public const string UnexpectedNegativeVolume = "EasyAbp.BookingService:UnexpectedNegativeVolume";
+    public const string CannotDeletePeriodInUse = "EasyAbp.BookingService:CannotDeletePeriodInUse";
+    public const string CannotUpdatePeriodInUse = "EasyAbp.BookingService:CannotUpdatePeriodInUse";
+    public const string CannotDeletePeriodSchemeInUse = "EasyAbp.BookingService:CannotDeletePeriodSchemeInUse";
 }

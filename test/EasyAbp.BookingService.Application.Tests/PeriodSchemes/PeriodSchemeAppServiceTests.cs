@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Shouldly;
 using System.Threading.Tasks;
-using EasyAbp.BookingService.AssetPeriodSchemes;
 using EasyAbp.BookingService.PeriodSchemes.Dtos;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using NSubstitute;
+using Shouldly;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.DependencyInjection;
 using Xunit;
 
 namespace EasyAbp.BookingService.PeriodSchemes
@@ -14,13 +17,20 @@ namespace EasyAbp.BookingService.PeriodSchemes
     {
         private readonly IPeriodSchemeAppService _periodSchemeAppService;
         private readonly IPeriodSchemeRepository _periodSchemeRepository;
-        private readonly PeriodSchemeManager _periodSchemeManager;
+        private PeriodSchemeManager _periodSchemeManager;
 
         public PeriodSchemeAppServiceTests()
         {
             _periodSchemeAppService = GetRequiredService<IPeriodSchemeAppService>();
             _periodSchemeRepository = GetRequiredService<IPeriodSchemeRepository>();
-            _periodSchemeManager = GetRequiredService<PeriodSchemeManager>();
+            _periodSchemeManager.LazyServiceProvider = GetRequiredService<IAbpLazyServiceProvider>();
+        }
+
+        protected override void AfterAddApplication(IServiceCollection services)
+        {
+            base.AfterAddApplication(services);
+            _periodSchemeManager = Substitute.ForPartsOf<PeriodSchemeManager>();
+            services.Replace(ServiceDescriptor.Transient(_ => _periodSchemeManager));
         }
 
         [Fact]
@@ -119,6 +129,33 @@ namespace EasyAbp.BookingService.PeriodSchemes
                 expected[i].Id.ShouldBe(getResult.Periods[i].Id);
                 expected[i].StartingTime.ShouldBe(getResult.Periods[i].StartingTime);
                 expected[i].Duration.ShouldBe(getResult.Periods[i].Duration);
+            }
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Delete_Test(bool shouldThrow)
+        {
+            // Arrange
+            var periodScheme = await _periodSchemeManager.CreateAsync(nameof(PeriodScheme), new List<Period>());
+            periodScheme = await WithUnitOfWorkAsync(() => _periodSchemeRepository.InsertAsync(periodScheme));
+
+            _periodSchemeManager.WhenForAnyArgs(x => x.IsPeriodSchemeInUseAsync(Arg.Any<PeriodScheme>()))
+                .DoNotCallBase();
+            _periodSchemeManager.IsPeriodSchemeInUseAsync(Arg.Any<PeriodScheme>())
+                .ReturnsForAnyArgs(Task.FromResult(shouldThrow));
+
+            // Act
+            if (shouldThrow)
+            {
+                await Should.ThrowAsync<CannotDeletePeriodSchemeInUseException>(
+                    WithUnitOfWorkAsync(() => _periodSchemeAppService.DeleteAsync(periodScheme.Id)));
+            }
+            else
+            {
+                await Should.NotThrowAsync(
+                    WithUnitOfWorkAsync(() => _periodSchemeAppService.DeleteAsync(periodScheme.Id)));
             }
         }
 
