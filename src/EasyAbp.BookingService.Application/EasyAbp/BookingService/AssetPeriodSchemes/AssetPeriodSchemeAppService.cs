@@ -44,4 +44,14 @@ public class AssetPeriodSchemeAppService : AbstractKeyCrudAppService<AssetPeriod
             .WhereIf(input.AssetId.HasValue, x => x.AssetId == input.AssetId.Value)
             .WhereIf(input.Date.HasValue, x => x.Date == input.Date.Value);
     }
+    protected override AssetPeriodScheme MapToEntity(CreateUpdateAssetPeriodSchemeDto createInput)
+    {
+        return new AssetPeriodScheme(
+            new AssetPeriodSchemeKey() {
+                AssetId = createInput.AssetId,
+                Date = createInput.Date
+            },
+            CurrentTenant.Id,
+            createInput.PeriodSchemeId);
+    }
 }
