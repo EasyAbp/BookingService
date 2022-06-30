@@ -116,13 +116,23 @@ public class PeriodSchemeAppService :
     {
         var periodScheme = await GetEntityByIdAsync(periodSchemeId);
 
-        var period = periodScheme.Periods.Single(x => x.Id == periodId);
-
-        periodScheme.Periods.Remove(period);
+        await _periodSchemeManager.DeletePeriodAsync(periodScheme, periodId);
 
         await _repository.UpdateAsync(periodScheme, true);
 
         return await MapToGetOutputDtoAsync(periodScheme);
+    }
+
+    public override async Task DeleteAsync(Guid id)
+    {
+        await CheckDeletePolicyAsync();
+        var entity = await GetEntityByIdAsync(id);
+        if (await _periodSchemeManager.IsPeriodSchemeInUseAsync(entity))
+        {
+            throw new CannotDeletePeriodSchemeInUseException(entity.Id, entity.Name);
+        }
+
+        await _repository.DeleteAsync(entity, true);
     }
 
     protected override async Task<PeriodSchemeDto> MapToGetOutputDtoAsync(PeriodScheme entity)

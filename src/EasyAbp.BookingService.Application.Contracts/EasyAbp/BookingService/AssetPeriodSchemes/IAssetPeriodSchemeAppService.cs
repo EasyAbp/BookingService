@@ -8,8 +8,8 @@ public interface IAssetPeriodSchemeAppService :
         AssetPeriodSchemeDto, 
         AssetPeriodSchemeKey, 
         GetAssetPeriodSchemesRequestDto,
-        CreateUpdateAssetPeriodSchemeDto,
-        CreateUpdateAssetPeriodSchemeDto>
+        CreateAssetPeriodSchemeDto,
+        UpdateAssetPeriodSchemeDto>
 {
 
 }

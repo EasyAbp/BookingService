@@ -33,6 +33,7 @@ namespace EasyAbp.BookingService.AssetOccupancies
 
         protected override void AfterAddApplication(IServiceCollection services)
         {
+            base.AfterAddApplication(services);
             _assetOccupancyProvider = Substitute.For<IAssetOccupancyProvider>();
             _distributedEventBus = Substitute.For<IDistributedEventBus>();
             services.Replace(ServiceDescriptor.Transient(s => _assetOccupancyProvider));

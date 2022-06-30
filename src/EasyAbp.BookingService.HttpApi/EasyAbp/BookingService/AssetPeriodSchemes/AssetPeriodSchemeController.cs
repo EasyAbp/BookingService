@@ -19,14 +19,14 @@ public class AssetPeriodSchemeController : BookingServiceController, IAssetPerio
 
     [HttpPost]
     [Route("")]
-    public virtual Task<AssetPeriodSchemeDto> CreateAsync(CreateUpdateAssetPeriodSchemeDto input)
+    public virtual Task<AssetPeriodSchemeDto> CreateAsync(CreateAssetPeriodSchemeDto input)
     {
         return _service.CreateAsync(input);
     }
 
     [HttpPut]
     [Route("{AssetId}/{Date}")]
-    public virtual Task<AssetPeriodSchemeDto> UpdateAsync(AssetPeriodSchemeKey id, CreateUpdateAssetPeriodSchemeDto input)
+    public virtual Task<AssetPeriodSchemeDto> UpdateAsync(AssetPeriodSchemeKey id, UpdateAssetPeriodSchemeDto input)
     {
         return _service.UpdateAsync(id, input);
     }
