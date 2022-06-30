@@ -7,8 +7,8 @@ using Volo.Abp.Application.Services;
 namespace EasyAbp.BookingService.AssetPeriodSchemes;
 
 public class AssetPeriodSchemeAppService : AbstractKeyCrudAppService<AssetPeriodScheme, AssetPeriodSchemeDto,
-        AssetPeriodSchemeKey, GetAssetPeriodSchemesRequestDto, CreateUpdateAssetPeriodSchemeDto,
-        CreateUpdateAssetPeriodSchemeDto>,
+        AssetPeriodSchemeKey, GetAssetPeriodSchemesRequestDto, CreateAssetPeriodSchemeDto,
+        UpdateAssetPeriodSchemeDto>,
     IAssetPeriodSchemeAppService
 {
     protected override string GetPolicyName { get; set; } = BookingServicePermissions.AssetPeriodScheme.Default;
