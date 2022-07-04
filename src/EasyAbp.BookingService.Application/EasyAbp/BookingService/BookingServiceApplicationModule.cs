@@ -18,7 +18,7 @@ public class BookingServiceApplicationModule : AbpModule
         context.Services.AddAutoMapperObjectMapper<BookingServiceApplicationModule>();
         Configure<AbpAutoMapperOptions>(options =>
         {
-            options.AddMaps<BookingServiceApplicationModule>(validate: true);
+            options.AddMaps<BookingServiceApplicationModule>(validate: false);
         });
     }
 }
