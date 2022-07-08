@@ -87,11 +87,34 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     }
 
     [UnitOfWork]
-    public virtual Task<List<PeriodOccupancyModel>> GetPeriodsAsync(AssetCategory category,
+    public virtual async Task<List<PeriodOccupancyModel>> GetPeriodsAsync(AssetCategory category,
         DateTime targetDate,
         DateTime? currentDateTime = default)
     {
-        throw new NotImplementedException();
+        var assets =
+            await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
+
+        var result = new List<PeriodOccupancyModel>();
+        foreach (var asset in assets)
+        {
+            var periodOccupancyModels = await GetPeriodsAsync(asset, category, targetDate, currentDateTime);
+
+            foreach (var periodOccupancyModel in periodOccupancyModels)
+            {
+                var existModel = result.FirstOrDefault(x => x.PeriodId == periodOccupancyModel.PeriodId);
+                if (existModel is null)
+                {
+                    result.Add(periodOccupancyModel);
+                }
+                else
+                {
+                    existModel.TotalVolume += periodOccupancyModel.TotalVolume;
+                    existModel.AvailableVolume += periodOccupancyModel.AvailableVolume;
+                }
+            }
+        }
+
+        return result;
     }
 
     public virtual async Task<CanOccupyResult> CanOccupyAsync(OccupyAssetInfoModel model)
