@@ -150,6 +150,7 @@ namespace EasyAbp.BookingService.AssetOccupancies
             var startingTime = TimeSpan.Zero;
             var duration = TimeSpan.FromHours(1);
             var model = new OccupyAssetByCategoryInfoModel(categoryId,
+                default,
                 volume,
                 date,
                 startingTime,
@@ -248,6 +249,7 @@ namespace EasyAbp.BookingService.AssetOccupancies
             var startingTime = TimeSpan.Zero;
             var duration = TimeSpan.FromHours(1);
             var categoryInfoModel = new OccupyAssetByCategoryInfoModel(categoryId,
+                default,
                 volume,
                 date,
                 startingTime,
@@ -320,6 +322,7 @@ namespace EasyAbp.BookingService.AssetOccupancies
             var startingTime = TimeSpan.Zero;
             var duration = TimeSpan.FromHours(1);
             var categoryInfoModel = new OccupyAssetByCategoryInfoModel(categoryId,
+                default,
                 volume,
                 date,
                 startingTime,

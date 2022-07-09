@@ -693,6 +693,7 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
                 if (model.OccupyingVolume > 0)
                 {
                     occupyingCategories.Add(new OccupyAssetByCategoryInfoModel(category.Id,
+                        default,
                         model.OccupyingVolume,
                         targetDate.AddDays(model.DayOffset),
                         TimeSpan.FromHours(model.PeriodStartingHour),

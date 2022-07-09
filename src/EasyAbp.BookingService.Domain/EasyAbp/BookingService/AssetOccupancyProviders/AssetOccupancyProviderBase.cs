@@ -64,6 +64,62 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     {
         var periodScheme = await GetEffectivePeriodSchemeAsync(targetDate, asset, categoryOfAsset);
 
+        return await InternalGetPeriodsAsync(asset, categoryOfAsset, periodScheme, targetDate, currentDateTime);
+    }
+
+    [UnitOfWork]
+    public virtual async Task<List<PeriodOccupancyModel>> GetPeriodsAsync(AssetCategory category,
+        Guid? periodSchemeId,
+        DateTime targetDate,
+        DateTime? currentDateTime = default)
+    {
+        var assets =
+            await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
+
+        var effectivePeriodScheme = await GetEffectivePeriodSchemeAsync(periodSchemeId, category);
+
+        var models = effectivePeriodScheme.Periods
+            .Select(x =>
+                new PeriodOccupancyModel(targetDate,
+                    x.StartingTime,
+                    x.GetEndingTime(),
+                    effectivePeriodScheme.Id,
+                    x.Id,
+                    0, 0))
+            .ToList();
+
+        foreach (var asset in assets)
+        {
+            var assetPeriodScheme = await GetEffectivePeriodSchemeAsync(targetDate, asset, category);
+            if (effectivePeriodScheme.Id != assetPeriodScheme.Id)
+            {
+                continue;
+            }
+
+            var assetPeriodOccupancyModels =
+                await InternalGetPeriodsAsync(asset, category, assetPeriodScheme, targetDate, currentDateTime);
+
+            var assetPeriodOccupancyModelDictionary = assetPeriodOccupancyModels.ToDictionary(x => x.PeriodId);
+            foreach (var periodOccupancyModel in models)
+            {
+                var assetPeriodOccupancyModel = assetPeriodOccupancyModelDictionary[periodOccupancyModel.PeriodId];
+                if (periodOccupancyModel.AvailableVolume < assetPeriodOccupancyModel.AvailableVolume)
+                {
+                    periodOccupancyModel.TotalVolume = assetPeriodOccupancyModel.TotalVolume;
+                    periodOccupancyModel.AvailableVolume = assetPeriodOccupancyModel.AvailableVolume;
+                }
+            }
+        }
+
+        return models;
+    }
+
+    protected virtual async Task<List<PeriodOccupancyModel>> InternalGetPeriodsAsync(Asset asset,
+        AssetCategory categoryOfAsset,
+        PeriodScheme periodScheme,
+        DateTime targetDate,
+        DateTime? currentDateTime = default)
+    {
         var defaultAvailable = !asset.Disabled && !categoryOfAsset.Disabled &&
                                await GetEffectivePeriodUsableAsync(asset, categoryOfAsset) is PeriodUsable.Accept;
 
@@ -82,39 +138,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         UpdatePeriodsUsableByTimeInAdvances(models, periodIdScheduleMapping, timeInAdvance,
             currentDateTime ?? Clock.Now);
         UpdatePeriodsUsableByOccupancies(models, occupancies);
-
         return models;
-    }
-
-    [UnitOfWork]
-    public virtual async Task<List<PeriodOccupancyModel>> GetPeriodsAsync(AssetCategory category,
-        DateTime targetDate,
-        DateTime? currentDateTime = default)
-    {
-        var assets =
-            await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
-
-        var result = new List<PeriodOccupancyModel>();
-        foreach (var asset in assets)
-        {
-            var periodOccupancyModels = await GetPeriodsAsync(asset, category, targetDate, currentDateTime);
-
-            foreach (var periodOccupancyModel in periodOccupancyModels)
-            {
-                var existModel = result.FirstOrDefault(x => x.PeriodId == periodOccupancyModel.PeriodId);
-                if (existModel is null)
-                {
-                    result.Add(periodOccupancyModel);
-                }
-                else
-                {
-                    existModel.TotalVolume += periodOccupancyModel.TotalVolume;
-                    existModel.AvailableVolume += periodOccupancyModel.AvailableVolume;
-                }
-            }
-        }
-
-        return result;
     }
 
     public virtual async Task<CanOccupyResult> CanOccupyAsync(OccupyAssetInfoModel model)
@@ -363,6 +387,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         OccupyAssetByCategoryInfoModel model)
     {
         var assets = await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
+        var effectivePeriodScheme = await GetEffectivePeriodSchemeAsync(model.PeriodSchemeId, category);
 
         foreach (var assetGroup in assets
                      .GroupBy(x => x.Priority)
@@ -370,7 +395,13 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         {
             foreach (var asset in assetGroup)
             {
-                var periods = await GetPeriodsAsync(asset, category, model.Date);
+                var assetPeriodScheme = await GetEffectivePeriodSchemeAsync(model.Date, asset, category);
+                if (effectivePeriodScheme.Id != assetPeriodScheme.Id)
+                {
+                    continue;
+                }
+
+                var periods = await InternalGetPeriodsAsync(asset, category, assetPeriodScheme, model.Date);
 
                 if (await IsVolumeSufficientAsync(model, periods))
                 {
@@ -462,6 +493,23 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         if (asset.PeriodSchemeId.HasValue)
         {
             return await PeriodSchemeRepository.GetAsync(asset.PeriodSchemeId.Value);
+        }
+
+        if (category.PeriodSchemeId.HasValue)
+        {
+            return await PeriodSchemeRepository.GetAsync(category.PeriodSchemeId.Value);
+        }
+
+        return await DefaultPeriodSchemeProvider.GetAsync();
+    }
+
+    protected virtual async Task<PeriodScheme> GetEffectivePeriodSchemeAsync(
+        Guid? periodSchemeId,
+        AssetCategory category)
+    {
+        if (periodSchemeId.HasValue)
+        {
+            return await PeriodSchemeRepository.GetAsync(periodSchemeId.Value);
         }
 
         if (category.PeriodSchemeId.HasValue)

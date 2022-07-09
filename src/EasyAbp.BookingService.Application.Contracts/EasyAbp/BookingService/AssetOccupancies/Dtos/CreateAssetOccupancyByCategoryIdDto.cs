@@ -10,6 +10,8 @@ namespace EasyAbp.BookingService.AssetOccupancies.Dtos;
 public class CreateAssetOccupancyByCategoryIdDto : ExtensibleObject, IOccupyingBaseInfo
 {
     public Guid AssetCategoryId { get; set; }
+    
+    public Guid? PeriodSchemeId { get; set; }
 
     [Range(1, int.MaxValue)]
     public int Volume { get; set; }

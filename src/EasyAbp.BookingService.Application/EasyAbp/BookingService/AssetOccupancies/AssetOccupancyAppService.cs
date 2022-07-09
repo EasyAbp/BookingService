@@ -79,6 +79,7 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         var (_, entity) = await _assetOccupancyProvider.OccupyByCategoryAsync(
             new OccupyAssetByCategoryInfoModel(
                 input.AssetCategoryId,
+                input.PeriodSchemeId,
                 input.Volume,
                 input.Date,
                 input.StartingTime,
@@ -121,7 +122,7 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         var category = await _assetCategoryRepository.GetAsync(input.CategoryId);
 
         var periods = await _assetOccupancyProvider.GetPeriodsAsync(
-            category, input.TargetDate, input.CurrentDateTime);
+            category, input.PeriodSchemeId, input.TargetDate, input.CurrentDateTime);
 
         return new SearchBookingPeriodsResultDto(
             ObjectMapper.Map<List<PeriodOccupancyModel>, List<BookingPeriodDto>>(periods));
@@ -150,6 +151,7 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         // Todo: create a permission for occupying assets with a specified OccupierUserId.
         var result = await _assetOccupancyProvider.CanOccupyByCategoryAsync(new OccupyAssetByCategoryInfoModel(
             input.AssetCategoryId,
+            input.PeriodSchemeId,
             input.Volume,
             input.Date,
             input.StartingTime,

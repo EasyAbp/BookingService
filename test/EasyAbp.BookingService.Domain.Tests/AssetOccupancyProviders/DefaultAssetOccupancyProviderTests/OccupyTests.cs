@@ -393,7 +393,7 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Act & Assert
         var result = await AssetOccupancyProvider.CanOccupyByCategoryAsync(
-            new OccupyAssetByCategoryInfoModel(category.Id, occupyingVolume, targetDate, period.StartingTime,
+            new OccupyAssetByCategoryInfoModel(category.Id, default, occupyingVolume, targetDate, period.StartingTime,
                 period.Duration));
         result.CanOccupy.ShouldBe(canOccupy);
         if (!canOccupy)
@@ -491,7 +491,7 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Act
         var (model, assetOccupancy) = await AssetOccupancyProvider.OccupyByCategoryAsync(
-            new OccupyAssetByCategoryInfoModel(category.Id, occupyingVolume, targetDate, period.StartingTime,
+            new OccupyAssetByCategoryInfoModel(category.Id, default, occupyingVolume, targetDate, period.StartingTime,
                 period.Duration), default);
 
         // Assert
@@ -546,7 +546,8 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Act
         var (_, assetOccupancy) = await AssetOccupancyProvider.OccupyByCategoryAsync(
-            new OccupyAssetByCategoryInfoModel(category.Id, 1, targetDate, period.StartingTime, period.Duration),
+            new OccupyAssetByCategoryInfoModel(category.Id, default, 1, targetDate, period.StartingTime,
+                period.Duration),
             userId);
 
         // Assert
@@ -584,7 +585,8 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Act
         await Should.ThrowAsync<BusinessException>(() => AssetOccupancyProvider.OccupyByCategoryAsync(
-            new OccupyAssetByCategoryInfoModel(category.Id, 1, targetDate, period.StartingTime, period.Duration),
+            new OccupyAssetByCategoryInfoModel(category.Id, default, 1, targetDate, period.StartingTime,
+                period.Duration),
             userId));
         var assetOccupancyCounts = await AssetOccupancyCountRepository.GetListAsync();
 
@@ -624,14 +626,14 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
             case nameof(AssetCategory):
                 await Should.ThrowAsync<DisabledAssetOrCategoryException>(() =>
                     AssetOccupancyProvider.OccupyByCategoryAsync(
-                        new OccupyAssetByCategoryInfoModel(category.Id, 1, targetDate, period.StartingTime,
+                        new OccupyAssetByCategoryInfoModel(category.Id, default, 1, targetDate, period.StartingTime,
                             period.Duration),
                         default));
                 break;
             case nameof(Asset):
                 await Should.ThrowAsync<InsufficientAssetVolumeException>(() =>
                     AssetOccupancyProvider.OccupyByCategoryAsync(
-                        new OccupyAssetByCategoryInfoModel(category.Id, 1, targetDate, period.StartingTime,
+                        new OccupyAssetByCategoryInfoModel(category.Id, default, 1, targetDate, period.StartingTime,
                             period.Duration),
                         default));
                 break;
@@ -678,7 +680,7 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Act & Assert
         await Should.ThrowAsync<InsufficientAssetVolumeException>(() => AssetOccupancyProvider.OccupyByCategoryAsync(
-            new OccupyAssetByCategoryInfoModel(category.Id, occupyingVolume, targetDate, period.StartingTime,
+            new OccupyAssetByCategoryInfoModel(category.Id, default, occupyingVolume, targetDate, period.StartingTime,
                 period.Duration),
             default));
     }
@@ -721,7 +723,7 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Act
         var (_, occupancy) = await AssetOccupancyProvider.OccupyByCategoryAsync(
-            new OccupyAssetByCategoryInfoModel(category.Id, 1, targetDate, period.StartingTime,
+            new OccupyAssetByCategoryInfoModel(category.Id,default, 1, targetDate, period.StartingTime,
                 period.Duration), null);
 
         // Assert

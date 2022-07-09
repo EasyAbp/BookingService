@@ -14,6 +14,7 @@ public interface IAssetOccupancyProvider
         DateTime? currentDateTime = default);
 
     Task<List<PeriodOccupancyModel>> GetPeriodsAsync(AssetCategory category,
+        Guid? periodSchemeId,
         DateTime targetDate,
         DateTime? currentDateTime = default);
 
