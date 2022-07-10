@@ -37,6 +37,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     protected IDefaultPeriodSchemeProvider DefaultPeriodSchemeProvider { get; }
     protected IAssetScheduleRepository AssetScheduleRepository { get; }
     protected IExternalUserLookupServiceProvider ExternalUserLookupServiceProvider { get; }
+    protected IAssetInCategorySelector AssetInCategorySelector { get; }
     protected BookingServiceOptions Options { get; }
 
     protected AssetOccupancyProviderBase(IServiceProvider serviceProvider)
@@ -54,6 +55,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         DefaultPeriodSchemeProvider = serviceProvider.GetRequiredService<IDefaultPeriodSchemeProvider>();
         AssetScheduleRepository = serviceProvider.GetRequiredService<IAssetScheduleRepository>();
         ExternalUserLookupServiceProvider = serviceProvider.GetRequiredService<IExternalUserLookupServiceProvider>();
+        AssetInCategorySelector = serviceProvider.GetRequiredService<IAssetInCategorySelector>();
         Options = serviceProvider.GetRequiredService<IOptions<BookingServiceOptions>>().Value;
     }
 
@@ -88,7 +90,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
                     0, 0))
             .ToList();
 
-        foreach (var asset in assets)
+        foreach (var asset in await AssetInCategorySelector.SelectAsync(assets))
         {
             var assetPeriodScheme = await GetEffectivePeriodSchemeAsync(targetDate, asset, category);
             if (effectivePeriodScheme.Id != assetPeriodScheme.Id)
@@ -96,18 +98,23 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
                 continue;
             }
 
-            var assetPeriodOccupancyModels =
+            var periods =
                 await InternalGetPeriodsAsync(asset, category, assetPeriodScheme, targetDate, currentDateTime);
 
-            var assetPeriodOccupancyModelDictionary = assetPeriodOccupancyModels.ToDictionary(x => x.PeriodId);
-            foreach (var periodOccupancyModel in models)
+            var assetPeriodDictionary = periods.ToDictionary(x => x.PeriodId);
+            foreach (var periodOccupancyModel in models.Where(x => x.AvailableVolume == 0))
             {
-                var assetPeriodOccupancyModel = assetPeriodOccupancyModelDictionary[periodOccupancyModel.PeriodId];
-                if (periodOccupancyModel.AvailableVolume < assetPeriodOccupancyModel.AvailableVolume)
+                var assetPeriodOccupancyModel = assetPeriodDictionary[periodOccupancyModel.PeriodId];
+                if (periodOccupancyModel.AvailableVolume > 0)
                 {
                     periodOccupancyModel.TotalVolume = assetPeriodOccupancyModel.TotalVolume;
                     periodOccupancyModel.AvailableVolume = assetPeriodOccupancyModel.AvailableVolume;
                 }
+            }
+
+            if (models.All(x => x.AvailableVolume > 0))
+            {
+                break;
             }
         }
 
@@ -219,14 +226,22 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
             {
                 foreach (var model in dateGroup)
                 {
+                    var effectivePeriodScheme = await GetEffectivePeriodSchemeAsync(model.PeriodSchemeId, category);
                     var assets =
                         await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
 
                     var periodOccupancyModels = new List<PeriodOccupancyModel>();
-                    foreach (var asset in assets)
+                    foreach (var asset in await AssetInCategorySelector.SelectAsync(assets))
                     {
+                        var assetPeriodScheme = await GetEffectivePeriodSchemeAsync(dateGroup.Key, asset, category);
+                        if (effectivePeriodScheme.Id != assetPeriodScheme.Id)
+                        {
+                            continue;
+                        }
+
                         var periods =
-                            await GetCachedAssetDayPeriodsAsync(asset, category, dateGroup.Key, assetDayPeriods);
+                            await GetCachedAssetDayPeriodsAsync(asset, category, dateGroup.Key, assetDayPeriods,
+                                assetPeriodScheme);
 
                         if (await IsVolumeSufficientAsync(model, periods))
                         {
@@ -255,12 +270,17 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     }
 
     protected virtual async Task<List<PeriodOccupancyModel>> GetCachedAssetDayPeriodsAsync(Asset asset,
-        AssetCategory category, DateTime date, Dictionary<(Guid, DateTime), List<PeriodOccupancyModel>> cachedPeriods)
+        AssetCategory category,
+        DateTime date,
+        Dictionary<(Guid, DateTime), List<PeriodOccupancyModel>> cachedPeriods,
+        PeriodScheme periodScheme = default)
     {
         if (!cachedPeriods.ContainsKey((asset.Id, date)))
         {
             cachedPeriods[(asset.Id, date)] =
-                await GetPeriodsAsync(asset, category, date);
+                periodScheme is null
+                    ? await GetPeriodsAsync(asset, category, date)
+                    : await InternalGetPeriodsAsync(asset, category, periodScheme, date);
         }
 
         return cachedPeriods[(asset.Id, date)];
@@ -389,24 +409,19 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         var assets = await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
         var effectivePeriodScheme = await GetEffectivePeriodSchemeAsync(model.PeriodSchemeId, category);
 
-        foreach (var assetGroup in assets
-                     .GroupBy(x => x.Priority)
-                     .OrderByDescending(x => x.Key))
+        foreach (var asset in await AssetInCategorySelector.SelectAsync(assets))
         {
-            foreach (var asset in assetGroup)
+            var assetPeriodScheme = await GetEffectivePeriodSchemeAsync(model.Date, asset, category);
+            if (effectivePeriodScheme.Id != assetPeriodScheme.Id)
             {
-                var assetPeriodScheme = await GetEffectivePeriodSchemeAsync(model.Date, asset, category);
-                if (effectivePeriodScheme.Id != assetPeriodScheme.Id)
-                {
-                    continue;
-                }
+                continue;
+            }
 
-                var periods = await InternalGetPeriodsAsync(asset, category, assetPeriodScheme, model.Date);
+            var periods = await InternalGetPeriodsAsync(asset, category, assetPeriodScheme, model.Date);
 
-                if (await IsVolumeSufficientAsync(model, periods))
-                {
-                    return asset;
-                }
+            if (await IsVolumeSufficientAsync(model, periods))
+            {
+                return asset;
             }
         }
 

@@ -13,7 +13,7 @@ public class SearchCategoryBookingPeriodsInputDto
     public Guid CategoryId { get; set; }
     
     /// <summary>
-    /// Override the value of Category.PeriodSchemeId
+    /// Restrict the PeriodSchemeId and fall back to Category.PeriodSchemeId if null.
     /// </summary>
     public Guid? PeriodSchemeId { get; set; }
 
