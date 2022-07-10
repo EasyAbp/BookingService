@@ -13,7 +13,7 @@ namespace EasyAbp.BookingService.AssetOccupancyProviders;
 public class DefaultAssetInCategorySelectorTests : DefaultAssetOccupancyProviderTestBase
 {
     [Fact]
-    public async Task Select_Priority_Test()
+    public async Task Sort_Priority_Test()
     {
         // Arrange
         var defaultSelector = ServiceProvider.GetRequiredService<DefaultAssetInCategorySelector>();
@@ -48,7 +48,7 @@ public class DefaultAssetInCategorySelectorTests : DefaultAssetOccupancyProvider
     }
 
     [Fact]
-    public async Task Select_Randomized_Test()
+    public async Task Sort_Randomized_Test()
     {
         // Arrange
         var defaultSelector = ServiceProvider.GetRequiredService<DefaultAssetInCategorySelector>();
