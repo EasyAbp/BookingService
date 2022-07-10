@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using EasyAbp.BookingService.AssetCategories;
 using EasyAbp.BookingService.AssetOccupancyCounts;
 using EasyAbp.BookingService.Assets;
+using EasyAbp.BookingService.PeriodSchemes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NSubstitute;
@@ -515,6 +516,125 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
     }
 
     [Fact]
+    public async Task Category_Occupy_PeriodSchemeId_Test()
+    {
+        // Arrange
+        var category = await CreateAssetCategoryAsync();
+        var asset = await CreateAssetAsync(category);
+        await AssetManager.UpdateAsync(asset,
+            asset.Name,
+            asset.AssetDefinitionName,
+            category,
+            asset.PeriodSchemeId,
+            asset.DefaultPeriodUsable,
+            1,
+            asset.Priority,
+            asset.TimeInAdvance,
+            asset.Disabled);
+
+        var anotherAsset = await CreateAssetAsync(category);
+        var periodScheme = await CreatePeriodScheme();
+        await PeriodSchemeManager.SetAsDefaultAsync(periodScheme);
+
+        var anotherPeriodScheme = await CreatePeriodScheme();
+        var period = anotherPeriodScheme.Periods[0];
+
+        await AssetManager.UpdateAsync(anotherAsset,
+            anotherAsset.Name,
+            anotherAsset.AssetDefinitionName,
+            category,
+            anotherPeriodScheme.Id,
+            anotherAsset.DefaultPeriodUsable,
+            1,
+            anotherAsset.Priority,
+            anotherAsset.TimeInAdvance,
+            anotherAsset.Disabled);
+
+        var currentDateTime = new DateTime(2022, 6, 17);
+        Clock.Now.Returns(currentDateTime);
+        var targetDate = new DateTime(2022, 6, 18);
+
+        await WithUnitOfWorkAsync(async () =>
+        {
+            await AssetCategoryRepository.InsertAsync(category);
+            await AssetRepository.InsertAsync(asset);
+            await AssetRepository.InsertAsync(anotherAsset);
+            await PeriodSchemeRepository.InsertAsync(periodScheme);
+            await PeriodSchemeRepository.InsertAsync(anotherPeriodScheme);
+        });
+
+        // Act
+        var (model, _) = await AssetOccupancyProvider.OccupyByCategoryAsync(
+            new OccupyAssetByCategoryInfoModel(category.Id,
+                anotherPeriodScheme.Id,
+                1,
+                targetDate,
+                period.StartingTime,
+                period.Duration), default);
+
+        // Assert
+        model.AssetId.ShouldBe(anotherAsset.Id);
+    }
+
+    [Fact]
+    public async Task Category_Occupy_PeriodSchemeId_ShouldThrowInsufficientAssetVolumeException_Test()
+    {
+        // Arrange
+        var category = await CreateAssetCategoryAsync();
+        var asset = await CreateAssetAsync(category);
+        await AssetManager.UpdateAsync(asset,
+            asset.Name,
+            asset.AssetDefinitionName,
+            category,
+            asset.PeriodSchemeId,
+            asset.DefaultPeriodUsable,
+            1,
+            asset.Priority,
+            asset.TimeInAdvance,
+            asset.Disabled);
+
+        var anotherAsset = await CreateAssetAsync(category);
+        var periodScheme = await CreatePeriodScheme();
+        await PeriodSchemeManager.SetAsDefaultAsync(periodScheme);
+
+        var anotherPeriodScheme = await CreatePeriodScheme();
+        var period = anotherPeriodScheme.Periods[0];
+
+        await AssetManager.UpdateAsync(anotherAsset,
+            anotherAsset.Name,
+            anotherAsset.AssetDefinitionName,
+            category,
+            anotherPeriodScheme.Id,
+            anotherAsset.DefaultPeriodUsable,
+            0,
+            anotherAsset.Priority,
+            anotherAsset.TimeInAdvance,
+            anotherAsset.Disabled);
+
+        var currentDateTime = new DateTime(2022, 6, 17);
+        Clock.Now.Returns(currentDateTime);
+        var targetDate = new DateTime(2022, 6, 18);
+
+        await WithUnitOfWorkAsync(async () =>
+        {
+            await AssetCategoryRepository.InsertAsync(category);
+            await AssetRepository.InsertAsync(asset);
+            await AssetRepository.InsertAsync(anotherAsset);
+            await PeriodSchemeRepository.InsertAsync(periodScheme);
+            await PeriodSchemeRepository.InsertAsync(anotherPeriodScheme);
+        });
+
+        // Act & Assert
+        await Should.ThrowAsync<InsufficientAssetVolumeException>(() => AssetOccupancyProvider.OccupyByCategoryAsync(
+            new OccupyAssetByCategoryInfoModel(category.Id,
+                anotherPeriodScheme.Id,
+                1,
+                targetDate,
+                period.StartingTime,
+                period.Duration), default));
+    }
+
+    [Fact]
     public async Task Category_Occupy_GetOccupierName_Test()
     {
         // Arrange
@@ -723,7 +843,7 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Act
         var (_, occupancy) = await AssetOccupancyProvider.OccupyByCategoryAsync(
-            new OccupyAssetByCategoryInfoModel(category.Id,default, 1, targetDate, period.StartingTime,
+            new OccupyAssetByCategoryInfoModel(category.Id, default, 1, targetDate, period.StartingTime,
                 period.Duration), null);
 
         // Assert
