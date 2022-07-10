@@ -512,4 +512,112 @@ public class GetPeriodAssetTests : DefaultAssetOccupancyProviderTestBase
         actualAnotherPeriod.TotalVolume.ShouldBe(asset.Volume);
         actualAnotherPeriod.PeriodSchemeId.ShouldBe(defaultPeriodScheme.Id);
     }
+
+    [Theory]
+    [InlineData(1, 1, 1, 1, false)]
+    [InlineData(1, 1, 1, 0, false)]
+    [InlineData(1, 0, 1, 1, false)]
+    [InlineData(1, 0, 1, 0, false)]
+    [InlineData(0, 0, 1, 1, true)]
+    [InlineData(1, 1, 0, 0, true)]
+    [InlineData(1, 0, 0, 1, true)]
+    [InlineData(0, 1, 1, 0, true)]
+    public async Task ByCategory_Baseline_Test(int asset1Period1VolumeCount,
+        int asset1Period2VolumeCount,
+        int asset2Period1VolumeCount,
+        int asset2Period2VolumeCount,
+        bool available)
+    {
+        // Arrange
+        var category = await CreateAssetCategoryAsync();
+        var asset = await CreateAssetAsync(category);
+        var anotherAsset = await CreateAssetAsync(category);
+        var defaultPeriodScheme = await CreatePeriodScheme();
+        var period = defaultPeriodScheme.Periods[0];
+        var anotherPeriod = await PeriodSchemeManager.CreatePeriodAsync(TimeSpan.FromHours(1), TimeSpan.FromHours(4));
+        defaultPeriodScheme.Periods.Add(anotherPeriod);
+        await PeriodSchemeManager.SetAsDefaultAsync(defaultPeriodScheme);
+        await WithUnitOfWorkAsync(async () =>
+        {
+            await PeriodSchemeRepository.InsertAsync(defaultPeriodScheme);
+            await AssetCategoryRepository.InsertAsync(category);
+        });
+
+        await WithUnitOfWorkAsync(async () =>
+        {
+            await AssetRepository.InsertAsync(asset);
+            await AssetRepository.InsertAsync(anotherAsset);
+        });
+
+        var currentDateTime = new DateTime(2022, 6, 17);
+        var targetDate = new DateTime(2022, 6, 18);
+
+        await WithUnitOfWorkAsync(async () =>
+        {
+            await AssetOccupancyCountRepository.InsertAsync(
+                new AssetOccupancyCount(default, asset.Id, asset.Name,
+                    targetDate, period.StartingTime, period.Duration, asset1Period1VolumeCount));
+            await AssetOccupancyCountRepository.InsertAsync(
+                new AssetOccupancyCount(default, asset.Id, asset.Name,
+                    targetDate, anotherPeriod.StartingTime, anotherPeriod.Duration, asset1Period2VolumeCount));
+            await AssetOccupancyCountRepository.InsertAsync(
+                new AssetOccupancyCount(default, anotherAsset.Id, anotherAsset.Name,
+                    targetDate, period.StartingTime, period.Duration, asset2Period1VolumeCount));
+
+            await AssetOccupancyCountRepository.InsertAsync(
+                new AssetOccupancyCount(default, anotherAsset.Id, anotherAsset.Name,
+                    targetDate, anotherPeriod.StartingTime, anotherPeriod.Duration, asset2Period2VolumeCount));
+        });
+
+
+        // Act
+        var actualPeriods =
+            await AssetOccupancyProvider.GetPeriodsAsync(category, default, targetDate, currentDateTime);
+
+        // Assert
+        actualPeriods.ShouldNotBeEmpty();
+        actualPeriods.Count.ShouldBe(defaultPeriodScheme.Periods.Count);
+        actualPeriods.All(x => x.AvailableVolume == 1).ShouldBe(available);
+    }
+
+    [Fact]
+    public async Task ByCategory_PeriodSchemeId_Test()
+    {
+        // Arrange
+        var category = await CreateAssetCategoryAsync();
+        var asset = await CreateAssetAsync(category);
+        var anotherAsset = await CreateAssetAsync(category);
+        var defaultPeriodScheme = await CreatePeriodScheme();
+        var period = defaultPeriodScheme.Periods[0];
+        await PeriodSchemeManager.SetAsDefaultAsync(defaultPeriodScheme);
+
+        var anotherPeriodScheme = await CreatePeriodScheme();
+        var anotherPeriod = anotherPeriodScheme.Periods[0];
+
+        await WithUnitOfWorkAsync(async () =>
+        {
+            await PeriodSchemeRepository.InsertAsync(defaultPeriodScheme);
+            await PeriodSchemeRepository.InsertAsync(anotherPeriodScheme);
+            await AssetCategoryRepository.InsertAsync(category);
+        });
+
+        await WithUnitOfWorkAsync(async () =>
+        {
+            await AssetRepository.InsertAsync(asset);
+            await AssetRepository.InsertAsync(anotherAsset);
+        });
+
+        var currentDateTime = new DateTime(2022, 6, 17);
+        var targetDate = new DateTime(2022, 6, 18);
+
+        // Act
+        var actualPeriods =
+            await AssetOccupancyProvider.GetPeriodsAsync(category, anotherPeriodScheme.Id, targetDate, currentDateTime);
+
+        // Assert
+        actualPeriods.ShouldNotBeEmpty();
+        actualPeriods.Count.ShouldBe(1);
+        actualPeriods[0].PeriodSchemeId.ShouldBe(anotherPeriodScheme.Id);
+        actualPeriods[0].PeriodId.ShouldBe(anotherPeriod.Id);
+    }
 }
