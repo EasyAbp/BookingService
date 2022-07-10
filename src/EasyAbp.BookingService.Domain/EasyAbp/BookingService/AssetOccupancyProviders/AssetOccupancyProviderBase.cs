@@ -90,7 +90,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
                     0, 0))
             .ToList();
 
-        foreach (var asset in await AssetInCategorySelector.SelectAsync(assets))
+        foreach (var asset in await AssetInCategorySelector.SortAsync(assets))
         {
             var assetPeriodScheme = await GetEffectivePeriodSchemeAsync(targetDate, asset, category);
             if (effectivePeriodScheme.Id != assetPeriodScheme.Id)
@@ -226,7 +226,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
                         await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
 
                     var periodOccupancyModels = new List<PeriodOccupancyModel>();
-                    foreach (var asset in await AssetInCategorySelector.SelectAsync(assets))
+                    foreach (var asset in await AssetInCategorySelector.SortAsync(assets))
                     {
                         var assetPeriodScheme = await GetEffectivePeriodSchemeAsync(dateGroup.Key, asset, category);
                         if (effectivePeriodScheme.Id != assetPeriodScheme.Id)
@@ -404,7 +404,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         var assets = await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
         var effectivePeriodScheme = await GetEffectivePeriodSchemeAsync(model.PeriodSchemeId, category);
 
-        foreach (var asset in await AssetInCategorySelector.SelectAsync(assets))
+        foreach (var asset in await AssetInCategorySelector.SortAsync(assets))
         {
             var assetPeriodScheme = await GetEffectivePeriodSchemeAsync(model.Date, asset, category);
             if (effectivePeriodScheme.Id != assetPeriodScheme.Id)

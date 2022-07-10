@@ -38,7 +38,7 @@ public class DefaultAssetInCategorySelectorTests : DefaultAssetOccupancyProvider
         assets = RandomHelper.GenerateRandomizedList(assets);
 
         // Act
-        var actual = await defaultSelector.SelectAsync(assets);
+        var actual = await defaultSelector.SortAsync(assets);
 
         // Assert
         for (var i = 1; i < actual.Count; i++)
@@ -71,7 +71,7 @@ public class DefaultAssetInCategorySelectorTests : DefaultAssetOccupancyProvider
         assets = RandomHelper.GenerateRandomizedList(assets);
 
         // Act
-        var actual = await defaultSelector.SelectAsync(assets);
+        var actual = await defaultSelector.SortAsync(assets);
 
         // Assert
         actual.SequenceEqual(assets).ShouldBeFalse();

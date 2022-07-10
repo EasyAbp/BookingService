@@ -9,7 +9,7 @@ namespace EasyAbp.BookingService.AssetOccupancyProviders;
 
 public class DefaultAssetInCategorySelector : IAssetInCategorySelector, ITransientDependency
 {
-    public virtual Task<List<Asset>> SelectAsync(List<Asset> assets)
+    public virtual Task<List<Asset>> SortAsync(List<Asset> assets)
     {
         var result = new List<Asset>();
 

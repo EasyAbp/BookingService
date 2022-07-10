@@ -6,5 +6,5 @@ namespace EasyAbp.BookingService.AssetOccupancyProviders;
 
 public interface IAssetInCategorySelector
 {
-    Task<List<Asset>> SelectAsync(List<Asset> assets);
+    Task<List<Asset>> SortAsync(List<Asset> assets);
 }
