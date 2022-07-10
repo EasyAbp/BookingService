@@ -102,19 +102,14 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
                 await InternalGetPeriodsAsync(asset, category, assetPeriodScheme, targetDate, currentDateTime);
 
             var assetPeriodDictionary = periods.ToDictionary(x => x.PeriodId);
-            foreach (var periodOccupancyModel in models.Where(x => x.AvailableVolume == 0))
+            foreach (var periodOccupancyModel in models)
             {
                 var assetPeriodOccupancyModel = assetPeriodDictionary[periodOccupancyModel.PeriodId];
-                if (periodOccupancyModel.AvailableVolume > 0)
+                if (periodOccupancyModel.AvailableVolume < assetPeriodOccupancyModel.AvailableVolume)
                 {
                     periodOccupancyModel.TotalVolume = assetPeriodOccupancyModel.TotalVolume;
                     periodOccupancyModel.AvailableVolume = assetPeriodOccupancyModel.AvailableVolume;
                 }
-            }
-
-            if (models.All(x => x.AvailableVolume > 0))
-            {
-                break;
             }
         }
 
