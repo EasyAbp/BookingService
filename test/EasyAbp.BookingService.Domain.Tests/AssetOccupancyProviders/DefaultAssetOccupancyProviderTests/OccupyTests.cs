@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using EasyAbp.BookingService.AssetCategories;
 using EasyAbp.BookingService.AssetOccupancyCounts;
 using EasyAbp.BookingService.Assets;
+using EasyAbp.BookingService.PeriodSchemes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NSubstitute;
@@ -393,7 +394,7 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Act & Assert
         var result = await AssetOccupancyProvider.CanOccupyByCategoryAsync(
-            new OccupyAssetByCategoryInfoModel(category.Id, occupyingVolume, targetDate, period.StartingTime,
+            new OccupyAssetByCategoryInfoModel(category.Id, default, occupyingVolume, targetDate, period.StartingTime,
                 period.Duration));
         result.CanOccupy.ShouldBe(canOccupy);
         if (!canOccupy)
@@ -491,7 +492,7 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Act
         var (model, assetOccupancy) = await AssetOccupancyProvider.OccupyByCategoryAsync(
-            new OccupyAssetByCategoryInfoModel(category.Id, occupyingVolume, targetDate, period.StartingTime,
+            new OccupyAssetByCategoryInfoModel(category.Id, default, occupyingVolume, targetDate, period.StartingTime,
                 period.Duration), default);
 
         // Assert
@@ -512,6 +513,125 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
         assetOccupancy.AssetId.ShouldBe(selectedAsset.Id);
         assetOccupancy.StartingTime.ShouldBe(period.StartingTime);
         assetOccupancy.AssetDefinitionName.ShouldBe(AssetDefinition.Name);
+    }
+
+    [Fact]
+    public async Task Category_Occupy_PeriodSchemeId_Test()
+    {
+        // Arrange
+        var category = await CreateAssetCategoryAsync();
+        var asset = await CreateAssetAsync(category);
+        await AssetManager.UpdateAsync(asset,
+            asset.Name,
+            asset.AssetDefinitionName,
+            category,
+            asset.PeriodSchemeId,
+            asset.DefaultPeriodUsable,
+            1,
+            asset.Priority,
+            asset.TimeInAdvance,
+            asset.Disabled);
+
+        var anotherAsset = await CreateAssetAsync(category);
+        var periodScheme = await CreatePeriodScheme();
+        await PeriodSchemeManager.SetAsDefaultAsync(periodScheme);
+
+        var anotherPeriodScheme = await CreatePeriodScheme();
+        var period = anotherPeriodScheme.Periods[0];
+
+        await AssetManager.UpdateAsync(anotherAsset,
+            anotherAsset.Name,
+            anotherAsset.AssetDefinitionName,
+            category,
+            anotherPeriodScheme.Id,
+            anotherAsset.DefaultPeriodUsable,
+            1,
+            anotherAsset.Priority,
+            anotherAsset.TimeInAdvance,
+            anotherAsset.Disabled);
+
+        var currentDateTime = new DateTime(2022, 6, 17);
+        Clock.Now.Returns(currentDateTime);
+        var targetDate = new DateTime(2022, 6, 18);
+
+        await WithUnitOfWorkAsync(async () =>
+        {
+            await AssetCategoryRepository.InsertAsync(category);
+            await AssetRepository.InsertAsync(asset);
+            await AssetRepository.InsertAsync(anotherAsset);
+            await PeriodSchemeRepository.InsertAsync(periodScheme);
+            await PeriodSchemeRepository.InsertAsync(anotherPeriodScheme);
+        });
+
+        // Act
+        var (model, _) = await AssetOccupancyProvider.OccupyByCategoryAsync(
+            new OccupyAssetByCategoryInfoModel(category.Id,
+                anotherPeriodScheme.Id,
+                1,
+                targetDate,
+                period.StartingTime,
+                period.Duration), default);
+
+        // Assert
+        model.AssetId.ShouldBe(anotherAsset.Id);
+    }
+
+    [Fact]
+    public async Task Category_Occupy_PeriodSchemeId_ShouldThrowInsufficientAssetVolumeException_Test()
+    {
+        // Arrange
+        var category = await CreateAssetCategoryAsync();
+        var asset = await CreateAssetAsync(category);
+        await AssetManager.UpdateAsync(asset,
+            asset.Name,
+            asset.AssetDefinitionName,
+            category,
+            asset.PeriodSchemeId,
+            asset.DefaultPeriodUsable,
+            1,
+            asset.Priority,
+            asset.TimeInAdvance,
+            asset.Disabled);
+
+        var anotherAsset = await CreateAssetAsync(category);
+        var periodScheme = await CreatePeriodScheme();
+        await PeriodSchemeManager.SetAsDefaultAsync(periodScheme);
+
+        var anotherPeriodScheme = await CreatePeriodScheme();
+        var period = anotherPeriodScheme.Periods[0];
+
+        await AssetManager.UpdateAsync(anotherAsset,
+            anotherAsset.Name,
+            anotherAsset.AssetDefinitionName,
+            category,
+            anotherPeriodScheme.Id,
+            anotherAsset.DefaultPeriodUsable,
+            0,
+            anotherAsset.Priority,
+            anotherAsset.TimeInAdvance,
+            anotherAsset.Disabled);
+
+        var currentDateTime = new DateTime(2022, 6, 17);
+        Clock.Now.Returns(currentDateTime);
+        var targetDate = new DateTime(2022, 6, 18);
+
+        await WithUnitOfWorkAsync(async () =>
+        {
+            await AssetCategoryRepository.InsertAsync(category);
+            await AssetRepository.InsertAsync(asset);
+            await AssetRepository.InsertAsync(anotherAsset);
+            await PeriodSchemeRepository.InsertAsync(periodScheme);
+            await PeriodSchemeRepository.InsertAsync(anotherPeriodScheme);
+        });
+
+        // Act & Assert
+        await Should.ThrowAsync<InsufficientAssetVolumeException>(() => AssetOccupancyProvider.OccupyByCategoryAsync(
+            new OccupyAssetByCategoryInfoModel(category.Id,
+                anotherPeriodScheme.Id,
+                1,
+                targetDate,
+                period.StartingTime,
+                period.Duration), default));
     }
 
     [Fact]
@@ -546,7 +666,8 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Act
         var (_, assetOccupancy) = await AssetOccupancyProvider.OccupyByCategoryAsync(
-            new OccupyAssetByCategoryInfoModel(category.Id, 1, targetDate, period.StartingTime, period.Duration),
+            new OccupyAssetByCategoryInfoModel(category.Id, default, 1, targetDate, period.StartingTime,
+                period.Duration),
             userId);
 
         // Assert
@@ -584,7 +705,8 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Act
         await Should.ThrowAsync<BusinessException>(() => AssetOccupancyProvider.OccupyByCategoryAsync(
-            new OccupyAssetByCategoryInfoModel(category.Id, 1, targetDate, period.StartingTime, period.Duration),
+            new OccupyAssetByCategoryInfoModel(category.Id, default, 1, targetDate, period.StartingTime,
+                period.Duration),
             userId));
         var assetOccupancyCounts = await AssetOccupancyCountRepository.GetListAsync();
 
@@ -624,14 +746,14 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
             case nameof(AssetCategory):
                 await Should.ThrowAsync<DisabledAssetOrCategoryException>(() =>
                     AssetOccupancyProvider.OccupyByCategoryAsync(
-                        new OccupyAssetByCategoryInfoModel(category.Id, 1, targetDate, period.StartingTime,
+                        new OccupyAssetByCategoryInfoModel(category.Id, default, 1, targetDate, period.StartingTime,
                             period.Duration),
                         default));
                 break;
             case nameof(Asset):
                 await Should.ThrowAsync<InsufficientAssetVolumeException>(() =>
                     AssetOccupancyProvider.OccupyByCategoryAsync(
-                        new OccupyAssetByCategoryInfoModel(category.Id, 1, targetDate, period.StartingTime,
+                        new OccupyAssetByCategoryInfoModel(category.Id, default, 1, targetDate, period.StartingTime,
                             period.Duration),
                         default));
                 break;
@@ -678,7 +800,7 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Act & Assert
         await Should.ThrowAsync<InsufficientAssetVolumeException>(() => AssetOccupancyProvider.OccupyByCategoryAsync(
-            new OccupyAssetByCategoryInfoModel(category.Id, occupyingVolume, targetDate, period.StartingTime,
+            new OccupyAssetByCategoryInfoModel(category.Id, default, occupyingVolume, targetDate, period.StartingTime,
                 period.Duration),
             default));
     }
@@ -721,7 +843,7 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Act
         var (_, occupancy) = await AssetOccupancyProvider.OccupyByCategoryAsync(
-            new OccupyAssetByCategoryInfoModel(category.Id, 1, targetDate, period.StartingTime,
+            new OccupyAssetByCategoryInfoModel(category.Id, default, 1, targetDate, period.StartingTime,
                 period.Duration), null);
 
         // Assert

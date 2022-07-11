@@ -290,6 +290,31 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
                 })
         };
 
+    private static object[] BulkOccupy_OccupyingCategory_MultiAssets_PeriodSchemeIds(bool canOccupy) =>
+        new object[]
+        {
+            new BulkOccupyTestModel(canOccupy,
+                new List<BulkOccupyCategoryTestModel>
+                {
+                    new(false,
+                        new List<BulkOccupyAssetTestModel>
+                        {
+                            new(false, 1, new List<BulkOccupyAssetOccupancyTestModel>
+                            {
+                                new(0, 0, 0, 1, 0)
+                            }),
+                            new(false, 1, new List<BulkOccupyAssetOccupancyTestModel>
+                            {
+                                new(canOccupy ? 0 : 1, 0, 0, 1, 0)
+                            }, "PeriodScheme1")
+                        },
+                        new List<BulkOccupyCategoryOccupancyTestModel>
+                        {
+                            new(1, 0, 1, 0, "PeriodScheme1")
+                        })
+                }, new List<string> { "PeriodScheme1" })
+        };
+
     private static object[] CanBulkOccupy_OccupyingCategory_MultiDates(bool canOccupy) =>
         new object[]
         {
@@ -432,7 +457,7 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
         Clock.Now.Returns(currentDateTime);
         var targetDate = new DateTime(2022, 6, 18);
 
-        var (assets, categories) = await CreateEntitiesAsync(testModel.Categories, targetDate);
+        var (assets, categories) = await CreateEntitiesAsync(testModel, targetDate);
 
         // Act & Assert
         var result = await AssetOccupancyProvider.CanBulkOccupyAsync(assets, categories);
@@ -457,7 +482,7 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
         Clock.Now.Returns(currentDateTime);
         var targetDate = new DateTime(2022, 6, 18);
 
-        var (assets, categories) = await CreateEntitiesAsync(testModel.Categories, targetDate);
+        var (assets, categories) = await CreateEntitiesAsync(testModel, targetDate);
 
         // Act & Assert
         var result = await AssetOccupancyProvider.CanBulkOccupyAsync(assets, categories);
@@ -518,6 +543,7 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
         CanBulkOccupy_OccupyingCategories_MultiAssetsAndMultiDates(false),
 
         CanBulkOccupy_OccupyingCategory_Asset_Disabled(),
+        BulkOccupy_OccupyingCategory_MultiAssets_PeriodSchemeIds(false),
     };
 
     public static IEnumerable<object[]> BulkOccupyShouldThrowDisabledAssetOrCategoryExceptionData => new List<object[]>
@@ -530,6 +556,7 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
     public static IEnumerable<object[]> BulkOccupyData => new List<object[]>
     {
         CanBulkOccupy_OccupyingAssetAndCategory_Baseline(),
+        BulkOccupy_OccupyingCategory_MultiAssets_PeriodSchemeIds(true),
     };
 
     public static IEnumerable<object[]> BulkOccupyRollbackData => new List<object[]>
@@ -551,7 +578,7 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
         Clock.Now.Returns(currentDateTime);
         var targetDate = new DateTime(2022, 6, 18);
 
-        var (assets, categories) = await CreateEntitiesAsync(testModel.Categories, targetDate);
+        var (assets, categories) = await CreateEntitiesAsync(testModel, targetDate);
 
         // Act & Assert
         await Should.ThrowAsync<InsufficientAssetVolumeException>(() =>
@@ -572,7 +599,7 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
         Clock.Now.Returns(currentDateTime);
         var targetDate = new DateTime(2022, 6, 18);
 
-        var (assets, categories) = await CreateEntitiesAsync(testModel.Categories, targetDate);
+        var (assets, categories) = await CreateEntitiesAsync(testModel, targetDate);
 
         // Act & Assert
         await Should.ThrowAsync<DisabledAssetOrCategoryException>(() =>
@@ -598,7 +625,7 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
         userData.UserName.Returns(userName);
         ExternalUserLookupServiceProvider.FindByIdAsync(userId).Returns(Task.FromResult(userData));
 
-        var (assets, categories) = await CreateEntitiesAsync(testModel.Categories, targetDate);
+        var (assets, categories) = await CreateEntitiesAsync(testModel, targetDate);
 
         // Act
         var result = await AssetOccupancyProvider.BulkOccupyAsync(assets, categories, userId);
@@ -623,7 +650,7 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
         Clock.Now.Returns(currentDateTime);
         var targetDate = new DateTime(2022, 6, 18);
 
-        var (assets, categories) = await CreateEntitiesAsync(testModel.Categories, targetDate);
+        var (assets, categories) = await CreateEntitiesAsync(testModel, targetDate);
 
         AssetOccupancyProvider.OccupyByCategoryAsync(Arg.Any<OccupyAssetByCategoryInfoModel>(), Arg.Any<Guid?>())
             .ThrowsForAnyArgs(new DisabledAssetOrCategoryException());
@@ -642,7 +669,7 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
     #region private
 
     private async Task<(List<OccupyAssetInfoModel>, List<OccupyAssetByCategoryInfoModel>)> CreateEntitiesAsync(
-        List<BulkOccupyCategoryTestModel> bulkOccupyCategories,
+        BulkOccupyTestModel testModel,
         DateTime targetDate)
     {
         var assets = new List<Asset>();
@@ -652,11 +679,11 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
         var occupyingCategories = new List<OccupyAssetByCategoryInfoModel>();
         var index = 0;
 
-        var distinctPeriods = bulkOccupyCategories
+        var distinctPeriods = testModel.Categories
             .SelectMany(x => x.Assets)
             .SelectMany(x => x.OccupancyTestModels)
             .Select(x => new { x.PeriodStartingHour, x.PeriodDurationHour })
-            .Concat(bulkOccupyCategories
+            .Concat(testModel.Categories
                 .SelectMany(x => x.OccupancyTestModels)
                 .Select(x => new { x.PeriodStartingHour, x.PeriodDurationHour }))
             .GroupBy(x => x)
@@ -670,15 +697,28 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
                 TimeSpan.FromHours(period.PeriodDurationHour)));
         }
 
-        var periodScheme = await PeriodSchemeManager.CreateAsync(nameof(PeriodScheme), periods);
+        var defaultPeriodScheme = await PeriodSchemeManager.CreateAsync(nameof(PeriodScheme), periods);
+        await PeriodSchemeManager.SetAsDefaultAsync(defaultPeriodScheme);
 
-        await PeriodSchemeManager.SetAsDefaultAsync(periodScheme);
+        var extraPeriodSchemes = new List<PeriodScheme>();
+        foreach (var periodScheme in testModel.ExtraPeriodSchemes)
+        {
+            var tempPeriods = new List<Period>();
+            foreach (var period in periods)
+            {
+                tempPeriods.Add(await PeriodSchemeManager.CreatePeriodAsync(period.StartingTime, period.Duration));
+            }
 
-        foreach (var categoryTestModel in bulkOccupyCategories)
+            extraPeriodSchemes.Add(await PeriodSchemeManager.CreateAsync(periodScheme, tempPeriods));
+        }
+
+        foreach (var categoryTestModel in testModel.Categories)
         {
             var category = await AssetCategoryManager.CreateAsync(default, nameof(AssetCategory) + index++,
                 AssetDefinition.Name,
-                default,
+                categoryTestModel.PeriodSchemeName.IsNullOrWhiteSpace()
+                    ? default
+                    : extraPeriodSchemes.FirstOrDefault(x => x.Name == categoryTestModel.PeriodSchemeName)?.Id,
                 default,
                 new TimeInAdvance
                 {
@@ -693,6 +733,9 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
                 if (model.OccupyingVolume > 0)
                 {
                     occupyingCategories.Add(new OccupyAssetByCategoryInfoModel(category.Id,
+                        model.PeriodSchemeName.IsNullOrWhiteSpace()
+                            ? default
+                            : extraPeriodSchemes.FirstOrDefault(x => x.Name == model.PeriodSchemeName)?.Id,
                         model.OccupyingVolume,
                         targetDate.AddDays(model.DayOffset),
                         TimeSpan.FromHours(model.PeriodStartingHour),
@@ -705,7 +748,9 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
                 var asset = await AssetManager.CreateAsync(nameof(Asset) + index++,
                     AssetDefinition.Name,
                     category,
-                    default,
+                    assetTestModel.PeriodSchemeName.IsNullOrWhiteSpace()
+                        ? default
+                        : extraPeriodSchemes.FirstOrDefault(x => x.Name == assetTestModel.PeriodSchemeName)?.Id,
                     default,
                     assetTestModel.InitialVolume,
                     default,
@@ -738,7 +783,8 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
 
         await WithUnitOfWorkAsync(async () =>
         {
-            await PeriodSchemeRepository.InsertAsync(periodScheme);
+            await PeriodSchemeRepository.InsertAsync(defaultPeriodScheme);
+            await PeriodSchemeRepository.InsertManyAsync(extraPeriodSchemes);
             await AssetCategoryRepository.InsertManyAsync(categories);
             await AssetRepository.InsertManyAsync(assets);
             await AssetOccupancyCountRepository.InsertManyAsync(counts);
@@ -750,14 +796,18 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
     private class BulkOccupyTestModel
     {
         public BulkOccupyTestModel(bool canOccupy, List<BulkOccupyCategoryTestModel> categories,
+            List<string> extraPeriodSchemes = default,
             [CallerMemberName] string name = "")
         {
             CanOccupy = canOccupy;
             Categories = categories;
             Name = name;
+            ExtraPeriodSchemes = extraPeriodSchemes ?? new List<string>();
         }
 
         public List<BulkOccupyCategoryTestModel> Categories { get; }
+
+        public List<string> ExtraPeriodSchemes { get; }
 
         public bool CanOccupy { get; }
 
@@ -772,10 +822,12 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
     private class BulkOccupyCategoryTestModel
     {
         public BulkOccupyCategoryTestModel(bool disabled, List<BulkOccupyAssetTestModel> assets,
-            List<BulkOccupyCategoryOccupancyTestModel> occupancyTestModels = default)
+            List<BulkOccupyCategoryOccupancyTestModel> occupancyTestModels = default,
+            string periodSchemeName = default)
         {
             Disabled = disabled;
             Assets = assets;
+            PeriodSchemeName = periodSchemeName;
             OccupancyTestModels = occupancyTestModels ?? new List<BulkOccupyCategoryOccupancyTestModel>();
         }
 
@@ -783,22 +835,28 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
 
         public List<BulkOccupyCategoryOccupancyTestModel> OccupancyTestModels { get; }
 
+        public string PeriodSchemeName { get; }
+
         public bool Disabled { get; }
     }
 
     private class BulkOccupyAssetTestModel
     {
         public BulkOccupyAssetTestModel(bool disabled, int initialVolume,
-            List<BulkOccupyAssetOccupancyTestModel> occupancyTestModels = default)
+            List<BulkOccupyAssetOccupancyTestModel> occupancyTestModels = default,
+            string periodSchemeName = default)
         {
             Disabled = disabled;
             InitialVolume = initialVolume;
+            PeriodSchemeName = periodSchemeName;
             OccupancyTestModels = occupancyTestModels ?? new List<BulkOccupyAssetOccupancyTestModel>();
         }
 
         public bool Disabled { get; }
 
         public int InitialVolume { get; }
+
+        public string PeriodSchemeName { get; }
 
         public List<BulkOccupyAssetOccupancyTestModel> OccupancyTestModels { get; }
     }
@@ -829,12 +887,13 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
     private class BulkOccupyCategoryOccupancyTestModel
     {
         public BulkOccupyCategoryOccupancyTestModel(int occupyingVolume, int periodStartingHour,
-            int periodDurationHour, int dayOffset)
+            int periodDurationHour, int dayOffset, string periodSchemeName = default)
         {
             PeriodStartingHour = periodStartingHour;
             PeriodDurationHour = periodDurationHour;
             DayOffset = dayOffset;
             OccupyingVolume = occupyingVolume;
+            PeriodSchemeName = periodSchemeName;
         }
 
         public int DayOffset { get; }
@@ -844,6 +903,8 @@ public class BulkOccupyTests : DefaultAssetOccupancyProviderTestBase
         public int PeriodStartingHour { get; }
 
         public int PeriodDurationHour { get; }
+
+        public string PeriodSchemeName { get; }
     }
 
     #endregion

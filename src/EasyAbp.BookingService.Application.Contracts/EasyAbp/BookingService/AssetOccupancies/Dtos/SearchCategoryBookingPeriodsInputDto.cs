@@ -11,6 +11,11 @@ public class SearchCategoryBookingPeriodsInputDto
     /// </summary>
     [Required]
     public Guid CategoryId { get; set; }
+    
+    /// <summary>
+    /// Restrict the PeriodSchemeId and fall back to Category.PeriodSchemeId if null.
+    /// </summary>
+    public Guid? PeriodSchemeId { get; set; }
 
     /// <summary>
     /// The moment of a user is going to book
