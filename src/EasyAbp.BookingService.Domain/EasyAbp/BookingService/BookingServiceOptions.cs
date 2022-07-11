@@ -10,4 +10,6 @@ public class BookingServiceOptions
     public const string ConfigurationKey = "BookingService";
 
     public List<AssetDefinition> AssetDefinitionConfigurations { get; set; } = new();
+
+    public int AssetOccupyLockTimeoutSeconds { get; set; } = 10;
 }

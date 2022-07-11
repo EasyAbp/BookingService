@@ -13,6 +13,7 @@
     "EasyAbp.BookingService:UnexpectedNegativeVolume": "AssetOccupancyCount(Asset:{assetId}, Date:{date}, StartingTime:{startingTime}, Duration:{duration})'s volume({volume},{changedVolume}) cannot less than zero. ",
     "EasyAbp.BookingService:CannotDeletePeriodInUse": "Can not delete Period which is in use. PeriodId: {id}",
     "EasyAbp.BookingService:CannotUpdatePeriodInUse": "Can not update Period which is in use. PeriodId: {id}",
-    "EasyAbp.BookingService:CannotDeletePeriodSchemeInUse": "Can not delete PeriodScheme which is in use. PeriodScheme: {name}, Id: {id}. "
+    "EasyAbp.BookingService:CannotDeletePeriodSchemeInUse": "Can not delete PeriodScheme which is in use. PeriodScheme: {name}, Id: {id}. ",
+    "EasyAbp.BookingService:FailToObtainAssetOccupancyLock": "Fail to obtain asset occupancy lock: CategoryId: {categoryId}, PeriodSchemeId: {periodSchemeId}, TargetDate: {date}, LockTimeoutSeconds: {timeout}"
   }
 }

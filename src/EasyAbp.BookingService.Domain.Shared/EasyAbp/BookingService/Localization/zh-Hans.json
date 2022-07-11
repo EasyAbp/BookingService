@@ -13,6 +13,7 @@
     "EasyAbp.BookingService:UnexpectedNegativeVolume": "资产占用计数(资产:{assetId}, 日期:{date}, 开始时间:{startingTime}, 持续时间:{duration})的volume({volume},{changedVolume})不能小于0",
     "EasyAbp.BookingService:CannotDeletePeriodInUse": "不能删除正在使用的时段。时段Id：{id}",
     "EasyAbp.BookingService:CannotUpdatePeriodInUse": "不能更新正在使用的时段。时段Id：{id}",
-    "EasyAbp.BookingService:CannotDeletePeriodSchemeInUse": "不能删除正在使用的时段方案：{name}, Id：{id}. "
+    "EasyAbp.BookingService:CannotDeletePeriodSchemeInUse": "不能删除正在使用的时段方案：{name}, Id：{id}. ",
+    "EasyAbp.BookingService:FailToObtainAssetOccupancyLock": "获取资产占用锁失败: 资产类型Id: {categoryId}, 时段方案Id: {periodSchemeId}, 预定日期: {date}, 锁获取超时秒数: {timeout}"
   }
 }

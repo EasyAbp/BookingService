@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EasyAbp.BookingService.AssetCategories;
+using EasyAbp.BookingService.AssetOccupancies;
 using EasyAbp.BookingService.AssetOccupancyCounts;
 using EasyAbp.BookingService.Assets;
 using EasyAbp.BookingService.PeriodSchemes;
@@ -178,6 +181,68 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
         assetOccupancy.AssetId.ShouldBe(asset.Id);
         assetOccupancy.StartingTime.ShouldBe(period.StartingTime);
         assetOccupancy.AssetDefinitionName.ShouldBe(AssetDefinition.Name);
+    }
+
+    [Fact]
+    public async Task Asset_Occupy_Concurrency_Test()
+    {
+        // Arrange
+        const int initialVolume = 10;
+        var category = await CreateAssetCategoryAsync();
+        var asset = await CreateAssetAsync(category);
+        await AssetManager.UpdateAsync(asset, asset.Name, asset.AssetDefinitionName, category,
+            asset.PeriodSchemeId, asset.DefaultPeriodUsable, initialVolume, asset.Priority,
+            asset.TimeInAdvance, asset.Disabled);
+        var periodScheme = await CreatePeriodScheme();
+        var period = periodScheme.Periods[0];
+        await PeriodSchemeManager.SetAsDefaultAsync(periodScheme);
+
+        var currentDateTime = new DateTime(2022, 6, 17);
+        Clock.Now.Returns(currentDateTime);
+        var targetDate = new DateTime(2022, 6, 18);
+
+        await WithUnitOfWorkAsync(async () =>
+        {
+            await AssetCategoryRepository.InsertAsync(category);
+            await AssetRepository.InsertAsync(asset);
+            await PeriodSchemeRepository.InsertAsync(periodScheme);
+        });
+
+        // Act
+        var totalOccupied = 0;
+        var manualResetEvent = new ManualResetEventSlim(false);
+        var tasks = new List<Task<(ProviderAssetOccupancyModel, AssetOccupancy)>>();
+        while (totalOccupied <= initialVolume)
+        {
+            var occupyingVolume = RandomHelper.GetRandom(2, 4);
+            totalOccupied += occupyingVolume;
+            tasks.Add(Task.Run(async () =>
+            {
+                await Task.Yield();
+                manualResetEvent.Wait();
+                return await WithUnitOfWorkAsync(async () =>
+                {
+                    try
+                    {
+                        return await AssetOccupancyProvider.OccupyAsync(
+                            new OccupyAssetInfoModel(asset.Id, occupyingVolume, targetDate, period.StartingTime,
+                                period.Duration),
+                            default);
+                    }
+                    catch (InsufficientAssetVolumeException)
+                    {
+                        return (default, default);
+                    }
+                });
+            }));
+        }
+
+        manualResetEvent.Set();
+        await Task.WhenAll(tasks);
+
+        // Assert
+        var success = tasks.Where(x => x.IsCompletedSuccessfully && x.Result.Item2 is not null).ToList();
+        success.Sum(x => x.Result.Item2.Volume).ShouldBeLessThanOrEqualTo(initialVolume);
     }
 
     [Fact]
@@ -513,6 +578,76 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
         assetOccupancy.AssetId.ShouldBe(selectedAsset.Id);
         assetOccupancy.StartingTime.ShouldBe(period.StartingTime);
         assetOccupancy.AssetDefinitionName.ShouldBe(AssetDefinition.Name);
+    }
+
+    [Fact]
+    public async Task Category_Occupy_Concurrency_Test()
+    {
+        // Arrange
+        const int initialVolume = 10;
+        var category = await CreateAssetCategoryAsync();
+        var asset = await CreateAssetAsync(category);
+        await AssetManager.UpdateAsync(asset, asset.Name, asset.AssetDefinitionName, category,
+            asset.PeriodSchemeId, asset.DefaultPeriodUsable, initialVolume, asset.Priority,
+            asset.TimeInAdvance, asset.Disabled);
+
+        var anotherAsset = await CreateAssetAsync(category);
+        await AssetManager.UpdateAsync(anotherAsset, anotherAsset.Name, anotherAsset.AssetDefinitionName, category,
+            anotherAsset.PeriodSchemeId, anotherAsset.DefaultPeriodUsable, initialVolume, anotherAsset.Priority,
+            anotherAsset.TimeInAdvance, anotherAsset.Disabled);
+
+        var periodScheme = await CreatePeriodScheme();
+        var period = periodScheme.Periods[0];
+        await PeriodSchemeManager.SetAsDefaultAsync(periodScheme);
+
+        var currentDateTime = new DateTime(2022, 6, 17);
+        Clock.Now.Returns(currentDateTime);
+        var targetDate = new DateTime(2022, 6, 18);
+
+        await WithUnitOfWorkAsync(async () =>
+        {
+            await AssetCategoryRepository.InsertAsync(category);
+            await AssetRepository.InsertAsync(asset);
+            await AssetRepository.InsertAsync(anotherAsset);
+            await PeriodSchemeRepository.InsertAsync(periodScheme);
+        });
+
+        // Act
+        var totalOccupied = 0;
+        var manualResetEvent = new ManualResetEventSlim(false);
+        var tasks = new List<Task<(ProviderAssetOccupancyModel, AssetOccupancy)>>();
+        while (totalOccupied <= initialVolume * 2)
+        {
+            var occupyingVolume = RandomHelper.GetRandom(2, 4);
+            totalOccupied += occupyingVolume;
+            tasks.Add(Task.Run(async () =>
+            {
+                await Task.Yield();
+                manualResetEvent.Wait();
+                return await WithUnitOfWorkAsync(async () =>
+                {
+                    try
+                    {
+                        return await AssetOccupancyProvider.OccupyByCategoryAsync(
+                            new OccupyAssetByCategoryInfoModel(category.Id, default, occupyingVolume, targetDate,
+                                period.StartingTime,
+                                period.Duration),
+                            default);
+                    }
+                    catch (InsufficientAssetVolumeException)
+                    {
+                        return (default, default);
+                    }
+                });
+            }));
+        }
+
+        manualResetEvent.Set();
+        await Task.WhenAll(tasks);
+
+        // Assert
+        var success = tasks.Where(x => x.IsCompletedSuccessfully && x.Result.Item2 is not null).ToList();
+        success.Sum(x => x.Result.Item2.Volume).ShouldBeLessThanOrEqualTo(initialVolume * 2);
     }
 
     [Fact]
