@@ -253,11 +253,11 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
         var periodScheme = await GetEffectivePeriodSchemeAsync(model.Date, asset, category);
         var handle = await DistributedLock.TryAcquireAsync(
-            CalculateLockName(category, periodScheme, model),
+            CalculateLockName(category, model),
             TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
         if (handle is null)
         {
-            throw new FailToObtainAssetOccupancyLockException(category, periodScheme, model,
+            throw new FailToObtainAssetOccupancyLockException(category, model,
                 Options.AssetOccupyLockTimeoutSeconds);
         }
 
@@ -289,11 +289,11 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
         var periodScheme = await GetEffectivePeriodSchemeAsync(model.PeriodSchemeId, category);
         var handle = await DistributedLock.TryAcquireAsync(
-            CalculateLockName(category, periodScheme, model),
+            CalculateLockName(category, model),
             TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
         if (handle is null)
         {
-            throw new FailToObtainAssetOccupancyLockException(category, periodScheme, model,
+            throw new FailToObtainAssetOccupancyLockException(category, model,
                 Options.AssetOccupyLockTimeoutSeconds);
         }
 
@@ -397,10 +397,10 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         return models;
     }
 
-    protected virtual string CalculateLockName(AssetCategory category, PeriodScheme periodScheme,
+    protected virtual string CalculateLockName(AssetCategory category,
         IOccupyingTimeInfo model)
     {
-        return $"C:{category.Id:N},P:{periodScheme.Id:N},D:{model.Date:yyyyMMdd}";
+        return $"C:{category.Id:N},D:{model.Date:yyyyMMdd}";
     }
 
     protected virtual async Task<List<PeriodOccupancyModel>> GetCachedAssetDayPeriodsAsync(Asset asset,
