@@ -187,7 +187,8 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
     public async Task Asset_Occupy_Concurrency_Test()
     {
         // Arrange
-        const int initialVolume = 10;
+        const int initialVolume = 5;
+        const int extraVolume = 3;
         var category = await CreateAssetCategoryAsync();
         var asset = await CreateAssetAsync(category);
         await AssetManager.UpdateAsync(asset, asset.Name, asset.AssetDefinitionName, category,
@@ -212,9 +213,9 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
         var totalOccupied = 0;
         var manualResetEvent = new ManualResetEventSlim(false);
         var tasks = new List<Task<(ProviderAssetOccupancyModel, AssetOccupancy)>>();
-        while (totalOccupied <= initialVolume)
+        while (totalOccupied <= initialVolume + extraVolume)
         {
-            var occupyingVolume = RandomHelper.GetRandom(2, 4);
+            var occupyingVolume = 1;
             totalOccupied += occupyingVolume;
             tasks.Add(Task.Run(async () =>
             {
@@ -242,7 +243,7 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Assert
         var success = tasks.Where(x => x.IsCompletedSuccessfully && x.Result.Item2 is not null).ToList();
-        success.Sum(x => x.Result.Item2.Volume).ShouldBeLessThanOrEqualTo(initialVolume);
+        success.Sum(x => x.Result.Item2.Volume).ShouldBe(initialVolume);
     }
 
     [Fact]
@@ -584,7 +585,8 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
     public async Task Category_Occupy_Concurrency_Test()
     {
         // Arrange
-        const int initialVolume = 10;
+        const int initialVolume = 3;
+        const int extraVolume = 2;
         var category = await CreateAssetCategoryAsync();
         var asset = await CreateAssetAsync(category);
         await AssetManager.UpdateAsync(asset, asset.Name, asset.AssetDefinitionName, category,
@@ -616,9 +618,9 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
         var totalOccupied = 0;
         var manualResetEvent = new ManualResetEventSlim(false);
         var tasks = new List<Task<(ProviderAssetOccupancyModel, AssetOccupancy)>>();
-        while (totalOccupied <= initialVolume * 2)
+        while (totalOccupied <= initialVolume * 2 + extraVolume)
         {
-            var occupyingVolume = RandomHelper.GetRandom(2, 4);
+            var occupyingVolume = 1;
             totalOccupied += occupyingVolume;
             tasks.Add(Task.Run(async () =>
             {
@@ -647,7 +649,7 @@ public class OccupyTests : DefaultAssetOccupancyProviderTestBase
 
         // Assert
         var success = tasks.Where(x => x.IsCompletedSuccessfully && x.Result.Item2 is not null).ToList();
-        success.Sum(x => x.Result.Item2.Volume).ShouldBeLessThanOrEqualTo(initialVolume * 2);
+        success.Sum(x => x.Result.Item2.Volume).ShouldBe(initialVolume * 2);
     }
 
     [Fact]
