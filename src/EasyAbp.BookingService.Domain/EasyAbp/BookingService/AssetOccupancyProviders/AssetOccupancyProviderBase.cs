@@ -13,7 +13,6 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Volo.Abp.DistributedLocking;
 using Volo.Abp.Guids;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.Timing;
@@ -39,7 +38,8 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     protected IAssetScheduleRepository AssetScheduleRepository { get; }
     protected IExternalUserLookupServiceProvider ExternalUserLookupServiceProvider { get; }
     protected IAssetInCategorySelector AssetInCategorySelector { get; }
-    protected IAbpDistributedLock DistributedLock { get; }
+    
+    protected IAssetOccupyTransactionManager AssetOccupyTransactionManager { get; }
     protected BookingServiceOptions Options { get; }
 
     protected AssetOccupancyProviderBase(IServiceProvider serviceProvider)
@@ -58,7 +58,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         AssetScheduleRepository = serviceProvider.GetRequiredService<IAssetScheduleRepository>();
         ExternalUserLookupServiceProvider = serviceProvider.GetRequiredService<IExternalUserLookupServiceProvider>();
         AssetInCategorySelector = serviceProvider.GetRequiredService<IAssetInCategorySelector>();
-        DistributedLock = serviceProvider.GetRequiredService<IAbpDistributedLock>();
+        AssetOccupyTransactionManager = serviceProvider.GetRequiredService<IAssetOccupyTransactionManager>();
         Options = serviceProvider.GetRequiredService<IOptions<BookingServiceOptions>>().Value;
     }
 
@@ -252,28 +252,9 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
             model.Date, model.Volume);
 
         var periodScheme = await GetEffectivePeriodSchemeAsync(model.Date, asset, category);
-        var handle = await DistributedLock.TryAcquireAsync(
-            CalculateLockName(category, model),
-            TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
-        if (handle is null)
-        {
-            throw new FailToObtainAssetOccupancyLockException(category, model,
-                Options.AssetOccupyLockTimeoutSeconds);
-        }
-
-        try
-        {
-            using var uow = UnitOfWorkManager.Begin(requiresNew: true, isTransactional: true);
-            var result = await InternalCanOccupyAsync(occupyingModel, periodScheme);
-            await HandleCanOccupyResultAsync(result);
-            var occupyResult = await InternalOccupyAsync(occupyingModel, occupierUserId);
-            await uow.CompleteAsync();
-            return occupyResult;
-        }
-        finally
-        {
-            await handle.DisposeAsync();
-        }
+        var result = await InternalCanOccupyAsync(occupyingModel, periodScheme);
+        await HandleCanOccupyResultAsync(result);
+        return await InternalOccupyAsync(occupyingModel, occupierUserId);
     }
 
     [UnitOfWork(true)]
@@ -288,34 +269,15 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         }
 
         var periodScheme = await GetEffectivePeriodSchemeAsync(model.PeriodSchemeId, category);
-        var handle = await DistributedLock.TryAcquireAsync(
-            CalculateLockName(category, model),
-            TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
-        if (handle is null)
+        var asset = await PickAssetOrNullAsync(category, periodScheme, model);
+        if (asset is null)
         {
-            throw new FailToObtainAssetOccupancyLockException(category, model,
-                Options.AssetOccupyLockTimeoutSeconds);
+            throw new InsufficientAssetVolumeException();
         }
 
-        try
-        {
-            using var uow = UnitOfWorkManager.Begin(requiresNew: true, isTransactional: true);
-            var asset = await PickAssetOrNullAsync(category, periodScheme, model);
-            if (asset is null)
-            {
-                throw new InsufficientAssetVolumeException();
-            }
-
-            var occupyResult = await InternalOccupyAsync(
-                new ProviderOccupyingInfoModel(asset, category, model.StartingTime, model.Duration, model.Date,
-                    model.Volume), occupierUserId);
-            await uow.CompleteAsync();
-            return occupyResult;
-        }
-        finally
-        {
-            await handle.DisposeAsync();
-        }
+        return await InternalOccupyAsync(
+            new ProviderOccupyingInfoModel(asset, category, model.StartingTime, model.Duration, model.Date,
+                model.Volume), occupierUserId);
     }
 
     [UnitOfWork(true)]
@@ -369,7 +331,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
         return Task.CompletedTask;
     }
-    
+
     protected virtual async Task<List<PeriodOccupancyModel>> InternalGetPeriodsAsync(Asset asset,
         AssetCategory categoryOfAsset,
         PeriodScheme periodScheme,
