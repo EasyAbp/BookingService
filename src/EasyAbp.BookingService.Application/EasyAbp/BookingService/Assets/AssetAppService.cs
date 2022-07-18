@@ -59,7 +59,8 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
             createInput.Volume,
             createInput.Priority,
             ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(createInput.TimeInAdvance),
-            createInput.Disabled);
+            createInput.Disabled,
+            createInput.ExtraProperties);
     }
 
     protected override async Task MapToEntityAsync(CreateUpdateAssetDto updateInput, Asset entity)
@@ -75,6 +76,7 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
             updateInput.Volume,
             updateInput.Priority,
             ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(updateInput.TimeInAdvance),
-            updateInput.Disabled);
+            updateInput.Disabled,
+            updateInput.ExtraProperties);
     }
 }

@@ -3,6 +3,7 @@ using EasyAbp.BookingService.AssetCategories;
 using EasyAbp.BookingService.AssetPeriodSchemes;
 using EasyAbp.BookingService.AssetSchedules;
 using JetBrains.Annotations;
+using Volo.Abp.Data;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.MultiTenancy;
 
@@ -56,7 +57,7 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
 
     internal Asset(Guid id, Guid? tenantId, [NotNull] string name, [NotNull] string assetDefinitionName,
         Guid assetCategoryId, Guid? periodSchemeId, PeriodUsable? defaultPeriodUsable, int volume, int priority,
-        [CanBeNull] TimeInAdvance timeInAdvance, bool disabled) : base(id)
+        [CanBeNull] TimeInAdvance timeInAdvance, bool disabled, ExtraPropertyDictionary extraProperties=null) : base(id)
     {
         TenantId = tenantId;
         Name = name;
@@ -68,11 +69,16 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
         Priority = priority;
         TimeInAdvance = timeInAdvance;
         Disabled = disabled;
+        if (extraProperties != null)
+        {
+            ExtraProperties = extraProperties;
+        }
     }
 
     internal void Update([NotNull] string name, [NotNull] string assetDefinitionName, Guid assetCategoryId,
         Guid? periodSchemeId, PeriodUsable? defaultPeriodUsable, int volume, int priority, TimeInAdvance timeInAdvance,
-        bool disabled)
+        bool disabled,
+        ExtraPropertyDictionary extraProperties = null)
     {
         Name = name;
         AssetDefinitionName = assetDefinitionName;
@@ -83,5 +89,6 @@ public class Asset : FullAuditedAggregateRoot<Guid>, IMultiTenant
         Priority = priority;
         TimeInAdvance = timeInAdvance;
         Disabled = disabled;
+        ExtraProperties = extraProperties;
     }
 }
