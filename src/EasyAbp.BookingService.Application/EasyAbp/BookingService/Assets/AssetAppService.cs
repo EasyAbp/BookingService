@@ -6,6 +6,7 @@ using EasyAbp.BookingService.Assets.Dtos;
 using EasyAbp.BookingService.Dtos;
 using EasyAbp.BookingService.Permissions;
 using Volo.Abp.Application.Services;
+using Volo.Abp.ObjectExtending;
 
 namespace EasyAbp.BookingService.Assets;
 
@@ -50,7 +51,7 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
     {
         var category = await _assetCategoryRepository.GetAsync(createInput.AssetCategoryId);
 
-        return await _assetManager.CreateAsync(
+        var entity = await _assetManager.CreateAsync(
             createInput.Name,
             createInput.AssetDefinitionName,
             category,
@@ -60,6 +61,10 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
             createInput.Priority,
             ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(createInput.TimeInAdvance),
             createInput.Disabled);
+
+        createInput.MapExtraPropertiesTo(entity);
+
+        return entity;
     }
 
     protected override async Task MapToEntityAsync(CreateUpdateAssetDto updateInput, Asset entity)
@@ -76,5 +81,7 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
             updateInput.Priority,
             ObjectMapper.Map<TimeInAdvanceDto, TimeInAdvance>(updateInput.TimeInAdvance),
             updateInput.Disabled);
+
+        updateInput.MapExtraPropertiesTo(entity);
     }
 }
