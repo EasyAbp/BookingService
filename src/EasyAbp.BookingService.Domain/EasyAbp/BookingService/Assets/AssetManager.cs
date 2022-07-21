@@ -7,7 +7,6 @@ using EasyAbp.BookingService.AssetSchedules;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 using Volo.Abp;
-using Volo.Abp.Data;
 using Volo.Abp.Domain.Services;
 
 namespace EasyAbp.BookingService.Assets;
@@ -23,7 +22,7 @@ public class AssetManager : DomainService
 
     public virtual Task<Asset> CreateAsync(string name, [NotNull] string assetDefinitionName,
         AssetCategory assetCategory, Guid? periodSchemeId, PeriodUsable? defaultPeriodUsable, int volume, int priority,
-        TimeInAdvance timeInAdvance, bool disabled, ExtraPropertyDictionary extraProperties = null)
+        TimeInAdvance timeInAdvance, bool disabled)
     {
         Check.NotNullOrWhiteSpace(assetDefinitionName, nameof(assetDefinitionName));
 
@@ -48,13 +47,12 @@ public class AssetManager : DomainService
             volume,
             priority,
             timeInAdvance,
-            disabled,
-            extraProperties));
+            disabled));
     }
 
     public Task UpdateAsync(Asset asset, string name, [NotNull] string assetDefinitionName, AssetCategory assetCategory,
         Guid? periodSchemeId, PeriodUsable? defaultPeriodUsable, int volume, int priority, TimeInAdvance timeInAdvance,
-        bool disabled, ExtraPropertyDictionary extraProperties = null)
+        bool disabled)
     {
         Check.NotNullOrWhiteSpace(assetDefinitionName, nameof(assetDefinitionName));
 
@@ -77,8 +75,7 @@ public class AssetManager : DomainService
             volume,
             priority,
             timeInAdvance,
-            disabled,
-            extraProperties);
+            disabled);
         return Task.CompletedTask;
     }
 }
