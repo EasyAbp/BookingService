@@ -38,8 +38,8 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     protected IAssetScheduleRepository AssetScheduleRepository { get; }
     protected IExternalUserLookupServiceProvider ExternalUserLookupServiceProvider { get; }
     protected IAssetInCategorySelector AssetInCategorySelector { get; }
-    
-    protected IAssetOccupyTransactionManager AssetOccupyTransactionManager { get; }
+
+    protected IAssetOccupyTransactionLock AssetOccupyTransactionLock { get; }
     protected BookingServiceOptions Options { get; }
 
     protected AssetOccupancyProviderBase(IServiceProvider serviceProvider)
@@ -58,7 +58,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         AssetScheduleRepository = serviceProvider.GetRequiredService<IAssetScheduleRepository>();
         ExternalUserLookupServiceProvider = serviceProvider.GetRequiredService<IExternalUserLookupServiceProvider>();
         AssetInCategorySelector = serviceProvider.GetRequiredService<IAssetInCategorySelector>();
-        AssetOccupyTransactionManager = serviceProvider.GetRequiredService<IAssetOccupyTransactionManager>();
+        AssetOccupyTransactionLock = serviceProvider.GetRequiredService<IAssetOccupyTransactionLock>();
         Options = serviceProvider.GetRequiredService<IOptions<BookingServiceOptions>>().Value;
     }
 
@@ -247,14 +247,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         Guid? occupierUserId)
     {
         var asset = await AssetRepository.GetAsync(model.AssetId);
-        var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
-        var occupyingModel = new ProviderOccupyingInfoModel(asset, category, model.StartingTime, model.Duration,
-            model.Date, model.Volume);
-
-        var periodScheme = await GetEffectivePeriodSchemeAsync(model.Date, asset, category);
-        var result = await InternalCanOccupyAsync(occupyingModel, periodScheme);
-        await HandleCanOccupyResultAsync(result);
-        return await InternalOccupyAsync(occupyingModel, occupierUserId);
+        return await OccupyByAssetAsync(asset, model, occupierUserId);
     }
 
     [UnitOfWork(true)]
@@ -288,12 +281,24 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         await HandleCanOccupyResultAsync(result);
 
         var assetOccupancies = new List<(ProviderAssetOccupancyModel, AssetOccupancy)>();
+        var assetModels = new List<(Asset Asset, OccupyAssetInfoModel Model)>();
+        foreach (var model in models)
+        {
+            var asset = await AssetRepository.GetAsync(model.AssetId);
+            assetModels.Add((asset, model));
+        }
+
+        var resources = assetModels
+            .Select(x => (x.Asset.AssetCategoryId, (IOccupyingTimeInfo)x.Model))
+            .Concat(byCategoryModels.Select(x => (x.AssetCategoryId, (IOccupyingTimeInfo)x)));
+        await using var handle = await AssetOccupyTransactionLock.TryAcquireAsync(resources,
+            TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
 
         try
         {
-            foreach (var model in models)
+            foreach (var (asset, model) in assetModels)
             {
-                assetOccupancies.Add(await OccupyAsync(model, occupierUserId));
+                assetOccupancies.Add(await OccupyByAssetAsync(asset, model, occupierUserId));
             }
 
             foreach (var model in byCategoryModels)
@@ -330,6 +335,19 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         }
 
         return Task.CompletedTask;
+    }
+
+    protected virtual async Task<(ProviderAssetOccupancyModel, AssetOccupancy)> OccupyByAssetAsync(Asset asset,
+        OccupyAssetInfoModel model, Guid? occupierUserId)
+    {
+        var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
+        var occupyingModel = new ProviderOccupyingInfoModel(asset, category, model.StartingTime, model.Duration,
+            model.Date, model.Volume);
+
+        var periodScheme = await GetEffectivePeriodSchemeAsync(model.Date, asset, category);
+        var result = await InternalCanOccupyAsync(occupyingModel, periodScheme);
+        await HandleCanOccupyResultAsync(result);
+        return await InternalOccupyAsync(occupyingModel, occupierUserId);
     }
 
     protected virtual async Task<List<PeriodOccupancyModel>> InternalGetPeriodsAsync(Asset asset,
