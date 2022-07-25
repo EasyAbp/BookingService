@@ -290,26 +290,14 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     public virtual async Task<(ProviderAssetOccupancyModel, AssetOccupancy)> OccupyAsync(OccupyAssetInfoModel model,
         Guid? occupierUserId)
     {
-        using var uow = UnitOfWorkManager.Begin(true, true);
         var asset = await AssetRepository.GetAsync(model.AssetId);
         var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
-
-        await using var handle = await DistributedLock.TryAcquireAsync(AssetOccupancyLock,
-            TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
-        if (handle is null)
-        {
-            throw new FailToObtainAssetOccupancyLockException();
-        }
-
-        var occupyResult = await OccupyAsync(asset, category, model, occupierUserId);
-        await uow.CompleteAsync();
-        return occupyResult;
+        return await OccupyAsync(asset, category, model, occupierUserId);
     }
 
     public virtual async Task<(ProviderAssetOccupancyModel, AssetOccupancy)> OccupyByCategoryAsync(
         OccupyAssetByCategoryInfoModel model, Guid? occupierUserId)
     {
-        using var uow = UnitOfWorkManager.Begin(true, true);
         var category = await AssetCategoryRepository.GetAsync(model.AssetCategoryId);
         if (category.Disabled)
         {
@@ -319,38 +307,19 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         var assets =
             await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
 
-        await using var handle = await DistributedLock.TryAcquireAsync(AssetOccupancyLock,
-            TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
-        if (handle is null)
-        {
-            throw new FailToObtainAssetOccupancyLockException();
-        }
-
-        var occupyResult = await OccupyByCategoryAsync(category, assets, model, occupierUserId);
-        await uow.CompleteAsync();
-        return occupyResult;
+        return await OccupyByCategoryAsync(category, assets, model, occupierUserId);
     }
 
     public virtual async Task<List<(ProviderAssetOccupancyModel, AssetOccupancy)>> BulkOccupyAsync(
         List<OccupyAssetInfoModel> models, List<OccupyAssetByCategoryInfoModel> byCategoryModels, Guid? occupierUserId)
     {
-        using var uow = UnitOfWorkManager.Begin(true, true);
-
-        var assetSet = await CreateAssetSetAsync(models);
-        var categoryCache = await CreateCategorySetAsync(byCategoryModels);
-
-        await using var handle = await DistributedLock.TryAcquireAsync(AssetOccupancyLock,
-            TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
-
-        if (handle is null)
-        {
-            throw new FailToObtainAssetOccupancyLockException();
-        }
-
         var result = await CanBulkOccupyAsync(models, byCategoryModels);
         await HandleCanOccupyResultAsync(result);
 
         var assetOccupancies = new List<(ProviderAssetOccupancyModel, AssetOccupancy)>();
+
+        var assetSet = await CreateAssetSetAsync(models);
+        var categoryCache = await CreateCategorySetAsync(byCategoryModels);
 
         try
         {
@@ -379,7 +348,6 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
             throw;
         }
 
-        await uow.CompleteAsync();
         return assetOccupancies;
     }
 
