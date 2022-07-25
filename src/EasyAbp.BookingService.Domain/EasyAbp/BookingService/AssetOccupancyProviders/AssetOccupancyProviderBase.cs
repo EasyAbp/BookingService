@@ -13,7 +13,6 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Volo.Abp.DistributedLocking;
 using Volo.Abp.Guids;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.Timing;
@@ -40,7 +39,6 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     protected IAssetScheduleRepository AssetScheduleRepository { get; }
     protected IExternalUserLookupServiceProvider ExternalUserLookupServiceProvider { get; }
     protected IAssetInCategorySelector AssetInCategorySelector { get; }
-    protected IAbpDistributedLock DistributedLock { get; }
     protected BookingServiceOptions Options { get; }
 
     protected AssetOccupancyProviderBase(IServiceProvider serviceProvider)
@@ -59,7 +57,6 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         AssetScheduleRepository = serviceProvider.GetRequiredService<IAssetScheduleRepository>();
         ExternalUserLookupServiceProvider = serviceProvider.GetRequiredService<IExternalUserLookupServiceProvider>();
         AssetInCategorySelector = serviceProvider.GetRequiredService<IAssetInCategorySelector>();
-        DistributedLock = serviceProvider.GetRequiredService<IAbpDistributedLock>();
         Options = serviceProvider.GetRequiredService<IOptions<BookingServiceOptions>>().Value;
     }
 

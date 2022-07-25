@@ -6,6 +6,7 @@ using EasyAbp.BookingService.AssetOccupancies;
 using EasyAbp.BookingService.AssetOccupancyCounts;
 using Microsoft.Extensions.Logging;
 using Volo.Abp.DependencyInjection;
+using Volo.Abp.DistributedLocking;
 using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.AssetOccupancyProviders;
@@ -13,14 +14,17 @@ namespace EasyAbp.BookingService.AssetOccupancyProviders;
 public class DefaultAssetOccupancyProvider : AssetOccupancyProviderBase, ITransientDependency
 {
     private readonly IAssetOccupancyCountRepository _assetOccupancyCountRepository;
+    private readonly IAbpDistributedLock _distributedLock;
     private readonly ILogger<DefaultAssetOccupancyProvider> _logger;
 
     public DefaultAssetOccupancyProvider(
         IAssetOccupancyCountRepository assetOccupancyCountRepository,
+        IAbpDistributedLock distributedLock,
         ILogger<DefaultAssetOccupancyProvider> logger,
         IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _assetOccupancyCountRepository = assetOccupancyCountRepository;
+        _distributedLock = distributedLock;
         _logger = logger;
     }
 
@@ -31,7 +35,7 @@ public class DefaultAssetOccupancyProvider : AssetOccupancyProviderBase, ITransi
         var asset = await AssetRepository.GetAsync(model.AssetId);
         var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
 
-        await using var handle = await DistributedLock.TryAcquireAsync(AssetOccupancyLock,
+        await using var handle = await _distributedLock.TryAcquireAsync(AssetOccupancyLock,
             TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
         if (handle is null)
         {
@@ -56,7 +60,7 @@ public class DefaultAssetOccupancyProvider : AssetOccupancyProviderBase, ITransi
         var assets =
             await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
 
-        await using var handle = await DistributedLock.TryAcquireAsync(AssetOccupancyLock,
+        await using var handle = await _distributedLock.TryAcquireAsync(AssetOccupancyLock,
             TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
         if (handle is null)
         {
@@ -76,7 +80,7 @@ public class DefaultAssetOccupancyProvider : AssetOccupancyProviderBase, ITransi
         var assetSet = await CreateAssetSetAsync(models);
         var categoryCache = await CreateCategorySetAsync(byCategoryModels);
 
-        await using var handle = await DistributedLock.TryAcquireAsync(AssetOccupancyLock,
+        await using var handle = await _distributedLock.TryAcquireAsync(AssetOccupancyLock,
             TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
 
         if (handle is null)
