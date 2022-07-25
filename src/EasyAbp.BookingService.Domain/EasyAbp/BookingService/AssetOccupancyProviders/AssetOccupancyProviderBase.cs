@@ -294,23 +294,16 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         var asset = await AssetRepository.GetAsync(model.AssetId);
         var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
 
-        var handle = await DistributedLock.TryAcquireAsync(AssetOccupancyLock,
+        await using var handle = await DistributedLock.TryAcquireAsync(AssetOccupancyLock,
             TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
         if (handle is null)
         {
             throw new FailToObtainAssetOccupancyLockException();
         }
 
-        try
-        {
-            var occupyResult = await OccupyAsync(asset, category, model, occupierUserId);
-            await uow.CompleteAsync();
-            return occupyResult;
-        }
-        finally
-        {
-            await handle.DisposeAsync();
-        }
+        var occupyResult = await OccupyAsync(asset, category, model, occupierUserId);
+        await uow.CompleteAsync();
+        return occupyResult;
     }
 
     public virtual async Task<(ProviderAssetOccupancyModel, AssetOccupancy)> OccupyByCategoryAsync(
@@ -326,53 +319,27 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         var assets =
             await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
 
-        var handle = await DistributedLock.TryAcquireAsync(AssetOccupancyLock,
+        await using var handle = await DistributedLock.TryAcquireAsync(AssetOccupancyLock,
             TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
         if (handle is null)
         {
             throw new FailToObtainAssetOccupancyLockException();
         }
 
-        try
-        {
-            var occupyResult = await OccupyByCategoryAsync(category, assets, model, occupierUserId);
-            await uow.CompleteAsync();
-            return occupyResult;
-        }
-        finally
-        {
-            await handle.DisposeAsync();
-        }
+        var occupyResult = await OccupyByCategoryAsync(category, assets, model, occupierUserId);
+        await uow.CompleteAsync();
+        return occupyResult;
     }
 
     public virtual async Task<List<(ProviderAssetOccupancyModel, AssetOccupancy)>> BulkOccupyAsync(
         List<OccupyAssetInfoModel> models, List<OccupyAssetByCategoryInfoModel> byCategoryModels, Guid? occupierUserId)
     {
         using var uow = UnitOfWorkManager.Begin(true, true);
-        var assetCache = new Dictionary<Guid, (Asset, AssetCategory)>();
-        var categoryCache = new Dictionary<Guid, (AssetCategory, List<Asset>)>();
 
-        foreach (var assetId in models.Select(x => x.AssetId).Distinct())
-        {
-            var asset = await AssetRepository.GetAsync(assetId);
-            var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
-            assetCache.Add(assetId, (asset, category));
-        }
+        var assetSet = await CreateAssetSetAsync(models);
+        var categoryCache = await CreateCategorySetAsync(byCategoryModels);
 
-        foreach (var categoryId in byCategoryModels.Select(x => x.AssetCategoryId).Distinct())
-        {
-            var category = await AssetCategoryRepository.GetAsync(categoryId);
-            if (category.Disabled)
-            {
-                throw new DisabledAssetOrCategoryException();
-            }
-
-            var assets =
-                await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
-            categoryCache.Add(categoryId, (category, assets));
-        }
-
-        var handle = await DistributedLock.TryAcquireAsync(AssetOccupancyLock,
+        await using var handle = await DistributedLock.TryAcquireAsync(AssetOccupancyLock,
             TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
 
         if (handle is null)
@@ -380,47 +347,40 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
             throw new FailToObtainAssetOccupancyLockException();
         }
 
+        var result = await CanBulkOccupyAsync(models, byCategoryModels);
+        await HandleCanOccupyResultAsync(result);
+
+        var assetOccupancies = new List<(ProviderAssetOccupancyModel, AssetOccupancy)>();
+
         try
         {
-            var result = await CanBulkOccupyAsync(models, byCategoryModels);
-            await HandleCanOccupyResultAsync(result);
-
-            var assetOccupancies = new List<(ProviderAssetOccupancyModel, AssetOccupancy)>();
-
-            try
+            foreach (var model in models)
             {
-                foreach (var model in models)
-                {
-                    var (asset, category) = assetCache[model.AssetId];
-                    assetOccupancies.Add(await OccupyAsync(asset, category, model, occupierUserId));
-                }
-
-                foreach (var model in byCategoryModels)
-                {
-                    var (category, assets) = categoryCache[model.AssetCategoryId];
-                    assetOccupancies.Add(await OccupyByCategoryAsync(category, assets, model, occupierUserId));
-                }
-            }
-            catch
-            {
-                foreach (var (model, _) in assetOccupancies)
-                {
-                    if (!await ProviderTryRollBackOccupancyAsync(model))
-                    {
-                        _logger.LogWarning("Occupancy provider occupancy rollback failed! {Model}", model);
-                    }
-                }
-
-                throw;
+                var (asset, category) = assetSet[model.AssetId];
+                assetOccupancies.Add(await OccupyAsync(asset, category, model, occupierUserId));
             }
 
-            await uow.CompleteAsync();
-            return assetOccupancies;
+            foreach (var model in byCategoryModels)
+            {
+                var (category, assets) = categoryCache[model.AssetCategoryId];
+                assetOccupancies.Add(await OccupyByCategoryAsync(category, assets, model, occupierUserId));
+            }
         }
-        finally
+        catch
         {
-            await handle.DisposeAsync();
+            foreach (var (model, _) in assetOccupancies)
+            {
+                if (!await ProviderTryRollBackOccupancyAsync(model))
+                {
+                    _logger.LogWarning("Occupancy provider occupancy rollback failed! {Model}", model);
+                }
+            }
+
+            throw;
         }
+
+        await uow.CompleteAsync();
+        return assetOccupancies;
     }
 
     public virtual Task HandleCanOccupyResultAsync(ICanOccupyResult result)
@@ -436,6 +396,40 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         }
 
         return Task.CompletedTask;
+    }
+
+    protected virtual async Task<Dictionary<Guid, (AssetCategory, List<Asset>)>> CreateCategorySetAsync(
+        List<OccupyAssetByCategoryInfoModel> byCategoryModels)
+    {
+        var categoryCache = new Dictionary<Guid, (AssetCategory, List<Asset>)>();
+        foreach (var categoryId in byCategoryModels.Select(x => x.AssetCategoryId).Distinct())
+        {
+            var category = await AssetCategoryRepository.GetAsync(categoryId);
+            if (category.Disabled)
+            {
+                throw new DisabledAssetOrCategoryException();
+            }
+
+            var assets =
+                await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
+            categoryCache.Add(categoryId, (category, assets));
+        }
+
+        return categoryCache;
+    }
+
+    protected virtual async Task<Dictionary<Guid, (Asset, AssetCategory)>> CreateAssetSetAsync(
+        List<OccupyAssetInfoModel> models)
+    {
+        var assetCache = new Dictionary<Guid, (Asset, AssetCategory)>();
+        foreach (var assetId in models.Select(x => x.AssetId).Distinct())
+        {
+            var asset = await AssetRepository.GetAsync(assetId);
+            var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
+            assetCache.Add(assetId, (asset, category));
+        }
+
+        return assetCache;
     }
 
     protected virtual async Task<(ProviderAssetOccupancyModel, AssetOccupancy)> OccupyAsync(Asset asset,
