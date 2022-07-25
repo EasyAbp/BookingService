@@ -24,7 +24,6 @@ namespace EasyAbp.BookingService.AssetOccupancyProviders;
 public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 {
     private readonly ILogger<AssetOccupancyProviderBase> _logger;
-    protected const string AssetOccupancyLock = nameof(AssetOccupancyLock);
 
     protected IClock Clock { get; }
     protected IGuidGenerator GuidGenerator { get; }

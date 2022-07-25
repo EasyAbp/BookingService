@@ -13,6 +13,7 @@ namespace EasyAbp.BookingService.AssetOccupancyProviders;
 
 public class DefaultAssetOccupancyProvider : AssetOccupancyProviderBase, ITransientDependency
 {
+    protected const string AssetOccupancyLock = nameof(AssetOccupancyLock);
     private readonly IAssetOccupancyCountRepository _assetOccupancyCountRepository;
     private readonly IAbpDistributedLock _distributedLock;
     private readonly ILogger<DefaultAssetOccupancyProvider> _logger;
