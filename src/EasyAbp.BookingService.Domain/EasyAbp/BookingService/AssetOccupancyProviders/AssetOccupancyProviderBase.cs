@@ -161,7 +161,9 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
             return new CanOccupyResult(false, BookingServiceErrorCodes.DisabledAssetOrCategory);
         }
 
-        if (await PickAssetOrNullAsync(category, model) is null)
+        var assets = await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
+
+        if (await PickAssetOrNullAsync(category, assets, model) is null)
         {
             return new CanOccupyResult(false, BookingServiceErrorCodes.InsufficientAssetVolume);
         }
@@ -281,64 +283,52 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         return cachedPeriods[(asset.Id, date)];
     }
 
-    [UnitOfWork(true)]
     public virtual async Task<(ProviderAssetOccupancyModel, AssetOccupancy)> OccupyAsync(OccupyAssetInfoModel model,
         Guid? occupierUserId)
     {
-        // Todo: lock the day?
         var asset = await AssetRepository.GetAsync(model.AssetId);
         var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
-        var occupyingModel = new ProviderOccupyingInfoModel(asset, category, model.StartingTime, model.Duration,
-            model.Date, model.Volume);
-        var result = await InternalCanOccupyAsync(occupyingModel);
-        await HandleCanOccupyResultAsync(result);
-        return await InternalOccupyAsync(occupyingModel, occupierUserId);
+        return await OccupyAsync(asset, category, model, occupierUserId);
     }
 
-    [UnitOfWork(true)]
     public virtual async Task<(ProviderAssetOccupancyModel, AssetOccupancy)> OccupyByCategoryAsync(
         OccupyAssetByCategoryInfoModel model, Guid? occupierUserId)
     {
-        // Todo: lock the day?
         var category = await AssetCategoryRepository.GetAsync(model.AssetCategoryId);
-
         if (category.Disabled)
         {
             throw new DisabledAssetOrCategoryException();
         }
 
-        var asset = await PickAssetOrNullAsync(category, model);
+        var assets =
+            await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
 
-        if (asset is null)
-        {
-            throw new InsufficientAssetVolumeException();
-        }
-
-        return await InternalOccupyAsync(
-            new ProviderOccupyingInfoModel(asset, category, model.StartingTime, model.Duration, model.Date,
-                model.Volume), occupierUserId);
+        return await OccupyByCategoryAsync(category, assets, model, occupierUserId);
     }
 
-    [UnitOfWork(true)]
     public virtual async Task<List<(ProviderAssetOccupancyModel, AssetOccupancy)>> BulkOccupyAsync(
         List<OccupyAssetInfoModel> models, List<OccupyAssetByCategoryInfoModel> byCategoryModels, Guid? occupierUserId)
     {
-        // Todo: lock the days?
         var result = await CanBulkOccupyAsync(models, byCategoryModels);
         await HandleCanOccupyResultAsync(result);
 
         var assetOccupancies = new List<(ProviderAssetOccupancyModel, AssetOccupancy)>();
 
+        var assetSet = await CreateAssetSetAsync(models);
+        var categorySet = await CreateCategorySetAsync(byCategoryModels);
+
         try
         {
             foreach (var model in models)
             {
-                assetOccupancies.Add(await OccupyAsync(model, occupierUserId));
+                var (asset, category) = assetSet[model.AssetId];
+                assetOccupancies.Add(await OccupyAsync(asset, category, model, occupierUserId));
             }
 
             foreach (var model in byCategoryModels)
             {
-                assetOccupancies.Add(await OccupyByCategoryAsync(model, occupierUserId));
+                var (category, assets) = categorySet[model.AssetCategoryId];
+                assetOccupancies.Add(await OccupyByCategoryAsync(category, assets, model, occupierUserId));
             }
         }
         catch
@@ -372,6 +362,69 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         return Task.CompletedTask;
     }
 
+    protected virtual async Task<Dictionary<Guid, (AssetCategory, List<Asset>)>> CreateCategorySetAsync(
+        List<OccupyAssetByCategoryInfoModel> byCategoryModels)
+    {
+        var categorySet = new Dictionary<Guid, (AssetCategory, List<Asset>)>();
+        foreach (var categoryId in byCategoryModels.Select(x => x.AssetCategoryId).Distinct())
+        {
+            var category = await AssetCategoryRepository.GetAsync(categoryId);
+            if (category.Disabled)
+            {
+                throw new DisabledAssetOrCategoryException();
+            }
+
+            var assets =
+                await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
+            categorySet.Add(categoryId, (category, assets));
+        }
+
+        return categorySet;
+    }
+
+    protected virtual async Task<Dictionary<Guid, (Asset, AssetCategory)>> CreateAssetSetAsync(
+        List<OccupyAssetInfoModel> models)
+    {
+        var assetCache = new Dictionary<Guid, (Asset, AssetCategory)>();
+        foreach (var assetId in models.Select(x => x.AssetId).Distinct())
+        {
+            var asset = await AssetRepository.GetAsync(assetId);
+            var category = await AssetCategoryRepository.GetAsync(asset.AssetCategoryId);
+            assetCache.Add(assetId, (asset, category));
+        }
+
+        return assetCache;
+    }
+
+    protected virtual async Task<(ProviderAssetOccupancyModel, AssetOccupancy)> OccupyAsync(Asset asset,
+        AssetCategory category,
+        OccupyAssetInfoModel model, Guid? occupierUserId)
+    {
+        var occupyingModel = new ProviderOccupyingInfoModel(asset, category, model.StartingTime, model.Duration,
+            model.Date, model.Volume);
+        var result = await InternalCanOccupyAsync(occupyingModel);
+        await HandleCanOccupyResultAsync(result);
+        return await InternalOccupyAsync(occupyingModel, occupierUserId);
+    }
+
+    protected virtual async Task<(ProviderAssetOccupancyModel, AssetOccupancy)> OccupyByCategoryAsync(
+        AssetCategory category,
+        List<Asset> assets,
+        OccupyAssetByCategoryInfoModel model,
+        Guid? occupierUserId)
+    {
+        var asset = await PickAssetOrNullAsync(category, assets, model);
+
+        if (asset is null)
+        {
+            throw new InsufficientAssetVolumeException();
+        }
+
+        return await InternalOccupyAsync(
+            new ProviderOccupyingInfoModel(asset, category, model.StartingTime, model.Duration, model.Date,
+                model.Volume), occupierUserId);
+    }
+
     protected virtual async Task<CanOccupyResult> InternalCanOccupyAsync(ProviderOccupyingInfoModel model)
     {
         if (model.Asset.Disabled || model.CategoryOfAsset.Disabled)
@@ -398,10 +451,9 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         return Task.FromResult(period.AvailableVolume >= model.Volume);
     }
 
-    protected virtual async Task<Asset> PickAssetOrNullAsync(AssetCategory category,
+    protected virtual async Task<Asset> PickAssetOrNullAsync(AssetCategory category, List<Asset> assets,
         OccupyAssetByCategoryInfoModel model)
     {
-        var assets = await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
         var effectivePeriodScheme = await GetEffectivePeriodSchemeAsync(model.PeriodSchemeId, category);
 
         foreach (var asset in await AssetInCategorySelector.SortAsync(assets))
