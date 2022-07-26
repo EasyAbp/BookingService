@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Shouldly;
 using System.Threading.Tasks;
+using EasyAbp.BookingService.AssetCategories;
+using EasyAbp.BookingService.Assets;
 using EasyAbp.BookingService.AssetSchedules.Dtos;
 using Volo.Abp.Application.Dtos;
 using Xunit;
@@ -65,6 +67,124 @@ namespace EasyAbp.BookingService.AssetSchedules
             }
         }
 
+        [Fact]
+        public async Task GetList_CategoryId_Test()
+        {
+            // Arrange
+            var categoryRepository = GetRequiredService<IAssetCategoryRepository>();
+            var categoryManager = GetRequiredService<AssetCategoryManager>();
+            var assetRepository = GetRequiredService<IAssetRepository>();
+            var assetManager = GetRequiredService<AssetManager>();
+
+            var category1 = await categoryManager.CreateAsync(null,
+                nameof(AssetCategory),
+                AssetDefinition.Name,
+                default,
+                default,
+                default,
+                default);
+
+            var category2 = await categoryManager.CreateAsync(null,
+                nameof(AssetCategory),
+                AssetDefinition.Name,
+                default,
+                default,
+                default,
+                default);
+
+            await WithUnitOfWorkAsync(async () =>
+            {
+                await categoryRepository.InsertAsync(category1);
+                await categoryRepository.InsertAsync(category2);
+            });
+
+            var category1Asset1 = await assetManager.CreateAsync(nameof(Asset), AssetDefinition.Name, category1,
+                default,
+                default,
+                1,
+                default,
+                default,
+                default);
+
+            var category1Asset2 = await assetManager.CreateAsync(nameof(Asset), AssetDefinition.Name, category1,
+                default,
+                default,
+                1,
+                default,
+                default,
+                default);
+
+            var category2Asset1 = await assetManager.CreateAsync(nameof(Asset), AssetDefinition.Name, category2,
+                default,
+                default,
+                1,
+                default,
+                default,
+                default);
+
+            var category2Asset2 = await assetManager.CreateAsync(nameof(Asset), AssetDefinition.Name, category2,
+                default,
+                default,
+                1,
+                default,
+                default,
+                default);
+
+            await WithUnitOfWorkAsync(async () =>
+            {
+                await assetRepository.InsertAsync(category1Asset1);
+                await assetRepository.InsertAsync(category1Asset2);
+                await assetRepository.InsertAsync(category2Asset1);
+                await assetRepository.InsertAsync(category2Asset2);
+            });
+
+            var dates = new HashSet<DateTime>
+            {
+                new DateTime(2022, 6, 20)
+            };
+            var assetIds = new HashSet<Guid>
+            {
+                category1Asset1.Id,
+                category1Asset2.Id,
+                category2Asset1.Id,
+                category2Asset2.Id,
+            };
+
+            var entities = await CreateEntitiesAsync(dates, assetIds);
+
+            await WithUnitOfWorkAsync(() =>
+                _assetScheduleRepository.InsertManyAsync(entities));
+
+            foreach (var input in GetInputs(new[] { category1.Id, category2.Id }))
+            {
+                // Act
+                var result = await WithUnitOfWorkAsync(() => _assetScheduleAppService.GetListAsync(input));
+
+                // Assert
+                if (!input.AssetCategoryId.HasValue)
+                {
+                    result.Items.ShouldContain(x => x.AssetId == category1Asset1.Id);
+                    result.Items.ShouldContain(x => x.AssetId == category1Asset2.Id);
+                    result.Items.ShouldContain(x => x.AssetId == category2Asset1.Id);
+                    result.Items.ShouldContain(x => x.AssetId == category2Asset2.Id);
+                }
+                else if (input.AssetCategoryId.Value == category1.Id)
+                {
+                    result.Items.ShouldContain(x => x.AssetId == category1Asset1.Id);
+                    result.Items.ShouldContain(x => x.AssetId == category1Asset2.Id);
+                    result.Items.ShouldNotContain(x => x.AssetId == category2Asset1.Id);
+                    result.Items.ShouldNotContain(x => x.AssetId == category2Asset2.Id);
+                }
+                else if (input.AssetCategoryId.Value == category2.Id)
+                {
+                    result.Items.ShouldNotContain(x => x.AssetId == category1Asset1.Id);
+                    result.Items.ShouldNotContain(x => x.AssetId == category1Asset2.Id);
+                    result.Items.ShouldContain(x => x.AssetId == category2Asset1.Id);
+                    result.Items.ShouldContain(x => x.AssetId == category2Asset2.Id);
+                }
+            }
+        }
+
         private static IEnumerable<GetAssetSchedulesRequestDto> GetInputs(IEnumerable<DateTime> dates,
             IReadOnlyCollection<Guid> assetIds)
         {
@@ -79,6 +199,18 @@ namespace EasyAbp.BookingService.AssetSchedules
                         MaxResultCount = LimitedResultRequestDto.MaxMaxResultCount
                     };
                 }
+            }
+        }
+
+        private static IEnumerable<GetAssetSchedulesRequestDto> GetInputs(IReadOnlyCollection<Guid> categoryIds)
+        {
+            foreach (var categoryId in new Guid?[] { null }.Concat(categoryIds.Select(x => (Guid?)x)))
+            {
+                yield return new GetAssetSchedulesRequestDto
+                {
+                    AssetCategoryId = categoryId,
+                    MaxResultCount = LimitedResultRequestDto.MaxMaxResultCount
+                };
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using EasyAbp.BookingService.Assets;
 using EasyAbp.BookingService.AssetSchedules.Dtos;
 using EasyAbp.BookingService.Dtos;
 using EasyAbp.BookingService.Permissions;
@@ -19,13 +20,16 @@ public class AssetScheduleAppService : CrudAppService<AssetSchedule, AssetSchedu
     protected override string DeletePolicyName { get; set; } = BookingServicePermissions.AssetSchedule.Delete;
 
     private readonly IAssetScheduleRepository _repository;
+    private readonly IAssetRepository _assetRepository;
     private readonly AssetScheduleManager _assetScheduleManager;
 
 
     public AssetScheduleAppService(IAssetScheduleRepository repository,
+        IAssetRepository assetRepository,
         AssetScheduleManager assetScheduleManager) : base(repository)
     {
         _repository = repository;
+        _assetRepository = assetRepository;
         _assetScheduleManager = assetScheduleManager;
     }
 
@@ -33,10 +37,17 @@ public class AssetScheduleAppService : CrudAppService<AssetSchedule, AssetSchedu
         GetAssetSchedulesRequestDto input)
     {
         var query = await base.CreateFilteredQueryAsync(input);
-        return query.WhereIf(input.Date.HasValue,
+        query = query.WhereIf(input.Date.HasValue,
                 x => x.Date == input.Date.Value)
             .WhereIf(input.AssetId.HasValue,
-                x => x.AssetId == input.AssetId.Value); // Todo: Support the CategoryId filter
+                x => x.AssetId == input.AssetId.Value);
+
+        if (input.AssetCategoryId.HasValue)
+        {
+            query = await _repository.FilterByAssetCategoryIdAsync(query, input.AssetCategoryId.Value);
+        }
+
+        return query;
     }
 
     protected override async Task<AssetSchedule> MapToEntityAsync(CreateAssetScheduleDto createInput)
