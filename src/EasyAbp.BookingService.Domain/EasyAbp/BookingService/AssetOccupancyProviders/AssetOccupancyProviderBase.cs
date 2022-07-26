@@ -315,7 +315,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         var assetOccupancies = new List<(ProviderAssetOccupancyModel, AssetOccupancy)>();
 
         var assetSet = await CreateAssetSetAsync(models);
-        var categoryCache = await CreateCategorySetAsync(byCategoryModels);
+        var categorySet = await CreateCategorySetAsync(byCategoryModels);
 
         try
         {
@@ -327,7 +327,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
             foreach (var model in byCategoryModels)
             {
-                var (category, assets) = categoryCache[model.AssetCategoryId];
+                var (category, assets) = categorySet[model.AssetCategoryId];
                 assetOccupancies.Add(await OccupyByCategoryAsync(category, assets, model, occupierUserId));
             }
         }
@@ -365,7 +365,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     protected virtual async Task<Dictionary<Guid, (AssetCategory, List<Asset>)>> CreateCategorySetAsync(
         List<OccupyAssetByCategoryInfoModel> byCategoryModels)
     {
-        var categoryCache = new Dictionary<Guid, (AssetCategory, List<Asset>)>();
+        var categorySet = new Dictionary<Guid, (AssetCategory, List<Asset>)>();
         foreach (var categoryId in byCategoryModels.Select(x => x.AssetCategoryId).Distinct())
         {
             var category = await AssetCategoryRepository.GetAsync(categoryId);
@@ -376,10 +376,10 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
             var assets =
                 await AssetRepository.GetListAsync(x => x.AssetCategoryId == category.Id && !x.Disabled);
-            categoryCache.Add(categoryId, (category, assets));
+            categorySet.Add(categoryId, (category, assets));
         }
 
-        return categoryCache;
+        return categorySet;
     }
 
     protected virtual async Task<Dictionary<Guid, (Asset, AssetCategory)>> CreateAssetSetAsync(

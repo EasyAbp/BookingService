@@ -79,7 +79,7 @@ public class DefaultAssetOccupancyProvider : AssetOccupancyProviderBase, ITransi
         using var uow = UnitOfWorkManager.Begin(true, true);
 
         var assetSet = await CreateAssetSetAsync(models);
-        var categoryCache = await CreateCategorySetAsync(byCategoryModels);
+        var categorySet = await CreateCategorySetAsync(byCategoryModels);
 
         await using var handle = await _distributedLock.TryAcquireAsync(AssetOccupancyLock,
             TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
@@ -104,7 +104,7 @@ public class DefaultAssetOccupancyProvider : AssetOccupancyProviderBase, ITransi
 
             foreach (var model in byCategoryModels)
             {
-                var (category, assets) = categoryCache[model.AssetCategoryId];
+                var (category, assets) = categorySet[model.AssetCategoryId];
                 assetOccupancies.Add(await OccupyByCategoryAsync(category, assets, model, occupierUserId));
             }
         }
