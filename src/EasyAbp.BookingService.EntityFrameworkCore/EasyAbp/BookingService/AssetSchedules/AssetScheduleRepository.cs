@@ -33,4 +33,16 @@ public class AssetScheduleRepository : EfCoreRepository<IBookingServiceDbContext
             x => x.Date == date && x.AssetId == assetId && x.PeriodSchemeId == periodSchemeId && x.PeriodId == periodId,
             cancellationToken);
     }
+
+    public async Task<IQueryable<AssetSchedule>> FilterByAssetCategoryIdAsync(IQueryable<AssetSchedule> query,
+        Guid assetCategoryId)
+    {
+        var assets = (await GetDbContextAsync()).Assets;
+        query = from schedule in query
+            from asset in assets.Where(x => x.Id == schedule.AssetId)
+            where asset.AssetCategoryId == assetCategoryId
+            select schedule;
+
+        return query;
+    }
 }

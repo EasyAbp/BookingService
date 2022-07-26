@@ -44,11 +44,7 @@ public class AssetScheduleAppService : CrudAppService<AssetSchedule, AssetSchedu
 
         if (input.AssetCategoryId.HasValue)
         {
-            var assetQueryable = await _assetRepository.GetQueryableAsync();
-            query = from schedule in query
-                from asset in assetQueryable
-                where schedule.AssetId == asset.Id && asset.AssetCategoryId == input.AssetCategoryId
-                select schedule;
+            query = await _repository.FilterByAssetCategoryIdAsync(query, input.AssetCategoryId.Value);
         }
 
         return query;
