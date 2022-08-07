@@ -78,9 +78,6 @@ public class DefaultAssetOccupancyProvider : AssetOccupancyProviderBase, ITransi
     {
         using var uow = UnitOfWorkManager.Begin(true, true);
 
-        var assetSet = await CreateAssetSetAsync(models);
-        var categorySet = await CreateCategorySetAsync(byCategoryModels);
-
         await using var handle = await _distributedLock.TryAcquireAsync(AssetOccupancyLock,
             TimeSpan.FromSeconds(Options.AssetOccupyLockTimeoutSeconds));
 
@@ -92,34 +89,7 @@ public class DefaultAssetOccupancyProvider : AssetOccupancyProviderBase, ITransi
         var result = await CanBulkOccupyAsync(models, byCategoryModels);
         await HandleCanOccupyResultAsync(result);
 
-        var assetOccupancies = new List<(ProviderAssetOccupancyModel, AssetOccupancy)>();
-
-        try
-        {
-            foreach (var model in models)
-            {
-                var (asset, category) = assetSet[model.AssetId];
-                assetOccupancies.Add(await OccupyAsync(asset, category, model, occupierUserId));
-            }
-
-            foreach (var model in byCategoryModels)
-            {
-                var (category, assets) = categorySet[model.AssetCategoryId];
-                assetOccupancies.Add(await OccupyByCategoryAsync(category, assets, model, occupierUserId));
-            }
-        }
-        catch
-        {
-            foreach (var (model, _) in assetOccupancies)
-            {
-                if (!await ProviderTryRollBackOccupancyAsync(model))
-                {
-                    _logger.LogWarning("Occupancy provider occupancy rollback failed! {Model}", model);
-                }
-            }
-
-            throw;
-        }
+        var assetOccupancies = await InternalBulkOccupyAsync(models, byCategoryModels, occupierUserId);
 
         await uow.CompleteAsync();
         return assetOccupancies;

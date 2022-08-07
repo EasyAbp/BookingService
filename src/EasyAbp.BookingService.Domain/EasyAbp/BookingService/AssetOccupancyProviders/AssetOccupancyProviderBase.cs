@@ -312,6 +312,27 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         var result = await CanBulkOccupyAsync(models, byCategoryModels);
         await HandleCanOccupyResultAsync(result);
 
+        return await InternalBulkOccupyAsync(models, byCategoryModels, occupierUserId);
+    }
+
+    public virtual Task HandleCanOccupyResultAsync(ICanOccupyResult result)
+    {
+        if (!result.CanOccupy)
+        {
+            throw result.ErrorCode switch
+            {
+                BookingServiceErrorCodes.DisabledAssetOrCategory => new DisabledAssetOrCategoryException(),
+                BookingServiceErrorCodes.InsufficientAssetVolume => new InsufficientAssetVolumeException(),
+                _ => new ArgumentOutOfRangeException(nameof(result.ErrorCode), result.ErrorCode, "Unknown error code.")
+            };
+        }
+
+        return Task.CompletedTask;
+    }
+
+    protected virtual async Task<List<(ProviderAssetOccupancyModel, AssetOccupancy)>> InternalBulkOccupyAsync(
+        List<OccupyAssetInfoModel> models, List<OccupyAssetByCategoryInfoModel> byCategoryModels, Guid? occupierUserId)
+    {
         var assetOccupancies = new List<(ProviderAssetOccupancyModel, AssetOccupancy)>();
 
         var assetSet = await CreateAssetSetAsync(models);
@@ -322,7 +343,9 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
             foreach (var model in models)
             {
                 var (asset, category) = assetSet[model.AssetId];
-                assetOccupancies.Add(await OccupyAsync(asset, category, model, occupierUserId));
+                var occupyingModel = new ProviderOccupyingInfoModel(asset, category, model.StartingTime, model.Duration,
+                    model.Date, model.Volume);
+                assetOccupancies.Add(await InternalOccupyAsync(occupyingModel, occupierUserId));
             }
 
             foreach (var model in byCategoryModels)
@@ -345,21 +368,6 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         }
 
         return assetOccupancies;
-    }
-
-    public virtual Task HandleCanOccupyResultAsync(ICanOccupyResult result)
-    {
-        if (!result.CanOccupy)
-        {
-            throw result.ErrorCode switch
-            {
-                BookingServiceErrorCodes.DisabledAssetOrCategory => new DisabledAssetOrCategoryException(),
-                BookingServiceErrorCodes.InsufficientAssetVolume => new InsufficientAssetVolumeException(),
-                _ => new ArgumentOutOfRangeException(nameof(result.ErrorCode), result.ErrorCode, "Unknown error code.")
-            };
-        }
-
-        return Task.CompletedTask;
     }
 
     protected virtual async Task<Dictionary<Guid, (AssetCategory, List<Asset>)>> CreateCategorySetAsync(
