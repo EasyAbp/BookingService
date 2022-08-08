@@ -53,8 +53,12 @@ public class AssetOccupancyGrain : Grain, IAssetOccupancyGrain
         }
         else
         {
-            occupancyCount.ChangeVolume(model.Volume);
+            if (occupancyCount.Volume + model.Volume > model.Asset.Volume)
+            {
+                throw new InsufficientAssetVolumeException();
+            }
 
+            occupancyCount.ChangeVolume(model.Volume);
             await assetOccupancyCountRepository.UpdateAsync(occupancyCount, true);
         }
 
