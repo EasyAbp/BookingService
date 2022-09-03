@@ -1,0 +1,83 @@
+{
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {},
+      "host": {}
+    }
+  },
+  "packages": {
+    "EasyAbp.BookingService.Common.Domain.Shared": {
+      "path": "src/EasyAbp.BookingService.Common.Domain.Shared/EasyAbp.BookingService.Common.Domain.Shared.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Common.Domain": {
+      "path": "src/EasyAbp.BookingService.Common.Domain/EasyAbp.BookingService.Common.Domain.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Common.Application.Contracts": {
+      "path": "src/EasyAbp.BookingService.Common.Application.Contracts/EasyAbp.BookingService.Common.Application.Contracts.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Common.Application": {
+      "path": "src/EasyAbp.BookingService.Common.Application/EasyAbp.BookingService.Common.Application.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Common.EntityFrameworkCore": {
+      "path": "src/EasyAbp.BookingService.Common.EntityFrameworkCore/EasyAbp.BookingService.Common.EntityFrameworkCore.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Common.MongoDB": {
+      "path": "src/EasyAbp.BookingService.Common.MongoDB/EasyAbp.BookingService.Common.MongoDB.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Common.HttpApi": {
+      "path": "src/EasyAbp.BookingService.Common.HttpApi/EasyAbp.BookingService.Common.HttpApi.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Common.HttpApi.Client": {
+      "path": "src/EasyAbp.BookingService.Common.HttpApi.Client/EasyAbp.BookingService.Common.HttpApi.Client.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Common.TestBase": {
+      "path": "test/EasyAbp.BookingService.Common.TestBase/EasyAbp.BookingService.Common.TestBase.abppkg.json",
+      "folder": "test"
+    },
+    "EasyAbp.BookingService.Common.EntityFrameworkCore.Tests": {
+      "path": "test/EasyAbp.BookingService.Common.EntityFrameworkCore.Tests/EasyAbp.BookingService.Common.EntityFrameworkCore.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "EasyAbp.BookingService.Common.MongoDB.Tests": {
+      "path": "test/EasyAbp.BookingService.Common.MongoDB.Tests/EasyAbp.BookingService.Common.MongoDB.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "EasyAbp.BookingService.Common.Domain.Tests": {
+      "path": "test/EasyAbp.BookingService.Common.Domain.Tests/EasyAbp.BookingService.Common.Domain.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "EasyAbp.BookingService.Common.Application.Tests": {
+      "path": "test/EasyAbp.BookingService.Common.Application.Tests/EasyAbp.BookingService.Common.Application.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "EasyAbp.BookingService.Common.Web": {
+      "path": "src/EasyAbp.BookingService.Common.Web/EasyAbp.BookingService.Common.Web.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Common.Host.Shared": {
+      "path": "host/EasyAbp.BookingService.Common.Host.Shared/EasyAbp.BookingService.Common.Host.Shared.abppkg.json",
+      "folder": "host"
+    },
+    "EasyAbp.BookingService.Common.Blazor": {
+      "path": "src/EasyAbp.BookingService.Common.Blazor/EasyAbp.BookingService.Common.Blazor.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Common.Blazor.Server": {
+      "path": "src/EasyAbp.BookingService.Common.Blazor.Server/EasyAbp.BookingService.Common.Blazor.Server.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Common.Blazor.WebAssembly": {
+      "path": "src/EasyAbp.BookingService.Common.Blazor.WebAssembly/EasyAbp.BookingService.Common.Blazor.WebAssembly.abppkg.json",
+      "folder": "src"
+    }
+  }
+}

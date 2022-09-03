@@ -1,0 +1,7 @@
+{
+  "modules": {
+    "EasyAbp.BookingService": {
+      "path": "EasyAbp.BookingService.abpmdl.json"
+    }
+  }
+}
