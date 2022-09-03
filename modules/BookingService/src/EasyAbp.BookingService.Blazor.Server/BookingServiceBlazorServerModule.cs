@@ -5,7 +5,8 @@ namespace EasyAbp.BookingService.Blazor.Server;
 
 [DependsOn(
     typeof(AbpAspNetCoreComponentsServerThemingModule),
-    typeof(BookingServiceBlazorModule)
+    typeof(BookingServiceBlazorModule),
+    typeof(BookingServiceCommonBlazorServerModule)
     )]
 public class BookingServiceBlazorServerModule : AbpModule
 {

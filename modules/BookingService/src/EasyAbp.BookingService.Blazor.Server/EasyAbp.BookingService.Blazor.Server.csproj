@@ -11,6 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\Common\src\EasyAbp.BookingService.Common.Blazor.Server\EasyAbp.BookingService.Common.Blazor.Server.csproj" />
         <ProjectReference Include="..\EasyAbp.BookingService.Blazor\EasyAbp.BookingService.Blazor.csproj" />
     </ItemGroup>
 

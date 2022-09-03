@@ -11,8 +11,9 @@ namespace EasyAbp.BookingService.Blazor;
 [DependsOn(
     typeof(BookingServiceApplicationContractsModule),
     typeof(AbpAspNetCoreComponentsWebThemingModule),
-    typeof(AbpAutoMapperModule)
-    )]
+    typeof(AbpAutoMapperModule),
+    typeof(BookingServiceCommonBlazorModule)
+)]
 public class BookingServiceBlazorModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)

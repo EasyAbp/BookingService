@@ -6,9 +6,9 @@ namespace EasyAbp.BookingService.Blazor.WebAssembly;
 [DependsOn(
     typeof(BookingServiceBlazorModule),
     typeof(BookingServiceHttpApiClientModule),
-    typeof(AbpAspNetCoreComponentsWebAssemblyThemingModule)
-    )]
+    typeof(AbpAspNetCoreComponentsWebAssemblyThemingModule),
+    typeof(BookingServiceCommonBlazorWebAssemblyModule)
+)]
 public class BookingServiceBlazorWebAssemblyModule : AbpModule
 {
-
 }
