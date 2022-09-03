@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <Import Project="..\..\..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+    <RootNamespace>EasyAbp.BookingService.Blazor.Host</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blazorise.Bootstrap5" Version="1.0.4" />
+    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Autofac.WebAssembly" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Components.WebAssembly.BasicTheme" Version="$(AbpVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Account.Application.Contracts" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Identity.Blazor.WebAssembly" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.TenantManagement.Blazor.WebAssembly" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.SettingManagement.Blazor.WebAssembly" Version="$(AbpVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EasyAbp.BookingService.Orleans.Host.Shared\EasyAbp.BookingService.Orleans.Host.Shared.csproj" />
+    <ProjectReference Include="..\..\src\EasyAbp.BookingService.Orleans.Blazor.WebAssembly\EasyAbp.BookingService.Orleans.Blazor.WebAssembly.csproj" />
+  </ItemGroup>
+
+</Project>

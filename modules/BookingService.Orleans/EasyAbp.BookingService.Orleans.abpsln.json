@@ -1,0 +1,7 @@
+{
+  "modules": {
+    "EasyAbp.BookingService.Orleans": {
+      "path": "EasyAbp.BookingService.Orleans.abpmdl.json"
+    }
+  }
+}

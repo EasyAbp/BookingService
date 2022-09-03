@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="$(AbpVersion)" />
+    <ProjectReference Include="..\..\..\Common\src\EasyAbp.BookingService.Common.HttpApi\EasyAbp.BookingService.Common.HttpApi.csproj" />
+    <ProjectReference Include="..\EasyAbp.BookingService.Orleans.Application.Contracts\EasyAbp.BookingService.Orleans.Application.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
