@@ -36,7 +36,6 @@ public class BookingServiceDbContext : AbpDbContext<BookingServiceDbContext>, IB
     {
         base.OnModelCreating(builder);
 
-        builder.ConfigureBookingServiceCommon();
         builder.ConfigureBookingService();
     }
 }

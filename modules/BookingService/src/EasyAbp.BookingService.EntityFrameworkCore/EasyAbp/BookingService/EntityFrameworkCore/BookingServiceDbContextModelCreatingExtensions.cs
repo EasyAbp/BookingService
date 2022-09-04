@@ -17,6 +17,8 @@ public static class BookingServiceDbContextModelCreatingExtensions
         this ModelBuilder builder)
     {
         Check.NotNull(builder, nameof(builder));
+        
+        builder.ConfigureBookingServiceCommon();
 
         builder.Entity<AssetOccupancyCount>(b =>
         {
