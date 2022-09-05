@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.*" />
+    <PackageReference Include="EasyAbp.Abp.Trees.Domain" Version="$(EasyAbpAbpTreesModuleVersion)" />
+    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Caching" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.DistributedLocking.Abstractions" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Users.Abstractions" Version="$(AbpVersion)" />
+    <ProjectReference Include="..\EasyAbp.BookingService.Common.Domain.Shared\EasyAbp.BookingService.Common.Domain.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

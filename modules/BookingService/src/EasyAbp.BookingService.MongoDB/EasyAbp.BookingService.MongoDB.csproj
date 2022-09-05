@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.MongoDB" Version="$(AbpVersion)" />
+    <ProjectReference Include="..\..\..\Common\src\EasyAbp.BookingService.Common.MongoDB\EasyAbp.BookingService.Common.MongoDB.csproj" />
+    <ProjectReference Include="..\EasyAbp.BookingService.Domain\EasyAbp.BookingService.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="EasyAbp\BookingService" />
+  </ItemGroup>
+
+</Project>
