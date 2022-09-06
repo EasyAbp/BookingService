@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using Orleans;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.Uow;
@@ -13,10 +14,13 @@ namespace EasyAbp.BookingService.AssetSchedules;
 public class AssetScheduleManager : DomainService, IAssetScheduleManager
 {
     private readonly IAssetScheduleRepository _repository;
+    private readonly IGrainFactory _grainFactory;
 
-    public AssetScheduleManager(IAssetScheduleRepository repository)
+    public AssetScheduleManager(IAssetScheduleRepository repository,
+        IGrainFactory grainFactory)
     {
         _repository = repository;
+        _grainFactory = grainFactory;
     }
 
     [UnitOfWork]
@@ -39,12 +43,11 @@ public class AssetScheduleManager : DomainService, IAssetScheduleManager
             timeInAdvance);
     }
 
-    [UnitOfWork]
-    public virtual async Task<List<IAssetSchedule>> GetListAsync(DateTime date, Guid assetId, Guid periodSchemeId,
+    public virtual Task<List<IAssetSchedule>> GetListAsync(DateTime date, Guid assetId, Guid periodSchemeId,
         CancellationToken token = default)
     {
-        var list = await _repository.GetListAsync(date, assetId, periodSchemeId, token);
-        return list.Cast<IAssetSchedule>().ToList();
+        var grain = _grainFactory.GetGrain<IAssetScheduleGrain>(assetId, CalculateCompoundKey(date));
+        return grain.GetListAsync(periodSchemeId);
     }
 
     [UnitOfWork]
@@ -57,5 +60,10 @@ public class AssetScheduleManager : DomainService, IAssetScheduleManager
     public Task<bool> AnyByPeriodIdAsync(Guid periodId, CancellationToken token = default)
     {
         return _repository.AnyAsync(x => x.PeriodId == periodId, token);
+    }
+
+    protected virtual string CalculateCompoundKey(DateTime date)
+    {
+        return AssetScheduleExtensions.CalculateCompoundKey(date, CurrentTenant.Id);
     }
 }

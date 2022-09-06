@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using EasyAbp.BookingService.Assets;
 using JetBrains.Annotations;
 using Volo.Abp.Domain.Entities.Auditing;

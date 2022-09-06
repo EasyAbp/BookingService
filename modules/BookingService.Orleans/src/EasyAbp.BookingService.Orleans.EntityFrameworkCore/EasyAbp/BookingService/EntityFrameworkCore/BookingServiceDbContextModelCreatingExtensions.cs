@@ -1,10 +1,4 @@
-using EasyAbp.BookingService.PeriodSchemes;
 using EasyAbp.BookingService.AssetSchedules;
-using EasyAbp.BookingService.Assets;
-using EasyAbp.BookingService.AssetPeriodSchemes;
-using EasyAbp.BookingService.AssetOccupancies;
-using EasyAbp.BookingService.AssetCategories;
-using EasyAbp.BookingService.AssetOccupancyCounts;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp;
 using Volo.Abp.EntityFrameworkCore.Modeling;
@@ -18,15 +12,7 @@ public static class BookingServiceDbContextModelCreatingExtensions
     {
         Check.NotNull(builder, nameof(builder));
 
-        builder.Entity<AssetOccupancyCount>(b =>
-        {
-            b.ToTable(BookingServiceDbProperties.DbTablePrefix + "AssetOccupancyCounts",
-                BookingServiceDbProperties.DbSchema);
-            b.ConfigureByConvention();
-
-            /* Configure more properties here */
-            b.HasKey(x => new { x.Date, x.AssetId, x.StartingTime, x.Duration });
-        });
+        builder.ConfigureBookingServiceCommon();
 
         builder.Entity<AssetSchedule>(b =>
         {

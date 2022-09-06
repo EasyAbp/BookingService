@@ -1,13 +1,6 @@
+using EasyAbp.BookingService.AssetSchedules;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Data;
-using Volo.Abp.EntityFrameworkCore;
-using EasyAbp.BookingService.AssetCategories;
-using EasyAbp.BookingService.AssetOccupancies;
-using EasyAbp.BookingService.AssetOccupancyCounts;
-using EasyAbp.BookingService.AssetPeriodSchemes;
-using EasyAbp.BookingService.Assets;
-using EasyAbp.BookingService.AssetSchedules;
-using EasyAbp.BookingService.PeriodSchemes;
 
 namespace EasyAbp.BookingService.EntityFrameworkCore;
 
@@ -18,5 +11,4 @@ public interface IBookingServiceDbContext : IBookingServiceCommonDbContext
      * DbSet<Question> Questions { get; }
      */
     DbSet<AssetSchedule> AssetSchedules { get; set; }
-    DbSet<AssetOccupancyCount> AssetOccupancyCounts { get; set; }
 }

@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using Volo.Abp;
 
-namespace EasyAbp.BookingService.AssetOccupancyCounts;
+namespace EasyAbp.BookingService.AssetOccupancies;
 
 public class UnexpectedNegativeVolumeException : BusinessException
 {

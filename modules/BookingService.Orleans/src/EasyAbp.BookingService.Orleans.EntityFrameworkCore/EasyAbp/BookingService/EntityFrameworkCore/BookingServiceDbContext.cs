@@ -1,6 +1,5 @@
 using EasyAbp.BookingService.AssetCategories;
 using EasyAbp.BookingService.AssetOccupancies;
-using EasyAbp.BookingService.AssetOccupancyCounts;
 using EasyAbp.BookingService.AssetPeriodSchemes;
 using EasyAbp.BookingService.Assets;
 using EasyAbp.BookingService.AssetSchedules;
@@ -18,7 +17,6 @@ public class BookingServiceDbContext : AbpDbContext<BookingServiceDbContext>, IB
      * public DbSet<Question> Questions { get; set; }
      */
     public DbSet<AssetSchedule> AssetSchedules { get; set; }
-    public DbSet<AssetOccupancyCount> AssetOccupancyCounts { get; set; }
 
     public DbSet<AssetCategory> AssetCategories { get; set; }
     public DbSet<AssetOccupancy> AssetOccupancies { get; set; }
@@ -36,7 +34,6 @@ public class BookingServiceDbContext : AbpDbContext<BookingServiceDbContext>, IB
     {
         base.OnModelCreating(builder);
 
-        builder.ConfigureBookingServiceCommon();
         builder.ConfigureBookingService();
     }
 }

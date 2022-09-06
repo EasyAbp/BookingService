@@ -17,5 +17,21 @@
     <ProjectReference Include="..\EasyAbp.BookingService.Orleans.Domain.Shared\EasyAbp.BookingService.Orleans.Domain.Shared.csproj" />
     <ProjectReference Include="..\..\..\Common\src\EasyAbp.BookingService.Common.Domain\EasyAbp.BookingService.Common.Domain.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Orleans.Client" Version="$(OrleansVersion)" />
+    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="$(OrleansVersion)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Orleans.Server" Version="$(OrleansVersion)" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Orleans_CodeGenInputs Remove="EasyAbp\BookingService\AssetOccupancyCounts\AssetOccupancyCount.cs" />
+    <Orleans_CodeGenInputs Remove="EasyAbp\BookingService\AssetOccupancyCounts\AssetOccupancyCountKey.cs" />
+    <Orleans_CodeGenInputs Remove="EasyAbp\BookingService\AssetOccupancyCounts\AssetOccupancyCountVolumeCannotLessThanZeroException.cs" />
+    <Orleans_CodeGenInputs Remove="EasyAbp\BookingService\AssetOccupancyCounts\IAssetOccupancyCountRepository.cs" />
+  </ItemGroup>
 
 </Project>
