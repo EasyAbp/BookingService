@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using EasyAbp.BookingService.AssetSchedules;
 using Orleans;
 using Volo.Abp.DependencyInjection;
 
 namespace EasyAbp.BookingService.AssetOccupancyProviders;
 
-[ExposeServices(typeof(IAssetOccupancyProvider), typeof(OrleansAssetOccupancyProvider))]
-[Dependency(ReplaceServices = true)]
 public class OrleansAssetOccupancyProvider : AssetOccupancyProviderBase, ITransientDependency
 {
     private readonly IGrainFactory _grainFactory;
@@ -47,6 +44,6 @@ public class OrleansAssetOccupancyProvider : AssetOccupancyProviderBase, ITransi
 
     protected virtual string CalculateCompoundKey(DateTime date)
     {
-        return AssetScheduleExtensions.CalculateCompoundKey(date, CurrentTenant.Id);
+        return AssetOccupancyGrainExtensions.CalculateCompoundKey(date, CurrentTenant.Id);
     }
 }

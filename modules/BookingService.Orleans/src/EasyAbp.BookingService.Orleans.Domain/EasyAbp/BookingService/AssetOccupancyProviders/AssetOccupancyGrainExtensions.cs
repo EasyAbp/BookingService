@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Globalization;
 
-namespace EasyAbp.BookingService.AssetSchedules;
+namespace EasyAbp.BookingService.AssetOccupancyProviders;
 
-public static class AssetScheduleExtensions
+public static class AssetOccupancyGrainExtensions
 {
     public const string CompoundKeySeparator = "|";
 
@@ -15,15 +15,5 @@ public static class AssetScheduleExtensions
     public static DateTime GetDateFromCompoundKey(this string compoundKey)
     {
         return DateTime.Parse(compoundKey.Split(CompoundKeySeparator)[0]);
-    }
-
-    public static AssetScheduleGrainStateModel ToAssetScheduleGrainStateModel(this AssetSchedule entity)
-    {
-        return new AssetScheduleGrainStateModel(
-            entity.Id,
-            entity.PeriodSchemeId,
-            entity.PeriodId,
-            entity.PeriodUsable,
-            entity.TimeInAdvance);
     }
 }

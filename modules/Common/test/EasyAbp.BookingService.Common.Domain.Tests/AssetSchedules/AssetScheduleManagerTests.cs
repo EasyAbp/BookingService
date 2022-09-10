@@ -6,7 +6,7 @@ using Xunit;
 
 namespace EasyAbp.BookingService.AssetSchedules
 {
-    public class AssetScheduleManagerTests : BookingServiceDomainTestBase
+    public class AssetScheduleManagerTests : BookingServiceCommonDomainTestBase
     {
         private readonly IAssetScheduleRepository _assetScheduleRepository;
         private readonly IGuidGenerator _guidGenerator;

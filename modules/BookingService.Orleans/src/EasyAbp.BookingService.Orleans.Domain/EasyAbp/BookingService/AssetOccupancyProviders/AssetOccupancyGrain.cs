@@ -48,7 +48,7 @@ public class AssetOccupancyGrain : Grain<AssetOccupancyStateModel>, IAssetOccupa
                 throw new InsufficientAssetVolumeException();
             }
 
-            if (!assetOccupancyModel.ChangeVolume(model.Volume))
+            if (!assetOccupancyModel.TryChangeVolume(model.Volume))
             {
                 throw new UnexpectedNegativeVolumeException(_assetId, _date, model.StartingTime, model.Duration,
                     assetOccupancyModel.Volume,
@@ -74,7 +74,7 @@ public class AssetOccupancyGrain : Grain<AssetOccupancyStateModel>, IAssetOccupa
                 return false;
             }
 
-            assetOccupancyModel.ChangeVolume(-1 * model.Volume);
+            assetOccupancyModel.TryChangeVolume(-1 * model.Volume);
             await WriteStateAsync();
             return true;
         }

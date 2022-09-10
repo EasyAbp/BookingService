@@ -26,12 +26,5 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Orleans.Server" Version="$(OrleansVersion)" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <Orleans_CodeGenInputs Remove="EasyAbp\BookingService\AssetOccupancyCounts\AssetOccupancyCount.cs" />
-    <Orleans_CodeGenInputs Remove="EasyAbp\BookingService\AssetOccupancyCounts\AssetOccupancyCountKey.cs" />
-    <Orleans_CodeGenInputs Remove="EasyAbp\BookingService\AssetOccupancyCounts\AssetOccupancyCountVolumeCannotLessThanZeroException.cs" />
-    <Orleans_CodeGenInputs Remove="EasyAbp\BookingService\AssetOccupancyCounts\IAssetOccupancyCountRepository.cs" />
-  </ItemGroup>
 
 </Project>

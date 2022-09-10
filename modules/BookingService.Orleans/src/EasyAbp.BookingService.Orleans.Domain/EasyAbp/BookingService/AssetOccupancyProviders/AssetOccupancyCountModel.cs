@@ -1,5 +1,4 @@
 ﻿using System;
-using EasyAbp.BookingService.AssetOccupancies;
 
 namespace EasyAbp.BookingService.AssetOccupancyProviders;
 
@@ -23,7 +22,7 @@ public class AssetOccupancyCountModel
         Volume = volume;
     }
 
-    public bool ChangeVolume(int changedVolume)
+    public bool TryChangeVolume(int changedVolume)
     {
         if (Volume + changedVolume < 0)
         {

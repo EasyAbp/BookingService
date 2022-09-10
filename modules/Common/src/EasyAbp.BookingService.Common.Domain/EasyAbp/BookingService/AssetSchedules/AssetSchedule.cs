@@ -6,7 +6,7 @@ using Volo.Abp.MultiTenancy;
 
 namespace EasyAbp.BookingService.AssetSchedules;
 
-public class AssetSchedule : FullAuditedAggregateRoot<Guid>, IMultiTenant, IAssetSchedule
+public class AssetSchedule : FullAuditedAggregateRoot<Guid>, IMultiTenant
 {
     public virtual Guid? TenantId { get; protected set; }
 
@@ -18,10 +18,15 @@ public class AssetSchedule : FullAuditedAggregateRoot<Guid>, IMultiTenant, IAsse
 
     public virtual Guid PeriodId { get; protected set; }
 
-    /// <inheritdoc/>>
+    /// <summary>
+    /// Accept or reject occupying within this time frame.
+    /// </summary>
     public virtual PeriodUsable PeriodUsable { get; protected set; }
 
-    /// <inheritdoc/>>
+    /// <summary>
+    /// This value object describes the time range for assets that can occupy.
+    /// Will fall back to <see cref="Asset"/> if the value here is <c>null</c>.
+    /// </summary>
     public virtual TimeInAdvance TimeInAdvance { get; protected set; }
 
     protected AssetSchedule()

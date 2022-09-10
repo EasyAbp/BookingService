@@ -7,7 +7,7 @@ using Xunit;
 
 namespace EasyAbp.BookingService.EntityFrameworkCore.AssetSchedules
 {
-    public class AssetScheduleRepositoryTests : BookingServiceOrleansEntityFrameworkCoreTestBase
+    public class AssetScheduleRepositoryTests : BookingServiceCommonEntityFrameworkCoreTestBase
     {
         private readonly IAssetScheduleRepository _assetScheduleRepository;
         private readonly AssetScheduleManager _assetScheduleManager;

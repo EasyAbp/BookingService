@@ -25,8 +25,8 @@ public class PeriodSchemeManager : DomainService
     protected IAssetPeriodSchemeRepository AssetPeriodSchemeRepository =>
         LazyServiceProvider.LazyGetRequiredService<IAssetPeriodSchemeRepository>();
 
-    protected IAssetScheduleManager AssetScheduleManager =>
-        LazyServiceProvider.LazyGetRequiredService<IAssetScheduleManager>();
+    protected AssetScheduleManager AssetScheduleManager =>
+        LazyServiceProvider.LazyGetRequiredService<AssetScheduleManager>();
 
     public virtual Task<PeriodScheme> CreateAsync(string name, List<Period> periods)
     {

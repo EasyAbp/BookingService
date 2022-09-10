@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,7 +14,7 @@ using Xunit;
 
 namespace EasyAbp.BookingService.PeriodSchemes;
 
-public class PeriodSchemeManagerTests : BookingServiceOrleansDomainTestBase
+public class PeriodSchemeManagerTests : BookingServiceCommonDomainTestBase
 {
     private static readonly AssetDefinition AssetDefinition = new(nameof(AssetDefinition),
         default,

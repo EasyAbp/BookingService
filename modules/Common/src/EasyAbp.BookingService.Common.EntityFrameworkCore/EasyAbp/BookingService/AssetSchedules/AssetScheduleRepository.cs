@@ -10,10 +10,10 @@ using Volo.Abp.EntityFrameworkCore;
 
 namespace EasyAbp.BookingService.AssetSchedules;
 
-public class AssetScheduleRepository : EfCoreRepository<IBookingServiceDbContext, AssetSchedule, Guid>,
+public class AssetScheduleRepository : EfCoreRepository<IBookingServiceCommonDbContext, AssetSchedule, Guid>,
     IAssetScheduleRepository
 {
-    public AssetScheduleRepository(IDbContextProvider<IBookingServiceDbContext> dbContextProvider) : base(
+    public AssetScheduleRepository(IDbContextProvider<IBookingServiceCommonDbContext> dbContextProvider) : base(
         dbContextProvider)
     {
     }

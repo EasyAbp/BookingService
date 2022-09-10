@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -10,13 +9,17 @@ using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.AssetSchedules;
 
-public class AssetScheduleManager : DomainService, IAssetScheduleManager
+public class AssetScheduleManager : DomainService
 {
     private readonly IAssetScheduleRepository _repository;
 
-    public AssetScheduleManager(IAssetScheduleRepository repository)
+    protected IAssetScheduleStore AssetScheduleStore { get; }
+
+    public AssetScheduleManager(IAssetScheduleRepository repository,
+        IAssetScheduleStore assetScheduleStore)
     {
         _repository = repository;
+        AssetScheduleStore = assetScheduleStore;
     }
 
     [UnitOfWork]
@@ -40,11 +43,10 @@ public class AssetScheduleManager : DomainService, IAssetScheduleManager
     }
 
     [UnitOfWork]
-    public virtual async Task<List<IAssetSchedule>> GetListAsync(DateTime date, Guid assetId, Guid periodSchemeId,
+    public virtual Task<List<AssetSchedule>> GetListAsync(DateTime date, Guid assetId, Guid periodSchemeId,
         CancellationToken token = default)
     {
-        var list = await _repository.GetListAsync(date, assetId, periodSchemeId, token);
-        return list.Cast<IAssetSchedule>().ToList();
+        return AssetScheduleStore.GetListAsync(date, assetId, periodSchemeId, token);
     }
 
     [UnitOfWork]
