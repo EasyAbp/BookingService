@@ -9,6 +9,11 @@ public class ProviderOccupyingInfoModel : IOccupyingBaseInfo
     public ProviderOccupyingInfoModel(Asset asset, AssetCategory categoryOfAsset, TimeSpan startingTime,
         TimeSpan duration, DateTime date, int volume)
     {
+        if (volume <= 0)
+        {
+            throw new NegativeOccupyingException(volume);
+        }
+
         Asset = asset;
         CategoryOfAsset = categoryOfAsset;
         StartingTime = startingTime;
