@@ -4,6 +4,7 @@ using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Entities.Events;
 using Volo.Abp.EventBus;
 using Volo.Abp.MultiTenancy;
+using Volo.Abp.Uow;
 
 namespace EasyAbp.BookingService.AssetSchedules;
 
@@ -11,21 +12,26 @@ public class AssetScheduleCacheInvalidator : ILocalEventHandler<EntityChangedEve
     ITransientDependency
 {
     protected IDistributedCache<AssetScheduleCacheItem> DistributedCache { get; }
+
+    protected IUnitOfWorkManager UnitOfWorkManager { get; }
     protected ICurrentTenant CurrentTenant { get; }
 
     public AssetScheduleCacheInvalidator(IDistributedCache<AssetScheduleCacheItem> distributedCache,
-        ICurrentTenant currentTenant)
+        ICurrentTenant currentTenant,
+        IUnitOfWorkManager unitOfWorkManager)
     {
         DistributedCache = distributedCache;
         CurrentTenant = currentTenant;
+        UnitOfWorkManager = unitOfWorkManager;
     }
 
-    public virtual Task HandleEventAsync(EntityChangedEventData<AssetSchedule> eventData)
+    public virtual async Task HandleEventAsync(EntityChangedEventData<AssetSchedule> eventData)
     {
         var key = AssetScheduleCacheItem.CalculateKey(eventData.Entity.Date,
             eventData.Entity.AssetId,
             eventData.Entity.PeriodSchemeId,
             CurrentTenant.Id);
-        return DistributedCache.RemoveAsync(key);
+        await DistributedCache.RemoveAsync(key);
+        UnitOfWorkManager.Current?.OnCompleted(() => DistributedCache.RemoveAsync(key));
     }
 }

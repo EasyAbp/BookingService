@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EasyAbp.BookingService.AssetOccupancies;
-using EasyAbp.BookingService.AssetSchedules;
 using Orleans;
 using Orleans.Providers;
 
@@ -74,7 +73,13 @@ public class AssetOccupancyGrain : Grain<AssetOccupancyStateModel>, IAssetOccupa
                 return false;
             }
 
-            assetOccupancyModel.TryChangeVolume(-1 * model.Volume);
+            if (!assetOccupancyModel.TryChangeVolume(-1 * model.Volume))
+            {
+                throw new UnexpectedNegativeVolumeException(_assetId, _date, model.StartingTime, model.Duration,
+                    assetOccupancyModel.Volume,
+                    model.Volume);
+            }
+
             await WriteStateAsync();
             return true;
         }

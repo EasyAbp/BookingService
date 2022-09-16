@@ -11,7 +11,7 @@ public class ProviderOccupyingInfoModel : IOccupyingBaseInfo
     {
         if (volume <= 0)
         {
-            throw new NegativeOccupyingException(volume);
+            throw new InvalidOccupyingVolumeException(volume);
         }
 
         Asset = asset;
