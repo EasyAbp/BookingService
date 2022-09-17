@@ -18,4 +18,5 @@ public static class BookingServiceErrorCodes
     public const string CannotUpdatePeriodInUse = "EasyAbp.BookingService:CannotUpdatePeriodInUse";
     public const string CannotDeletePeriodSchemeInUse = "EasyAbp.BookingService:CannotDeletePeriodSchemeInUse";
     public const string FailToObtainAssetOccupancyLock = "EasyAbp.BookingService:FailToObtainAssetOccupancyLock";
+    public const string InvalidOccupyingVolume = "EasyAbp.BookingService:InvalidOccupyingVolume";
 }

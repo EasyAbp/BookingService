@@ -1,9 +1,3 @@
-using EasyAbp.BookingService.PeriodSchemes;
-using EasyAbp.BookingService.AssetSchedules;
-using EasyAbp.BookingService.Assets;
-using EasyAbp.BookingService.AssetPeriodSchemes;
-using EasyAbp.BookingService.AssetOccupancies;
-using EasyAbp.BookingService.AssetCategories;
 using EasyAbp.BookingService.AssetOccupancyCounts;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp;
@@ -28,16 +22,6 @@ public static class BookingServiceDbContextModelCreatingExtensions
 
             /* Configure more properties here */
             b.HasKey(x => new { x.Date, x.AssetId, x.StartingTime, x.Duration });
-        });
-
-        builder.Entity<AssetSchedule>(b =>
-        {
-            b.ToTable(BookingServiceDbProperties.DbTablePrefix + "AssetSchedules", BookingServiceDbProperties.DbSchema);
-            b.ConfigureByConvention();
-
-            /* Configure more properties here */
-            b.OwnsOne(x => x.TimeInAdvance);
-            b.HasIndex(x => new { x.Date, x.AssetId, x.PeriodSchemeId });
         });
     }
 }

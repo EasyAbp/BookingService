@@ -22,6 +22,7 @@ public class BookingServiceCommonDbContext : AbpDbContext<BookingServiceCommonDb
     public DbSet<Asset> Assets { get; set; }
     public DbSet<PeriodScheme> PeriodSchemes { get; set; }
     public DbSet<Period> Periods { get; set; }
+    public DbSet<AssetSchedule> AssetSchedules { get; set; }
 
     public BookingServiceCommonDbContext(DbContextOptions<BookingServiceCommonDbContext> options)
         : base(options)

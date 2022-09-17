@@ -8,6 +8,8 @@ using EasyAbp.BookingService.AssetPeriodSchemes;
 using EasyAbp.BookingService.AssetPeriodSchemes.Dtos;
 using EasyAbp.BookingService.Assets;
 using EasyAbp.BookingService.Assets.Dtos;
+using EasyAbp.BookingService.AssetSchedules;
+using EasyAbp.BookingService.AssetSchedules.Dtos;
 using EasyAbp.BookingService.Dtos;
 using EasyAbp.BookingService.PeriodSchemes;
 using EasyAbp.BookingService.PeriodSchemes.Dtos;
@@ -31,6 +33,8 @@ public class BookingServiceCommonApplicationAutoMapperProfile : Profile
         CreateMap<PeriodScheme, PeriodSchemeDto>();
         CreateMap<Period, PeriodDto>();
         CreateMap<PeriodOccupancyModel, BookingPeriodDto>();
+
+        CreateMap<AssetSchedule, AssetScheduleDto>();
 
         CreateMap<CreateAssetPeriodSchemeDto, AssetPeriodScheme>(MemberList.Source);
         CreateMap<UpdateAssetPeriodSchemeDto, AssetPeriodScheme>(MemberList.Source);

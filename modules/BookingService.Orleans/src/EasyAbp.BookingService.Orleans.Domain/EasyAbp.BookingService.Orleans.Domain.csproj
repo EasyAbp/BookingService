@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.*" />
+    <PackageReference Include="EasyAbp.Abp.Trees.Domain" Version="$(EasyAbpAbpTreesModuleVersion)" />
+    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Caching" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.DistributedLocking.Abstractions" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Users.Abstractions" Version="$(AbpVersion)" />
+    <ProjectReference Include="..\EasyAbp.BookingService.Orleans.Domain.Shared\EasyAbp.BookingService.Orleans.Domain.Shared.csproj" />
+    <ProjectReference Include="..\..\..\Common\src\EasyAbp.BookingService.Common.Domain\EasyAbp.BookingService.Common.Domain.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Orleans.Client" Version="$(OrleansVersion)" />
+    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="$(OrleansVersion)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Orleans.Server" Version="$(OrleansVersion)" />
+  </ItemGroup>
+
+</Project>

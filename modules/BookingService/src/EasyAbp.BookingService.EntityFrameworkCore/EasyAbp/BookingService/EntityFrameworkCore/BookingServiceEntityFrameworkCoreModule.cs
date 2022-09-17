@@ -1,6 +1,5 @@
 using EasyAbp.Abp.Trees.EntityFrameworkCore;
 using EasyAbp.BookingService.AssetOccupancyCounts;
-using EasyAbp.BookingService.AssetSchedules;
 using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Modularity;
@@ -24,11 +23,8 @@ public class BookingServiceEntityFrameworkCoreModule : AbpModule
             /* Add custom repositories here. Example:
              * options.AddRepository<Question, EfCoreQuestionRepository>();
              */
-            options.AddRepository<AssetSchedule, AssetScheduleRepository>();
             options.AddRepository<AssetOccupancyCount, AssetOccupancyCountRepository>();
 
-            options.Entity<AssetSchedule>(entityOptions =>
-                entityOptions.DefaultWithDetailsFunc = x => x.IncludeDetails());
             options.Entity<AssetOccupancyCount>(entityOptions =>
                 entityOptions.DefaultWithDetailsFunc = x => x.IncludeDetails());
         });

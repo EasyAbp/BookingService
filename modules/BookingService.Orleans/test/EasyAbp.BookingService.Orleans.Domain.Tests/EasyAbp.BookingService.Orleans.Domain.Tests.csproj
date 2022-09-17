@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>EasyAbp.BookingService</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <PackageReference Include="Microsoft.Orleans.TestingHost" Version="$(OrleansVersion)" />
+    <ProjectReference Include="..\EasyAbp.BookingService.Orleans.EntityFrameworkCore.Tests\EasyAbp.BookingService.Orleans.EntityFrameworkCore.Tests.csproj" />
+  </ItemGroup>
+
+</Project>

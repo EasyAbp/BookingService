@@ -107,6 +107,66 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Web.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Web.Unified", "modules\BookingService\host\EasyAbp.BookingService.Web.Unified\EasyAbp.BookingService.Web.Unified.csproj", "{12F749AA-95DE-4220-B126-CE0E3039D3E7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BookingService.Orleans", "BookingService.Orleans", "{7E8CE173-1B61-4B79-B443-CE8D6DB74073}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BF04983D-C6B8-48E7-8A25-3550FF069955}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Application", "modules\BookingService.Orleans\src\EasyAbp.BookingService.Orleans.Application\EasyAbp.BookingService.Orleans.Application.csproj", "{251EB747-C0E6-460E-A557-44D987A792BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Application.Contracts", "modules\BookingService.Orleans\src\EasyAbp.BookingService.Orleans.Application.Contracts\EasyAbp.BookingService.Orleans.Application.Contracts.csproj", "{AC64A835-6938-4D26-BF4E-40C733E1E9F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Blazor", "modules\BookingService.Orleans\src\EasyAbp.BookingService.Orleans.Blazor\EasyAbp.BookingService.Orleans.Blazor.csproj", "{1F462CF0-D268-46A8-8CE8-DA0CC2C03DA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Blazor.Server", "modules\BookingService.Orleans\src\EasyAbp.BookingService.Orleans.Blazor.Server\EasyAbp.BookingService.Orleans.Blazor.Server.csproj", "{7D1E5CC2-EF6A-4807-8742-84E707C8EF65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Blazor.WebAssembly", "modules\BookingService.Orleans\src\EasyAbp.BookingService.Orleans.Blazor.WebAssembly\EasyAbp.BookingService.Orleans.Blazor.WebAssembly.csproj", "{8C11499C-61B8-41A6-84E1-432E139386D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Domain", "modules\BookingService.Orleans\src\EasyAbp.BookingService.Orleans.Domain\EasyAbp.BookingService.Orleans.Domain.csproj", "{B234FE73-319C-4AB3-925D-33A970AABD22}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Domain.Shared", "modules\BookingService.Orleans\src\EasyAbp.BookingService.Orleans.Domain.Shared\EasyAbp.BookingService.Orleans.Domain.Shared.csproj", "{83632BDF-02EA-46DE-9BB4-F6FEEC53A7E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.EntityFrameworkCore", "modules\BookingService.Orleans\src\EasyAbp.BookingService.Orleans.EntityFrameworkCore\EasyAbp.BookingService.Orleans.EntityFrameworkCore.csproj", "{60E5D757-2185-4F2D-BD4C-F627FEEB9443}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.HttpApi", "modules\BookingService.Orleans\src\EasyAbp.BookingService.Orleans.HttpApi\EasyAbp.BookingService.Orleans.HttpApi.csproj", "{F6650F5A-259F-49B5-9E80-F0163143D8BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.HttpApi.Client", "modules\BookingService.Orleans\src\EasyAbp.BookingService.Orleans.HttpApi.Client\EasyAbp.BookingService.Orleans.HttpApi.Client.csproj", "{DDFFA6BF-B52C-4B76-AFD7-08B855A13699}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Installer", "modules\BookingService.Orleans\src\EasyAbp.BookingService.Orleans.Installer\EasyAbp.BookingService.Orleans.Installer.csproj", "{51B66026-F4EE-4126-8473-F2AE53B0A813}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.MongoDB", "modules\BookingService.Orleans\src\EasyAbp.BookingService.Orleans.MongoDB\EasyAbp.BookingService.Orleans.MongoDB.csproj", "{BEDDCA67-0E07-493E-A655-B3D8149CBAE6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Web", "modules\BookingService.Orleans\src\EasyAbp.BookingService.Orleans.Web\EasyAbp.BookingService.Orleans.Web.csproj", "{2DD00A6F-33CF-4B1A-925A-7FAA9042B81A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A69BD289-D61F-4955-A680-8E9DF9C48CCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Application.Tests", "modules\BookingService.Orleans\test\EasyAbp.BookingService.Orleans.Application.Tests\EasyAbp.BookingService.Orleans.Application.Tests.csproj", "{AA8AEB4A-D22A-40F6-905B-23C33EE26E16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Domain.Tests", "modules\BookingService.Orleans\test\EasyAbp.BookingService.Orleans.Domain.Tests\EasyAbp.BookingService.Orleans.Domain.Tests.csproj", "{D63E27F7-2135-4E78-BFFA-12CBD9DF9541}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.EntityFrameworkCore.Tests", "modules\BookingService.Orleans\test\EasyAbp.BookingService.Orleans.EntityFrameworkCore.Tests\EasyAbp.BookingService.Orleans.EntityFrameworkCore.Tests.csproj", "{1958060D-3A08-46BB-B2C4-1CCA299521DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.HttpApi.Client.ConsoleTestApp", "modules\BookingService.Orleans\test\EasyAbp.BookingService.Orleans.HttpApi.Client.ConsoleTestApp\EasyAbp.BookingService.Orleans.HttpApi.Client.ConsoleTestApp.csproj", "{5B728AB8-1426-4F7B-8C9B-84B61B741070}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.MongoDB.Tests", "modules\BookingService.Orleans\test\EasyAbp.BookingService.Orleans.MongoDB.Tests\EasyAbp.BookingService.Orleans.MongoDB.Tests.csproj", "{F9FFAE67-DF93-403F-A39C-10C7214A9203}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.TestBase", "modules\BookingService.Orleans\test\EasyAbp.BookingService.Orleans.TestBase\EasyAbp.BookingService.Orleans.TestBase.csproj", "{C73B04D0-7DDA-4FAD-9F0A-427FD965F611}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "host", "host", "{714CD703-D135-4730-B088-337279B9F872}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Blazor.Host", "modules\BookingService.Orleans\host\EasyAbp.BookingService.Orleans.Blazor.Host\EasyAbp.BookingService.Orleans.Blazor.Host.csproj", "{8DB5A989-098F-4B1B-8EF1-D8F6E2EB7459}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Blazor.Server.Host", "modules\BookingService.Orleans\host\EasyAbp.BookingService.Orleans.Blazor.Server.Host\EasyAbp.BookingService.Orleans.Blazor.Server.Host.csproj", "{175FADF9-EE80-4C60-9F53-C7DC4ABE8044}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Host.Shared", "modules\BookingService.Orleans\host\EasyAbp.BookingService.Orleans.Host.Shared\EasyAbp.BookingService.Orleans.Host.Shared.csproj", "{A62AF1B1-CAAB-42B2-8804-E6E88B6D5B7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.HttpApi.Host", "modules\BookingService.Orleans\host\EasyAbp.BookingService.Orleans.HttpApi.Host\EasyAbp.BookingService.Orleans.HttpApi.Host.csproj", "{6F50A287-E6EC-4BAB-AD8B-F3C6C6D43FFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.IdentityServer", "modules\BookingService.Orleans\host\EasyAbp.BookingService.Orleans.IdentityServer\EasyAbp.BookingService.Orleans.IdentityServer.csproj", "{E2E742E6-1384-431A-86FA-B27BFAD6851A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Web.Host", "modules\BookingService.Orleans\host\EasyAbp.BookingService.Orleans.Web.Host\EasyAbp.BookingService.Orleans.Web.Host.csproj", "{C097C417-99A3-4D3B-8769-5D651FD9989C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyAbp.BookingService.Orleans.Web.Unified", "modules\BookingService.Orleans\host\EasyAbp.BookingService.Orleans.Web.Unified\EasyAbp.BookingService.Orleans.Web.Unified.csproj", "{A3A92BF5-017B-412C-8339-185FF68D32CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -293,6 +353,110 @@ Global
 		{12F749AA-95DE-4220-B126-CE0E3039D3E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12F749AA-95DE-4220-B126-CE0E3039D3E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12F749AA-95DE-4220-B126-CE0E3039D3E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{251EB747-C0E6-460E-A557-44D987A792BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{251EB747-C0E6-460E-A557-44D987A792BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{251EB747-C0E6-460E-A557-44D987A792BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{251EB747-C0E6-460E-A557-44D987A792BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC64A835-6938-4D26-BF4E-40C733E1E9F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC64A835-6938-4D26-BF4E-40C733E1E9F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC64A835-6938-4D26-BF4E-40C733E1E9F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC64A835-6938-4D26-BF4E-40C733E1E9F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F462CF0-D268-46A8-8CE8-DA0CC2C03DA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F462CF0-D268-46A8-8CE8-DA0CC2C03DA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F462CF0-D268-46A8-8CE8-DA0CC2C03DA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F462CF0-D268-46A8-8CE8-DA0CC2C03DA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D1E5CC2-EF6A-4807-8742-84E707C8EF65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D1E5CC2-EF6A-4807-8742-84E707C8EF65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D1E5CC2-EF6A-4807-8742-84E707C8EF65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D1E5CC2-EF6A-4807-8742-84E707C8EF65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C11499C-61B8-41A6-84E1-432E139386D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C11499C-61B8-41A6-84E1-432E139386D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C11499C-61B8-41A6-84E1-432E139386D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C11499C-61B8-41A6-84E1-432E139386D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B234FE73-319C-4AB3-925D-33A970AABD22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B234FE73-319C-4AB3-925D-33A970AABD22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B234FE73-319C-4AB3-925D-33A970AABD22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B234FE73-319C-4AB3-925D-33A970AABD22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83632BDF-02EA-46DE-9BB4-F6FEEC53A7E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83632BDF-02EA-46DE-9BB4-F6FEEC53A7E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83632BDF-02EA-46DE-9BB4-F6FEEC53A7E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83632BDF-02EA-46DE-9BB4-F6FEEC53A7E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60E5D757-2185-4F2D-BD4C-F627FEEB9443}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60E5D757-2185-4F2D-BD4C-F627FEEB9443}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60E5D757-2185-4F2D-BD4C-F627FEEB9443}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60E5D757-2185-4F2D-BD4C-F627FEEB9443}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6650F5A-259F-49B5-9E80-F0163143D8BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6650F5A-259F-49B5-9E80-F0163143D8BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6650F5A-259F-49B5-9E80-F0163143D8BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6650F5A-259F-49B5-9E80-F0163143D8BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDFFA6BF-B52C-4B76-AFD7-08B855A13699}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDFFA6BF-B52C-4B76-AFD7-08B855A13699}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDFFA6BF-B52C-4B76-AFD7-08B855A13699}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDFFA6BF-B52C-4B76-AFD7-08B855A13699}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51B66026-F4EE-4126-8473-F2AE53B0A813}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51B66026-F4EE-4126-8473-F2AE53B0A813}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51B66026-F4EE-4126-8473-F2AE53B0A813}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51B66026-F4EE-4126-8473-F2AE53B0A813}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEDDCA67-0E07-493E-A655-B3D8149CBAE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEDDCA67-0E07-493E-A655-B3D8149CBAE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEDDCA67-0E07-493E-A655-B3D8149CBAE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEDDCA67-0E07-493E-A655-B3D8149CBAE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DD00A6F-33CF-4B1A-925A-7FAA9042B81A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DD00A6F-33CF-4B1A-925A-7FAA9042B81A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DD00A6F-33CF-4B1A-925A-7FAA9042B81A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DD00A6F-33CF-4B1A-925A-7FAA9042B81A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA8AEB4A-D22A-40F6-905B-23C33EE26E16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA8AEB4A-D22A-40F6-905B-23C33EE26E16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA8AEB4A-D22A-40F6-905B-23C33EE26E16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA8AEB4A-D22A-40F6-905B-23C33EE26E16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D63E27F7-2135-4E78-BFFA-12CBD9DF9541}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D63E27F7-2135-4E78-BFFA-12CBD9DF9541}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D63E27F7-2135-4E78-BFFA-12CBD9DF9541}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D63E27F7-2135-4E78-BFFA-12CBD9DF9541}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1958060D-3A08-46BB-B2C4-1CCA299521DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1958060D-3A08-46BB-B2C4-1CCA299521DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1958060D-3A08-46BB-B2C4-1CCA299521DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1958060D-3A08-46BB-B2C4-1CCA299521DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B728AB8-1426-4F7B-8C9B-84B61B741070}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B728AB8-1426-4F7B-8C9B-84B61B741070}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B728AB8-1426-4F7B-8C9B-84B61B741070}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B728AB8-1426-4F7B-8C9B-84B61B741070}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9FFAE67-DF93-403F-A39C-10C7214A9203}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9FFAE67-DF93-403F-A39C-10C7214A9203}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9FFAE67-DF93-403F-A39C-10C7214A9203}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9FFAE67-DF93-403F-A39C-10C7214A9203}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C73B04D0-7DDA-4FAD-9F0A-427FD965F611}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C73B04D0-7DDA-4FAD-9F0A-427FD965F611}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C73B04D0-7DDA-4FAD-9F0A-427FD965F611}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C73B04D0-7DDA-4FAD-9F0A-427FD965F611}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DB5A989-098F-4B1B-8EF1-D8F6E2EB7459}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DB5A989-098F-4B1B-8EF1-D8F6E2EB7459}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DB5A989-098F-4B1B-8EF1-D8F6E2EB7459}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DB5A989-098F-4B1B-8EF1-D8F6E2EB7459}.Release|Any CPU.Build.0 = Release|Any CPU
+		{175FADF9-EE80-4C60-9F53-C7DC4ABE8044}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{175FADF9-EE80-4C60-9F53-C7DC4ABE8044}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{175FADF9-EE80-4C60-9F53-C7DC4ABE8044}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{175FADF9-EE80-4C60-9F53-C7DC4ABE8044}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A62AF1B1-CAAB-42B2-8804-E6E88B6D5B7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A62AF1B1-CAAB-42B2-8804-E6E88B6D5B7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A62AF1B1-CAAB-42B2-8804-E6E88B6D5B7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A62AF1B1-CAAB-42B2-8804-E6E88B6D5B7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F50A287-E6EC-4BAB-AD8B-F3C6C6D43FFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F50A287-E6EC-4BAB-AD8B-F3C6C6D43FFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F50A287-E6EC-4BAB-AD8B-F3C6C6D43FFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F50A287-E6EC-4BAB-AD8B-F3C6C6D43FFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2E742E6-1384-431A-86FA-B27BFAD6851A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2E742E6-1384-431A-86FA-B27BFAD6851A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2E742E6-1384-431A-86FA-B27BFAD6851A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2E742E6-1384-431A-86FA-B27BFAD6851A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C097C417-99A3-4D3B-8769-5D651FD9989C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C097C417-99A3-4D3B-8769-5D651FD9989C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C097C417-99A3-4D3B-8769-5D651FD9989C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C097C417-99A3-4D3B-8769-5D651FD9989C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3A92BF5-017B-412C-8339-185FF68D32CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3A92BF5-017B-412C-8339-185FF68D32CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3A92BF5-017B-412C-8339-185FF68D32CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3A92BF5-017B-412C-8339-185FF68D32CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5DD6F7D6-5AD1-4314-88C5-30461406D912} = {18F42590-FD24-4A37-8197-BEC2AA954ED8}
@@ -346,5 +510,34 @@ Global
 		{B4432A01-B5D4-45B0-846E-803F2B169A27} = {F148D86B-AFEF-4F70-ABF9-D8561AE6EE22}
 		{C0FD00D9-8211-4F17-B42A-886DDC2F0C10} = {F148D86B-AFEF-4F70-ABF9-D8561AE6EE22}
 		{12F749AA-95DE-4220-B126-CE0E3039D3E7} = {F148D86B-AFEF-4F70-ABF9-D8561AE6EE22}
+		{BF04983D-C6B8-48E7-8A25-3550FF069955} = {7E8CE173-1B61-4B79-B443-CE8D6DB74073}
+		{251EB747-C0E6-460E-A557-44D987A792BD} = {BF04983D-C6B8-48E7-8A25-3550FF069955}
+		{AC64A835-6938-4D26-BF4E-40C733E1E9F5} = {BF04983D-C6B8-48E7-8A25-3550FF069955}
+		{1F462CF0-D268-46A8-8CE8-DA0CC2C03DA3} = {BF04983D-C6B8-48E7-8A25-3550FF069955}
+		{7D1E5CC2-EF6A-4807-8742-84E707C8EF65} = {BF04983D-C6B8-48E7-8A25-3550FF069955}
+		{8C11499C-61B8-41A6-84E1-432E139386D7} = {BF04983D-C6B8-48E7-8A25-3550FF069955}
+		{B234FE73-319C-4AB3-925D-33A970AABD22} = {BF04983D-C6B8-48E7-8A25-3550FF069955}
+		{83632BDF-02EA-46DE-9BB4-F6FEEC53A7E5} = {BF04983D-C6B8-48E7-8A25-3550FF069955}
+		{60E5D757-2185-4F2D-BD4C-F627FEEB9443} = {BF04983D-C6B8-48E7-8A25-3550FF069955}
+		{F6650F5A-259F-49B5-9E80-F0163143D8BC} = {BF04983D-C6B8-48E7-8A25-3550FF069955}
+		{DDFFA6BF-B52C-4B76-AFD7-08B855A13699} = {BF04983D-C6B8-48E7-8A25-3550FF069955}
+		{51B66026-F4EE-4126-8473-F2AE53B0A813} = {BF04983D-C6B8-48E7-8A25-3550FF069955}
+		{BEDDCA67-0E07-493E-A655-B3D8149CBAE6} = {BF04983D-C6B8-48E7-8A25-3550FF069955}
+		{2DD00A6F-33CF-4B1A-925A-7FAA9042B81A} = {BF04983D-C6B8-48E7-8A25-3550FF069955}
+		{A69BD289-D61F-4955-A680-8E9DF9C48CCF} = {7E8CE173-1B61-4B79-B443-CE8D6DB74073}
+		{AA8AEB4A-D22A-40F6-905B-23C33EE26E16} = {A69BD289-D61F-4955-A680-8E9DF9C48CCF}
+		{D63E27F7-2135-4E78-BFFA-12CBD9DF9541} = {A69BD289-D61F-4955-A680-8E9DF9C48CCF}
+		{1958060D-3A08-46BB-B2C4-1CCA299521DA} = {A69BD289-D61F-4955-A680-8E9DF9C48CCF}
+		{5B728AB8-1426-4F7B-8C9B-84B61B741070} = {A69BD289-D61F-4955-A680-8E9DF9C48CCF}
+		{F9FFAE67-DF93-403F-A39C-10C7214A9203} = {A69BD289-D61F-4955-A680-8E9DF9C48CCF}
+		{C73B04D0-7DDA-4FAD-9F0A-427FD965F611} = {A69BD289-D61F-4955-A680-8E9DF9C48CCF}
+		{714CD703-D135-4730-B088-337279B9F872} = {7E8CE173-1B61-4B79-B443-CE8D6DB74073}
+		{8DB5A989-098F-4B1B-8EF1-D8F6E2EB7459} = {714CD703-D135-4730-B088-337279B9F872}
+		{175FADF9-EE80-4C60-9F53-C7DC4ABE8044} = {714CD703-D135-4730-B088-337279B9F872}
+		{A62AF1B1-CAAB-42B2-8804-E6E88B6D5B7A} = {714CD703-D135-4730-B088-337279B9F872}
+		{6F50A287-E6EC-4BAB-AD8B-F3C6C6D43FFE} = {714CD703-D135-4730-B088-337279B9F872}
+		{E2E742E6-1384-431A-86FA-B27BFAD6851A} = {714CD703-D135-4730-B088-337279B9F872}
+		{C097C417-99A3-4D3B-8769-5D651FD9989C} = {714CD703-D135-4730-B088-337279B9F872}
+		{A3A92BF5-017B-412C-8339-185FF68D32CB} = {714CD703-D135-4730-B088-337279B9F872}
 	EndGlobalSection
 EndGlobal

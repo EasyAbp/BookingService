@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.prod.json",
+  "compilerOptions": {
+    "paths": {
+      "@easy-abp/booking-service": [
+        "projects/booking-service/src/public-api.ts"
+      ],
+      "@easy-abp/booking-service/config": [
+        "projects/booking-service/config/src/public-api.ts"
+      ],
+      "@proxy": ["projects/booking-service/src/lib/proxy/index.ts"],
+      "@proxy/*": ["projects/booking-service/src/lib/proxy/*"]
+    }
+  }
+}

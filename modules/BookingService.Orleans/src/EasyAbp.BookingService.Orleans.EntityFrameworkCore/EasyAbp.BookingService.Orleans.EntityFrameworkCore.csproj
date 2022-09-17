@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EasyAbp.Abp.Trees.EntityFrameworkCore" Version="$(EasyAbpAbpTreesModuleVersion)" />
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore" Version="$(AbpVersion)" />
+    <ProjectReference Include="..\..\..\Common\src\EasyAbp.BookingService.Common.EntityFrameworkCore\EasyAbp.BookingService.Common.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\EasyAbp.BookingService.Orleans.Domain\EasyAbp.BookingService.Orleans.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

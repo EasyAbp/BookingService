@@ -3,6 +3,7 @@ using EasyAbp.BookingService.AssetCategories;
 using EasyAbp.BookingService.AssetOccupancies;
 using EasyAbp.BookingService.AssetPeriodSchemes;
 using EasyAbp.BookingService.Assets;
+using EasyAbp.BookingService.AssetSchedules;
 using EasyAbp.BookingService.PeriodSchemes;
 using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
@@ -30,6 +31,7 @@ public class BookingServiceCommonEntityFrameworkCoreModule : AbpModule
         options.AddRepository<AssetPeriodScheme, AssetPeriodSchemeRepository>();
         options.AddRepository<Asset, AssetRepository>();
         options.AddRepository<PeriodScheme, PeriodSchemeRepository>();
+        options.AddRepository<AssetSchedule, AssetScheduleRepository>();
 
         options.Entity<AssetCategory>(entityOptions =>
             entityOptions.DefaultWithDetailsFunc = x => x.IncludeDetails());
@@ -40,6 +42,8 @@ public class BookingServiceCommonEntityFrameworkCoreModule : AbpModule
         options.Entity<Asset>(entityOptions =>
             entityOptions.DefaultWithDetailsFunc = x => x.IncludeDetails());
         options.Entity<PeriodScheme>(entityOptions =>
+            entityOptions.DefaultWithDetailsFunc = x => x.IncludeDetails());
+        options.Entity<AssetSchedule>(entityOptions =>
             entityOptions.DefaultWithDetailsFunc = x => x.IncludeDetails());
     }
 }

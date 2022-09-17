@@ -1,0 +1,111 @@
+{
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {},
+      "host": {}
+    }
+  },
+  "packages": {
+    "EasyAbp.BookingService.Orleans.Domain.Shared": {
+      "path": "src/EasyAbp.BookingService.Orleans.Domain.Shared/EasyAbp.BookingService.Orleans.Domain.Shared.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Orleans.Domain": {
+      "path": "src/EasyAbp.BookingService.Orleans.Domain/EasyAbp.BookingService.Orleans.Domain.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Orleans.Application.Contracts": {
+      "path": "src/EasyAbp.BookingService.Orleans.Application.Contracts/EasyAbp.BookingService.Orleans.Application.Contracts.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Orleans.Application": {
+      "path": "src/EasyAbp.BookingService.Orleans.Application/EasyAbp.BookingService.Orleans.Application.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Orleans.EntityFrameworkCore": {
+      "path": "src/EasyAbp.BookingService.Orleans.EntityFrameworkCore/EasyAbp.BookingService.Orleans.EntityFrameworkCore.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Orleans.MongoDB": {
+      "path": "src/EasyAbp.BookingService.Orleans.MongoDB/EasyAbp.BookingService.Orleans.MongoDB.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Orleans.HttpApi": {
+      "path": "src/EasyAbp.BookingService.Orleans.HttpApi/EasyAbp.BookingService.Orleans.HttpApi.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Orleans.HttpApi.Client": {
+      "path": "src/EasyAbp.BookingService.Orleans.HttpApi.Client/EasyAbp.BookingService.Orleans.HttpApi.Client.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Orleans.TestBase": {
+      "path": "test/EasyAbp.BookingService.Orleans.TestBase/EasyAbp.BookingService.Orleans.TestBase.abppkg.json",
+      "folder": "test"
+    },
+    "EasyAbp.BookingService.Orleans.EntityFrameworkCore.Tests": {
+      "path": "test/EasyAbp.BookingService.Orleans.EntityFrameworkCore.Tests/EasyAbp.BookingService.Orleans.EntityFrameworkCore.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "EasyAbp.BookingService.Orleans.MongoDB.Tests": {
+      "path": "test/EasyAbp.BookingService.Orleans.MongoDB.Tests/EasyAbp.BookingService.Orleans.MongoDB.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "EasyAbp.BookingService.Orleans.Domain.Tests": {
+      "path": "test/EasyAbp.BookingService.Orleans.Domain.Tests/EasyAbp.BookingService.Orleans.Domain.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "EasyAbp.BookingService.Orleans.Application.Tests": {
+      "path": "test/EasyAbp.BookingService.Orleans.Application.Tests/EasyAbp.BookingService.Orleans.Application.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "EasyAbp.BookingService.Orleans.HttpApi.Host": {
+      "path": "host/EasyAbp.BookingService.Orleans.HttpApi.Host/EasyAbp.BookingService.Orleans.HttpApi.Host.abppkg.json",
+      "folder": "host"
+    },
+    "EasyAbp.BookingService.Orleans.Web": {
+      "path": "src/EasyAbp.BookingService.Orleans.Web/EasyAbp.BookingService.Orleans.Web.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Orleans.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/EasyAbp.BookingService.Orleans.HttpApi.Client.ConsoleTestApp/EasyAbp.BookingService.Orleans.HttpApi.Client.ConsoleTestApp.abppkg.json",
+      "folder": "test"
+    },
+    "EasyAbp.BookingService.Orleans.Web.Host": {
+      "path": "host/EasyAbp.BookingService.Orleans.Web.Host/EasyAbp.BookingService.Orleans.Web.Host.abppkg.json",
+      "folder": "host"
+    },
+    "EasyAbp.BookingService.Orleans.IdentityServer": {
+      "path": "host/EasyAbp.BookingService.Orleans.IdentityServer/EasyAbp.BookingService.Orleans.IdentityServer.abppkg.json",
+      "folder": "host"
+    },
+    "EasyAbp.BookingService.Orleans.Host.Shared": {
+      "path": "host/EasyAbp.BookingService.Orleans.Host.Shared/EasyAbp.BookingService.Orleans.Host.Shared.abppkg.json",
+      "folder": "host"
+    },
+    "EasyAbp.BookingService.Orleans.Web.Unified": {
+      "path": "host/EasyAbp.BookingService.Orleans.Web.Unified/EasyAbp.BookingService.Orleans.Web.Unified.abppkg.json",
+      "folder": "host"
+    },
+    "EasyAbp.BookingService.Orleans.Blazor": {
+      "path": "src/EasyAbp.BookingService.Orleans.Blazor/EasyAbp.BookingService.Orleans.Blazor.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Orleans.Blazor.Host": {
+      "path": "host/EasyAbp.BookingService.Orleans.Blazor.Host/EasyAbp.BookingService.Orleans.Blazor.Host.abppkg.json",
+      "folder": "host"
+    },
+    "EasyAbp.BookingService.Orleans.Blazor.Server": {
+      "path": "src/EasyAbp.BookingService.Orleans.Blazor.Server/EasyAbp.BookingService.Orleans.Blazor.Server.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Orleans.Blazor.WebAssembly": {
+      "path": "src/EasyAbp.BookingService.Orleans.Blazor.WebAssembly/EasyAbp.BookingService.Orleans.Blazor.WebAssembly.abppkg.json",
+      "folder": "src"
+    },
+    "EasyAbp.BookingService.Orleans.Blazor.Server.Host": {
+      "path": "host/EasyAbp.BookingService.Orleans.Blazor.Server.Host/EasyAbp.BookingService.Orleans.Blazor.Server.Host.abppkg.json",
+      "folder": "host"
+    }
+  }
+}

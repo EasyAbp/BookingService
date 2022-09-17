@@ -35,7 +35,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
     protected IPeriodSchemeRepository PeriodSchemeRepository { get; }
     protected IAssetPeriodSchemeRepository AssetPeriodSchemeRepository { get; }
     protected IDefaultPeriodSchemeProvider DefaultPeriodSchemeProvider { get; }
-    protected IAssetScheduleManager AssetScheduleManager { get; }
+    protected AssetScheduleManager AssetScheduleManager { get; }
     protected IExternalUserLookupServiceProvider ExternalUserLookupServiceProvider { get; }
     protected IAssetInCategorySelector AssetInCategorySelector { get; }
     protected BookingServiceOptions Options { get; }
@@ -53,7 +53,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
         PeriodSchemeRepository = serviceProvider.GetRequiredService<IPeriodSchemeRepository>();
         AssetPeriodSchemeRepository = serviceProvider.GetRequiredService<IAssetPeriodSchemeRepository>();
         DefaultPeriodSchemeProvider = serviceProvider.GetRequiredService<IDefaultPeriodSchemeProvider>();
-        AssetScheduleManager = serviceProvider.GetRequiredService<IAssetScheduleManager>();
+        AssetScheduleManager = serviceProvider.GetRequiredService<AssetScheduleManager>();
         ExternalUserLookupServiceProvider = serviceProvider.GetRequiredService<IExternalUserLookupServiceProvider>();
         AssetInCategorySelector = serviceProvider.GetRequiredService<IAssetInCategorySelector>();
         Options = serviceProvider.GetRequiredService<IOptions<BookingServiceOptions>>().Value;
@@ -633,7 +633,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
     protected virtual void UpdatePeriodsUsableBySchedules(
         List<PeriodOccupancyModel> models,
-        IDictionary<Guid, IAssetSchedule> periodIdScheduleMapping)
+        IDictionary<Guid, AssetSchedule> periodIdScheduleMapping)
     {
         foreach (var model in models)
         {
@@ -669,7 +669,7 @@ public abstract class AssetOccupancyProviderBase : IAssetOccupancyProvider
 
     protected virtual void UpdatePeriodsUsableByTimeInAdvances(
         IEnumerable<PeriodOccupancyModel> models,
-        IDictionary<Guid, IAssetSchedule> periodIdScheduleMapping,
+        IDictionary<Guid, AssetSchedule> periodIdScheduleMapping,
         [NotNull] TimeInAdvance fallbackTimeInAdvance,
         DateTime currentDateTime)
     {

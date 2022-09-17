@@ -1,4 +1,5 @@
 ﻿using System;
+using EasyAbp.BookingService.AssetOccupancies;
 using JetBrains.Annotations;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.MultiTenancy;
