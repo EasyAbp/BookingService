@@ -15,6 +15,19 @@
     "EasyAbp.BookingService:CannotUpdatePeriodInUse": "Can not update Period which is in use. PeriodId: {id}",
     "EasyAbp.BookingService:CannotDeletePeriodSchemeInUse": "Can not delete PeriodScheme which is in use. PeriodScheme: {name}, Id: {id}. ",
     "EasyAbp.BookingService:FailToObtainAssetOccupancyLock": "Fail to obtain asset occupancy lock",
-    "EasyAbp.BookingService:InvalidOccupyingVolume": "Negative occupying volume: {volume}"
+    "EasyAbp.BookingService:InvalidOccupyingVolume": "Negative occupying volume: {volume}",
+    "Menu:BookingService": "BookingService",
+    "Menu:AssetCategory": "AssetCategory",
+    "Permission:PeriodScheme": "PeriodScheme",
+    "Permission:AssetSchedule": "AssetSchedule",
+    "Permission:Asset": "Asset",
+    "Permission:AssetPeriodScheme": "AssetPeriodScheme",
+    "Menu:AssetOccupancy": "AssetOccupancy",
+    "Menu:AssetPeriodScheme": "AssetPeriodScheme",
+    "Menu:Asset": "Asset",
+    "Menu:AssetSchedule": "AssetSchedule",
+    "Menu:PeriodScheme": "PeriodScheme",
+    "Permission:AssetCategory": "AssetCategory",
+    "Permission:AssetOccupancy": "AssetOccupancy"
   }
 }

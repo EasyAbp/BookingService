@@ -15,6 +15,19 @@
     "EasyAbp.BookingService:CannotUpdatePeriodInUse": "不能更新正在使用的时段。时段Id：{id}",
     "EasyAbp.BookingService:CannotDeletePeriodSchemeInUse": "不能删除正在使用的时段方案：{name}, Id：{id}. ",
     "EasyAbp.BookingService:FailToObtainAssetOccupancyLock": "获取资产占用锁失败",
-    "EasyAbp.BookingService:InvalidOccupyingVolume": "占用容量必须大于0: {volume}"
+    "EasyAbp.BookingService:InvalidOccupyingVolume": "占用容量必须大于0: {volume}",
+    "Menu:BookingService": "预订服务",
+    "Menu:AssetCategory": "资产目录",
+    "Permission:PeriodScheme": "时段方案",
+    "Permission:AssetSchedule": "资产排期",
+    "Permission:Asset": "资产",
+    "Permission:AssetPeriodScheme": "资产时段方案",
+    "Menu:AssetOccupancy": "资产占用",
+    "Menu:AssetPeriodScheme": "资产时段方案",
+    "Menu:Asset": "资产",
+    "Menu:AssetSchedule": "资产排期",
+    "Menu:PeriodScheme": "时段方案",
+    "Permission:AssetCategory": "资产目录",
+    "Permission:AssetOccupancy": "资产占用"
   }
 }
