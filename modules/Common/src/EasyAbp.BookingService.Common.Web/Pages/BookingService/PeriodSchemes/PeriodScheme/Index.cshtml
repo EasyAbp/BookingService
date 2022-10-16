@@ -1,0 +1,53 @@
+@page
+@using EasyAbp.BookingService.Localization
+@using EasyAbp.BookingService.Permissions
+@using EasyAbp.BookingService.Web.Menus
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Button
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Card
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Grid
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Table
+@using Volo.Abp.AspNetCore.Mvc.UI.Bundling.TagHelpers
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@model EasyAbp.BookingService.Web.Pages.BookingService.PeriodSchemes.PeriodScheme.IndexModel
+@inject IPageLayout PageLayout
+@inject IAuthorizationService Authorization
+@inject IHtmlLocalizer<BookingServiceResource> L
+@{
+    PageLayout.Content.Title = L["PeriodScheme"].Value;
+    PageLayout.Content.BreadCrumb.Add(L["Menu:PeriodScheme"].Value);
+    PageLayout.Content.MenuItemName = BookingServiceCommonMenus.PeriodScheme;
+}
+
+@section scripts
+{
+    <abp-script src="/Pages/BookingService/PeriodSchemes/PeriodScheme/index.js"/>
+}
+
+@section styles
+{
+    <abp-style src="/Pages/BookingService/PeriodSchemes/PeriodScheme/index.css"/>
+}
+
+<abp-card>
+    <abp-card-header>
+        <abp-row>
+            <abp-column size-md="_6">
+                <abp-card-title>@L["PeriodScheme"]</abp-card-title>
+            </abp-column>
+            <abp-column size-md="_6" class="text-end">
+                @if (await Authorization.IsGrantedAsync(BookingServicePermissions.PeriodScheme.Create))
+                {
+                    <abp-button id="NewPeriodSchemeButton"
+                                text="@L["CreatePeriodScheme"].Value"
+                                icon="plus"
+                                button-type="Primary"/>
+                }
+            </abp-column>
+        </abp-row>
+    </abp-card-header>
+    <abp-card-body>
+        <abp-table striped-rows="true" id="PeriodSchemeTable" class="nowrap"/>
+    </abp-card-body>
+</abp-card>

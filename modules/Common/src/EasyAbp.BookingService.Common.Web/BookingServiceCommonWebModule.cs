@@ -1,10 +1,12 @@
 ﻿using EasyAbp.BookingService.Localization;
+using EasyAbp.BookingService.Web.Menus;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.AspNetCore.Mvc.Localization;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Modularity;
+using Volo.Abp.UI.Navigation;
 using Volo.Abp.VirtualFileSystem;
 
 namespace EasyAbp.BookingService.Web;
@@ -32,6 +34,11 @@ public class BookingServiceCommonWebModule : AbpModule
 
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+        Configure<AbpNavigationOptions>(options =>
+        {
+            options.MenuContributors.Add(new BookingServiceCommonMenuContributor());
+        });
+
         Configure<AbpVirtualFileSystemOptions>(options =>
         {
             options.FileSets.AddEmbedded<BookingServiceCommonWebModule>();

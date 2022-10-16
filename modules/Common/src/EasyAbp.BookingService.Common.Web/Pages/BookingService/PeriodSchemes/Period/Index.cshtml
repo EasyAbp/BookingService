@@ -1,0 +1,55 @@
+@page
+@using EasyAbp.BookingService.Localization
+@using EasyAbp.BookingService.Permissions
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Button
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Card
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Grid
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Table
+@using Volo.Abp.AspNetCore.Mvc.UI.Bundling.TagHelpers
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@model EasyAbp.BookingService.Web.Pages.BookingService.PeriodSchemes.Period.IndexModel
+@inject IPageLayout PageLayout
+@inject IAuthorizationService Authorization
+@inject IHtmlLocalizer<BookingServiceResource> L
+@{
+    PageLayout.Content.Title = L["Period"].Value;
+    PageLayout.Content.BreadCrumb.Add(L["Menu:Period"].Value);
+}
+
+@section scripts
+{
+    <abp-script src="/Pages/BookingService/PeriodSchemes/Period/index.js"/>
+}
+
+@section styles
+{
+    <abp-style src="/Pages/BookingService/PeriodSchemes/Period/index.css"/>
+}
+
+<script>
+    let periodSchemeId = '@Model.PeriodSchemeId';
+</script>
+
+<abp-card>
+    <abp-card-header>
+        <abp-row>
+            <abp-column size-md="_6">
+                <abp-card-title>@L["Period"]</abp-card-title>
+            </abp-column>
+            <abp-column size-md="_6" class="text-end">
+                @if (await Authorization.IsGrantedAsync(BookingServicePermissions.PeriodScheme.Update))
+                {
+                    <abp-button id="NewPeriodButton"
+                                text="@L["CreatePeriod"].Value"
+                                icon="plus"
+                                button-type="Primary"/>
+                }
+            </abp-column>
+        </abp-row>
+    </abp-card-header>
+    <abp-card-body>
+        <abp-table striped-rows="true" id="PeriodTable" class="nowrap"/>
+    </abp-card-body>
+</abp-card>

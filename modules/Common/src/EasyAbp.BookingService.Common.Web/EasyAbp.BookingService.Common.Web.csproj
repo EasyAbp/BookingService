@@ -37,4 +37,13 @@
     <Content Remove="wwwroot\**\*.*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\BookingService\AssetCategories" />
+    <Folder Include="Pages\BookingService\AssetOccupancies" />
+    <Folder Include="Pages\BookingService\AssetPeriodSchemes" />
+    <Folder Include="Pages\BookingService\Assets" />
+    <Folder Include="Pages\BookingService\AssetSchedules" />
+    <Folder Include="Pages\BookingService\PeriodSchemes" />
+  </ItemGroup>
+
 </Project>

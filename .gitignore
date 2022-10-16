@@ -257,4 +257,5 @@ modules/BookingService/host/EasyAbp.BookingService.HttpApi.Host/Logs/logs.txt
 modules/BookingService/host/EasyAbp.BookingService.Web.Host/Logs/logs.txt
 modules/BookingService/host/EasyAbp.BookingService.Web.Unified/Logs/logs.txt
 modules/BookingService/host/EasyAbp.BookingService.Blazor.Server.Host/Logs/logs.txt
+appsettings.secrets.json
 /local

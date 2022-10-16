@@ -1,0 +1,53 @@
+@page
+@using EasyAbp.BookingService.Localization
+@using EasyAbp.BookingService.Permissions
+@using EasyAbp.BookingService.Web.Menus
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Button
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Card
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Grid
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Table
+@using Volo.Abp.AspNetCore.Mvc.UI.Bundling.TagHelpers
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@model EasyAbp.BookingService.Web.Pages.BookingService.Assets.Asset.IndexModel
+@inject IPageLayout PageLayout
+@inject IAuthorizationService AuthorizationService
+@inject IHtmlLocalizer<BookingServiceResource> L
+@{
+    PageLayout.Content.Title = L["Asset"].Value;
+    PageLayout.Content.BreadCrumb.Add(L["Menu:Asset"].Value);
+    PageLayout.Content.MenuItemName = BookingServiceCommonMenus.Asset;
+}
+
+@section scripts
+{
+    <abp-script src="/Pages/BookingService/Assets/Asset/index.js"/>
+}
+
+@section styles
+{
+    <abp-style src="/Pages/BookingService/Assets/Asset/index.css"/>
+}
+
+<abp-card>
+    <abp-card-header>
+        <abp-row>
+            <abp-column size-md="_6">
+                <abp-card-title>@L["Asset"]</abp-card-title>
+            </abp-column>
+            <abp-column size-md="_6" class="text-end">
+                @if (await AuthorizationService.IsGrantedAsync(BookingServicePermissions.Asset.Create))
+                {
+                    <abp-button id="NewAssetButton"
+                                text="@L["CreateAsset"].Value"
+                                icon="plus"
+                                button-type="Primary"/>
+                }
+            </abp-column>
+        </abp-row>
+    </abp-card-header>
+    <abp-card-body>
+        <abp-table striped-rows="true" id="AssetTable" class="nowrap"/>
+    </abp-card-body>
+</abp-card>
