@@ -1,4 +1,5 @@
 using EasyAbp.Abp.Trees;
+using Orleans.Serialization;
 using Volo.Abp.Caching;
 using Volo.Abp.DistributedLocking;
 using Volo.Abp.Domain;
@@ -19,5 +20,11 @@ public class BookingServiceOrleansDomainModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+        // todo: upgrade to Orleans 7
+        // context.Services.AddSerializer(builder =>
+        // {
+        //     builder.AddJsonSerializer(isSupported: type =>
+        //         type.Namespace?.StartsWith("EasyAbp.BookingService") ?? false);
+        // });
     }
 }

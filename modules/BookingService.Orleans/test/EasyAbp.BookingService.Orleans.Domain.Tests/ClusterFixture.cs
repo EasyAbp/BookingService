@@ -1,6 +1,7 @@
 ﻿using System;
 using EasyAbp.BookingService.AssetOccupancyProviders;
 using Orleans.Hosting;
+using Orleans.Serialization;
 using Orleans.TestingHost;
 using Volo.Abp.DependencyInjection;
 
@@ -28,6 +29,13 @@ public class ClusterFixture : IDisposable, ITransientDependency
     {
         public void Configure(ISiloBuilder siloBuilder)
         {
+            // todo: upgrade to Orleans 7
+            // siloBuilder.Services.AddSerializer(builder =>
+            // {
+            //     builder.AddJsonSerializer(isSupported: type =>
+            //         type.Namespace?.StartsWith("EasyAbp.BookingService") ?? false);
+            // });
+
             siloBuilder.AddMemoryGrainStorage(AssetOccupancyGrain.StorageProviderName);
         }
     }

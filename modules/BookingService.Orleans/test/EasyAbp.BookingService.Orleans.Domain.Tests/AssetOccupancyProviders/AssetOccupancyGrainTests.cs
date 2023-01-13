@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using EasyAbp.BookingService.AssetCategories;
 using EasyAbp.BookingService.AssetDefinitions;
-using EasyAbp.BookingService.AssetOccupancies;
 using EasyAbp.BookingService.Assets;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans.TestingHost;
