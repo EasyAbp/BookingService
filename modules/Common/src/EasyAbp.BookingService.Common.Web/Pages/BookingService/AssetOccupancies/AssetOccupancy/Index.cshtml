@@ -1,0 +1,53 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using EasyAbp.BookingService.Localization
+@using EasyAbp.BookingService.Permissions
+@using EasyAbp.BookingService.Web.Menus
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Button
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Card
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Grid
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Table
+@using Volo.Abp.AspNetCore.Mvc.UI.Bundling.TagHelpers
+@model EasyAbp.BookingService.Web.Pages.BookingService.AssetOccupancies.AssetOccupancy.IndexModel
+@inject IPageLayout PageLayout
+@inject IAuthorizationService AuthorizationService
+@inject IHtmlLocalizer<BookingServiceResource> L
+@{
+    PageLayout.Content.Title = L["AssetOccupancy"].Value;
+    PageLayout.Content.BreadCrumb.Add(L["Menu:AssetOccupancy"].Value);
+    PageLayout.Content.MenuItemName = BookingServiceCommonMenus.AssetOccupancy;
+}
+
+@section scripts
+{
+    <abp-script src="/Pages/BookingService/AssetOccupancies/AssetOccupancy/index.js"/>
+}
+
+@section styles
+{
+    <abp-style src="/Pages/BookingService/AssetOccupancies/AssetOccupancy/index.css"/>
+}
+
+<abp-card>
+    <abp-card-header>
+        <abp-row>
+            <abp-column size-md="_6">
+                <abp-card-title>@L["AssetOccupancy"]</abp-card-title>
+            </abp-column>
+            <abp-column size-md="_6" class="text-end">
+                @if (await AuthorizationService.IsGrantedAsync(BookingServicePermissions.AssetOccupancy.Create))
+                {
+                    <abp-button id="NewAssetOccupancyButton"
+                                text="@L["CreateAssetOccupancy"].Value"
+                                icon="plus"
+                                button-type="Primary"/>
+                }
+            </abp-column>
+        </abp-row>
+    </abp-card-header>
+    <abp-card-body>
+        <abp-table striped-rows="true" id="AssetOccupancyTable" class="nowrap"/>
+    </abp-card-body>
+</abp-card>

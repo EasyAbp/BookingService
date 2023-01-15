@@ -8,9 +8,9 @@ using Serilog.Events;
 
 namespace EasyAbp.BookingService.Blazor.Server.Host;
 
-public class Program
+public static class Program
 {
-    public async static Task<int> Main(string[] args)
+    public static async Task<int> Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
 #if DEBUG
