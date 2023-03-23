@@ -257,4 +257,9 @@ modules/BookingService/host/EasyAbp.BookingService.HttpApi.Host/Logs/logs.txt
 modules/BookingService/host/EasyAbp.BookingService.Web.Host/Logs/logs.txt
 modules/BookingService/host/EasyAbp.BookingService.Web.Unified/Logs/logs.txt
 modules/BookingService/host/EasyAbp.BookingService.Blazor.Server.Host/Logs/logs.txt
+modules/BookingService.Orleans/host/EasyAbp.BookingService.Orleans.IdentityServer/Logs/logs.txt
+modules/BookingService.Orleans/host/EasyAbp.BookingService.Orleans.HttpApi.Host/Logs/logs.txt
+modules/BookingService.Orleans/host/EasyAbp.BookingService.Orleans.Web.Host/Logs/logs.txt
+modules/BookingService.Orleans/host/EasyAbp.BookingService.Orleans.Web.Unified/Logs/logs.txt
+modules/BookingService.Orleans/host/EasyAbp.BookingService.Orleans.Blazor.Server.Host/Logs/logs.txt
 /local
