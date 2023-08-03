@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Entities.Events;
@@ -12,17 +13,20 @@ public class AssetScheduleCacheInvalidator : ILocalEventHandler<EntityChangedEve
     ITransientDependency
 {
     protected IDistributedCache<AssetScheduleCacheItem> DistributedCache { get; }
-
-    protected IUnitOfWorkManager UnitOfWorkManager { get; }
     protected ICurrentTenant CurrentTenant { get; }
+    protected IUnitOfWorkManager UnitOfWorkManager { get; }
+    protected IServiceScopeFactory ServiceScopeFactory { get; }
 
-    public AssetScheduleCacheInvalidator(IDistributedCache<AssetScheduleCacheItem> distributedCache,
+    public AssetScheduleCacheInvalidator(
+        IDistributedCache<AssetScheduleCacheItem> distributedCache,
         ICurrentTenant currentTenant,
-        IUnitOfWorkManager unitOfWorkManager)
+        IUnitOfWorkManager unitOfWorkManager,
+        IServiceScopeFactory serviceScopeFactory)
     {
         DistributedCache = distributedCache;
         CurrentTenant = currentTenant;
         UnitOfWorkManager = unitOfWorkManager;
+        ServiceScopeFactory = serviceScopeFactory;
     }
 
     public virtual async Task HandleEventAsync(EntityChangedEventData<AssetSchedule> eventData)
@@ -31,7 +35,14 @@ public class AssetScheduleCacheInvalidator : ILocalEventHandler<EntityChangedEve
             eventData.Entity.AssetId,
             eventData.Entity.PeriodSchemeId,
             CurrentTenant.Id);
+
         await DistributedCache.RemoveAsync(key);
-        UnitOfWorkManager.Current?.OnCompleted(() => DistributedCache.RemoveAsync(key));
+
+        UnitOfWorkManager.Current?.OnCompleted(async () =>
+        {
+            using var scope = ServiceScopeFactory.CreateScope();
+            var cache = scope.ServiceProvider.GetRequiredService<IDistributedCache<AssetScheduleCacheItem>>();
+            await cache.RemoveAsync(key);
+        });
     }
 }
