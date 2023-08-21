@@ -16,7 +16,8 @@ public class BookingServiceMenuContributor : IMenuContributor
     private Task ConfigureMainMenuAsync(MenuConfigurationContext context)
     {
         //Add main menu items.
-        context.Menu.AddItem(new ApplicationMenuItem(BookingServiceMenus.Prefix, displayName: "BookingService", "~/BookingService", icon: "fa fa-globe"));
+        context.Menu.GetAdministration().AddItem(new ApplicationMenuItem(BookingServiceMenus.Prefix,
+            displayName: "BookingService", "~/BookingService", icon: "fa fa-book-user"));
 
         return Task.CompletedTask;
     }
