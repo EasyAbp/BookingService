@@ -17,7 +17,7 @@ public class BookingServiceOrleansMenuContributor : IMenuContributor
     {
         //Add main menu items.
         context.Menu.GetAdministration().AddItem(new ApplicationMenuItem(BookingServiceOrleansMenus.Prefix,
-            displayName: "BookingService", "~/BookingService", icon: "fa fa-globe"));
+            displayName: "BookingService", "~/BookingService", icon: "fa fa-book-user"));
 
         return Task.CompletedTask;
     }
