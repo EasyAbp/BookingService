@@ -4,6 +4,7 @@ using EasyAbp.BookingService.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace EasyAbp.BookingService.Migrations
 {
     [DbContext(typeof(UnifiedDbContext))]
-    partial class UnifiedDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240730112307_UpgradedToAbp_8_2")]
+    partial class UpgradedToAbp_8_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -171,47 +174,6 @@ namespace EasyAbp.BookingService.Migrations
                     b.HasIndex("Date", "AssetId", "StartingTime", "Duration");
 
                     b.ToTable("EasyAbpBookingServiceAssetOccupancies", (string)null);
-                });
-
-            modelBuilder.Entity("EasyAbp.BookingService.AssetOccupancyCounts.AssetOccupancyCount", b =>
-                {
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("AssetId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<TimeSpan>("StartingTime")
-                        .HasColumnType("time");
-
-                    b.Property<TimeSpan>("Duration")
-                        .HasColumnType("time");
-
-                    b.Property<string>("Asset")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)")
-                        .HasColumnName("ConcurrencyStamp");
-
-                    b.Property<string>("ExtraProperties")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("ExtraProperties");
-
-                    b.Property<Guid?>("TenantId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("TenantId");
-
-                    b.Property<int>("Volume")
-                        .HasColumnType("int");
-
-                    b.HasKey("Date", "AssetId", "StartingTime", "Duration");
-
-                    b.ToTable("EasyAbpBookingServiceAssetOccupancyCounts", (string)null);
                 });
 
             modelBuilder.Entity("EasyAbp.BookingService.AssetPeriodSchemes.AssetPeriodScheme", b =>
