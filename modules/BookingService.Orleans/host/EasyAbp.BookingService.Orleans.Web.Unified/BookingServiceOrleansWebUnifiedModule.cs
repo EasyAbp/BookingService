@@ -162,7 +162,7 @@ public class BookingServiceOrleansWebUnifiedModule : AbpModule
         }
 
         app.UseHttpsRedirection();
-        app.UseStaticFiles();
+        app.MapAbpStaticAssets();
         app.UseRouting();
         app.UseAuthentication();
 
