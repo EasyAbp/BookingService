@@ -1,9 +1,7 @@
 <Project>
-    <PropertyGroup>
-
-        <AbpVersion>9.0.2</AbpVersion>
-        <EasyAbpAbpTreesModuleVersion>2.19.0</EasyAbpAbpTreesModuleVersion>
-        <OrleansVersion>3.7.2</OrleansVersion>
-
-    </PropertyGroup>
+  <PropertyGroup>
+    <AbpVersion>9.1.1</AbpVersion>
+    <EasyAbpAbpTreesModuleVersion>2.20.0</EasyAbpAbpTreesModuleVersion>
+    <OrleansVersion>3.7.2</OrleansVersion>
+  </PropertyGroup>
 </Project>
