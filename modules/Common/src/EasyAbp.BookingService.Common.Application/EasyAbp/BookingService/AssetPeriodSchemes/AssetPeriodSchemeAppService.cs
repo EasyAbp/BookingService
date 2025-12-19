@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using EasyAbp.BookingService.AssetPeriodSchemes.Dtos;
+using EasyAbp.BookingService.Localization;
 using EasyAbp.BookingService.Permissions;
 using Volo.Abp.Application.Services;
 
@@ -23,6 +24,9 @@ public class AssetPeriodSchemeAppService : AbstractKeyCrudAppService<AssetPeriod
     public AssetPeriodSchemeAppService(IAssetPeriodSchemeRepository repository) : base(repository)
     {
         _repository = repository;
+
+        LocalizationResource = typeof(BookingServiceResource);
+        ObjectMapperContext = typeof(BookingServiceCommonApplicationModule);
     }
 
     protected override Task DeleteByIdAsync(AssetPeriodSchemeKey id)

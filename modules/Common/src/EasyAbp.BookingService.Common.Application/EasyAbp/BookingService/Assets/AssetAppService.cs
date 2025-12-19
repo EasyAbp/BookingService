@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using EasyAbp.BookingService.AssetCategories;
 using EasyAbp.BookingService.Assets.Dtos;
 using EasyAbp.BookingService.Dtos;
+using EasyAbp.BookingService.Localization;
 using EasyAbp.BookingService.Permissions;
 using Volo.Abp.Application.Services;
 using Volo.Abp.ObjectExtending;
@@ -31,6 +32,9 @@ public class AssetAppService : CrudAppService<Asset, AssetDto, Guid, GetAssetsRe
         _repository = repository;
         _assetCategoryRepository = assetCategoryRepository;
         _assetManager = assetManager;
+
+        LocalizationResource = typeof(BookingServiceResource);
+        ObjectMapperContext = typeof(BookingServiceCommonApplicationModule);
     }
 
     protected override async Task<IQueryable<Asset>> CreateFilteredQueryAsync(

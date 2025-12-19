@@ -231,8 +231,8 @@ public class BookingServiceOrleansBlazorHostModule : AbpModule
 
         app.UseHttpsRedirection();
         app.UseCorrelationId();
-        app.MapAbpStaticAssets();
         app.UseRouting();
+        app.MapAbpStaticAssets();
         app.UseAuthentication();
         app.UseJwtTokenMiddleware();
 

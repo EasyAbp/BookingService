@@ -6,6 +6,7 @@ using EasyAbp.BookingService.AssetCategories;
 using EasyAbp.BookingService.AssetOccupancies.Dtos;
 using EasyAbp.BookingService.AssetOccupancyProviders;
 using EasyAbp.BookingService.Assets;
+using EasyAbp.BookingService.Localization;
 using EasyAbp.BookingService.Permissions;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
@@ -38,6 +39,9 @@ public class AssetOccupancyAppService : CrudAppService<AssetOccupancy, AssetOccu
         _assetRepository = assetRepository;
         _assetCategoryRepository = assetCategoryRepository;
         _assetOccupancyProvider = assetOccupancyProvider;
+
+        LocalizationResource = typeof(BookingServiceResource);
+        ObjectMapperContext = typeof(BookingServiceCommonApplicationModule);
     }
 
     protected override async Task<IQueryable<AssetOccupancy>> CreateFilteredQueryAsync(
