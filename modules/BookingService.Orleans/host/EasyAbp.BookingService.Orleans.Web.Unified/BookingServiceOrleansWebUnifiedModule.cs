@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using EasyAbp.BookingService.EntityFrameworkCore;
 using EasyAbp.BookingService.MultiTenancy;
 using EasyAbp.BookingService.Web;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.Swagger;
 using Volo.Abp;
 using Volo.Abp.Account;
