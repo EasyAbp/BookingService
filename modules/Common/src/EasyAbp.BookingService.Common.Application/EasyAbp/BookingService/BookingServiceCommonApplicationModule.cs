@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Volo.Abp.AutoMapper;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.Application;
 
@@ -9,16 +9,12 @@ namespace EasyAbp.BookingService;
     typeof(BookingServiceCommonDomainModule),
     typeof(BookingServiceCommonApplicationContractsModule),
     typeof(AbpDddApplicationModule),
-    typeof(AbpAutoMapperModule)
+    typeof(AbpMapperlyModule)
     )]
 public class BookingServiceCommonApplicationModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Services.AddAutoMapperObjectMapper<BookingServiceCommonApplicationModule>();
-        Configure<AbpAutoMapperOptions>(options =>
-        {
-            options.AddMaps<BookingServiceCommonApplicationModule>(validate: true);
-        });
+        context.Services.AddMapperlyObjectMapper<BookingServiceCommonApplicationModule>();
     }
 }

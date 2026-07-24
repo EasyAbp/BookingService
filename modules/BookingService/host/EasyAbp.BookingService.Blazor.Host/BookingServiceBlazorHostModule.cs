@@ -11,7 +11,6 @@ using Volo.Abp.AspNetCore.Components.Web.BasicTheme.Themes.Basic;
 using Volo.Abp.AspNetCore.Components.Web.Theming.Routing;
 using Volo.Abp.AspNetCore.Components.WebAssembly.BasicTheme;
 using Volo.Abp.Autofac.WebAssembly;
-using Volo.Abp.AutoMapper;
 using Volo.Abp.Identity.Blazor.WebAssembly;
 using Volo.Abp.Modularity;
 using Volo.Abp.SettingManagement.Blazor.WebAssembly;
@@ -42,7 +41,6 @@ public class BookingServiceBlazorHostModule : AbpModule
         ConfigureRouter(context);
         ConfigureUI(builder);
         ConfigureMenu(context);
-        ConfigureAutoMapper(context);
     }
 
     private void ConfigureRouter(ServiceConfigurationContext context)
@@ -90,11 +88,4 @@ public class BookingServiceBlazorHostModule : AbpModule
         });
     }
 
-    private void ConfigureAutoMapper(ServiceConfigurationContext context)
-    {
-        Configure<AbpAutoMapperOptions>(options =>
-        {
-            options.AddMaps<BookingServiceBlazorHostModule>();
-        });
-    }
 }

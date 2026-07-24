@@ -4,7 +4,7 @@ using EasyAbp.BookingService.Localization;
 using EasyAbp.BookingService.Web.Menus;
 using Volo.Abp.AspNetCore.Mvc.Localization;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
-using Volo.Abp.AutoMapper;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.UI.Navigation;
 using Volo.Abp.VirtualFileSystem;
@@ -15,7 +15,7 @@ namespace EasyAbp.BookingService.Web;
 [DependsOn(
     typeof(BookingServiceOrleansApplicationContractsModule),
     typeof(AbpAspNetCoreMvcUiThemeSharedModule),
-    typeof(AbpAutoMapperModule),
+    typeof(AbpMapperlyModule),
     typeof(BookingServiceCommonWebModule)
 )]
 public class BookingServiceOrleansWebModule : AbpModule
@@ -42,8 +42,7 @@ public class BookingServiceOrleansWebModule : AbpModule
 
         Configure<AbpVirtualFileSystemOptions>(options => { options.FileSets.AddEmbedded<BookingServiceOrleansWebModule>(); });
 
-        context.Services.AddAutoMapperObjectMapper<BookingServiceOrleansWebModule>();
-        Configure<AbpAutoMapperOptions>(options => { options.AddMaps<BookingServiceOrleansWebModule>(validate: true); });
+        context.Services.AddMapperlyObjectMapper<BookingServiceOrleansWebModule>();
 
         Configure<RazorPagesOptions>(options =>
         {

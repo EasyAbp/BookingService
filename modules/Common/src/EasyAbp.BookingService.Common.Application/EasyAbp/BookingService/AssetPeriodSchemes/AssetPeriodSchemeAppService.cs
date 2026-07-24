@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using EasyAbp.BookingService.AssetPeriodSchemes.Dtos;
 using EasyAbp.BookingService.Localization;
@@ -27,6 +28,25 @@ public class AssetPeriodSchemeAppService : AbstractKeyCrudAppService<AssetPeriod
 
         LocalizationResource = typeof(BookingServiceResource);
         ObjectMapperContext = typeof(BookingServiceCommonApplicationModule);
+    }
+
+    // Mapperly cannot write the aggregate's protected setters, so build/update the entity explicitly.
+    protected override Task<AssetPeriodScheme> MapToEntityAsync(CreateAssetPeriodSchemeDto createInput)
+    {
+        return Task.FromResult(new AssetPeriodScheme(
+            new AssetPeriodSchemeKey
+            {
+                AssetId = createInput.AssetId,
+                Date = createInput.Date
+            },
+            CurrentTenant.Id,
+            createInput.PeriodSchemeId));
+    }
+
+    protected override Task MapToEntityAsync(UpdateAssetPeriodSchemeDto updateInput, AssetPeriodScheme entity)
+    {
+        entity.Update(updateInput.Date);
+        return Task.CompletedTask;
     }
 
     protected override Task DeleteByIdAsync(AssetPeriodSchemeKey id)
