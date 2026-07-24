@@ -7,6 +7,8 @@ using EasyAbp.BookingService.AssetOccupancies.Dtos;
 using EasyAbp.BookingService.AssetPeriodSchemes.Dtos;
 using EasyAbp.BookingService.Assets;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Data;
+using Volo.Abp.ObjectMapping;
 using Xunit;
 
 namespace EasyAbp.BookingService.AssetPeriodSchemes
@@ -15,11 +17,83 @@ namespace EasyAbp.BookingService.AssetPeriodSchemes
     {
         private readonly IAssetPeriodSchemeAppService _assetPeriodSchemeAppService;
         private readonly IAssetPeriodSchemeRepository _assetPeriodSchemeRepository;
+        private readonly IObjectMapper<BookingServiceCommonApplicationModule> _objectMapper;
 
         public AssetPeriodSchemeAppServiceTests()
         {
             _assetPeriodSchemeAppService = GetRequiredService<IAssetPeriodSchemeAppService>();
             _assetPeriodSchemeRepository = GetRequiredService<IAssetPeriodSchemeRepository>();
+            _objectMapper = GetRequiredService<IObjectMapper<BookingServiceCommonApplicationModule>>();
+        }
+
+        [Fact]
+        public async Task Create_Should_Build_Entity_Through_MapToEntity()
+        {
+            // Arrange
+            var assetId = GuidGenerator.Create();
+            var periodSchemeId = GuidGenerator.Create();
+            var date = new DateTime(2022, 6, 20);
+
+            // Act
+            var dto = await WithUnitOfWorkAsync(() => _assetPeriodSchemeAppService.CreateAsync(
+                new CreateAssetPeriodSchemeDto
+                {
+                    AssetId = assetId,
+                    PeriodSchemeId = periodSchemeId,
+                    Date = date
+                }));
+
+            // Assert
+            dto.AssetId.ShouldBe(assetId);
+            dto.PeriodSchemeId.ShouldBe(periodSchemeId);
+            dto.Date.ShouldBe(date);
+
+            var entity = await WithUnitOfWorkAsync(() =>
+                _assetPeriodSchemeRepository.GetAsync(x => x.AssetId == assetId && x.Date == date));
+            entity.PeriodSchemeId.ShouldBe(periodSchemeId);
+        }
+
+        [Fact]
+        public async Task Update_Should_Apply_Input_Through_MapToEntity()
+        {
+            // Arrange
+            var assetId = GuidGenerator.Create();
+            var periodSchemeId = GuidGenerator.Create();
+            var date = new DateTime(2022, 6, 20);
+
+            await WithUnitOfWorkAsync(() => _assetPeriodSchemeRepository.InsertAsync(
+                new AssetPeriodScheme(new AssetPeriodSchemeKey { AssetId = assetId, Date = date }, default,
+                    periodSchemeId)));
+
+            // Act
+            var dto = await WithUnitOfWorkAsync(() => _assetPeriodSchemeAppService.UpdateAsync(
+                new AssetPeriodSchemeKey { AssetId = assetId, Date = date },
+                new UpdateAssetPeriodSchemeDto { Date = date }));
+
+            // Assert
+            dto.AssetId.ShouldBe(assetId);
+            dto.Date.ShouldBe(date);
+            dto.PeriodSchemeId.ShouldBe(periodSchemeId);
+        }
+
+        [Fact]
+        public void ObjectMapper_Should_Map_Entity_To_Dto_Including_ExtraProperties()
+        {
+            // Arrange
+            var entity = new AssetPeriodScheme(
+                new AssetPeriodSchemeKey { AssetId = GuidGenerator.Create(), Date = new DateTime(2022, 6, 20) },
+                default,
+                GuidGenerator.Create());
+            entity.SetProperty("MyExtraProperty", "my-value");
+
+            // Act
+            var dto = _objectMapper.Map<AssetPeriodScheme, AssetPeriodSchemeDto>(entity);
+
+            // Assert
+            dto.AssetId.ShouldBe(entity.AssetId);
+            dto.PeriodSchemeId.ShouldBe(entity.PeriodSchemeId);
+            dto.Date.ShouldBe(entity.Date);
+            dto.GetProperty<string>("MyExtraProperty").ShouldBe("my-value");
         }
 
         [Fact]

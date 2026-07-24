@@ -2,7 +2,7 @@
 using EasyAbp.BookingService.Blazor.Menus;
 using Volo.Abp.AspNetCore.Components.Web.Theming;
 using Volo.Abp.AspNetCore.Components.Web.Theming.Routing;
-using Volo.Abp.AutoMapper;
+using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.UI.Navigation;
 
@@ -11,18 +11,13 @@ namespace EasyAbp.BookingService.Blazor;
 [DependsOn(
     typeof(BookingServiceCommonApplicationContractsModule),
     typeof(AbpAspNetCoreComponentsWebThemingModule),
-    typeof(AbpAutoMapperModule)
+    typeof(AbpMapperlyModule)
     )]
 public class BookingServiceCommonBlazorModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Services.AddAutoMapperObjectMapper<BookingServiceCommonBlazorModule>();
-
-        Configure<AbpAutoMapperOptions>(options =>
-        {
-            options.AddProfile<BookingServiceCommonBlazorAutoMapperProfile>(validate: true);
-        });
+        context.Services.AddMapperlyObjectMapper<BookingServiceCommonBlazorModule>();
 
         Configure<AbpNavigationOptions>(options =>
         {

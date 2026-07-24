@@ -35,4 +35,9 @@ public class AssetPeriodScheme : AuditedAggregateRoot, IMultiTenant
     {
         return new object[] { Date, AssetId };
     }
+
+    public void Update(DateTime date)
+    {
+        Date = date;
+    }
 }
